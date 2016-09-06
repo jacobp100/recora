@@ -9,7 +9,7 @@ const OPERATOR_MULTIPLY = 'multiply';
 const OPERATOR_DIVIDE = 'divide';
 const OPERATOR_ADD = 'add';
 const OPERATOR_SUBTRACT = 'subtract';
-const OPERATOR_MODULO = 'modulo';
+const OPERATOR_NEGATE = 'negate';
 
 type TokenType = string;
 
@@ -205,13 +205,14 @@ const tokenizer = createTokenizer({
     { match: '/', token: { type: TOKEN_OPERATOR, value: OPERATOR_DIVIDE }, penalty: -1000 },
     { match: '+', token: { type: TOKEN_OPERATOR, value: OPERATOR_ADD }, penalty: -1000 },
     { match: '-', token: { type: TOKEN_OPERATOR, value: OPERATOR_SUBTRACT }, penalty: -1000 },
-    { match: '%', token: { type: TOKEN_OPERATOR, value: OPERATOR_MODULO }, penalty: -1000 },
+    { match: '-', token: { type: TOKEN_OPERATOR, value: OPERATOR_NEGATE }, penalty: -500 },
   ],
   unit: [
     wordMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: oneWordUnits, penalty: -400 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
+    { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },
   ],
   color: [
     { match: /#[0-9a-f]{3,8}/, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -500 },
