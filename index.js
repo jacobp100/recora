@@ -1,6 +1,7 @@
 // @flow
 import {
-  __, startsWith, last, get, map, flatMap, mapValues, flow, assign, includes, sortBy,
+  __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy, has, curry, join,
+  range,
 } from 'lodash/fp';
 
 const OPERATOR_EXPONENT = 'exponent';
@@ -14,7 +15,11 @@ type TokenType = string;
 
 const TOKEN_OPERATOR: TokenType = 'operator';
 const TOKEN_NUMBER: TokenType = 'number';
-const TOKEN_UNIT: TokenType = 'unit';
+const TOKEN_UNIT_NAME: TokenType = 'unit-name';
+const TOKEN_UNIT_PREFIX: TokenType = 'unit-prefix';
+const TOKEN_UNIT_SUFFIX: TokenType = 'unit-suffix';
+const TOKEN_OPEN_BRAKET: TokenType = 'open-bracket';
+const TOKEN_CLOSE_BRAKET: TokenType = 'close-bracket';
 const TOKEN_COLOR: TokenType = 'color';
 const TOKEN_NOOP: TokenType = 'noop';
 const TOKEN_VECTOR_START: TokenType = 'vector-start';
@@ -23,25 +28,26 @@ const TOKEN_VECTOR_END: TokenType = 'vector-end';
 
 type Token = { type: TokenType, value?: any, start?: number, end?: number };
 
-type TokenMatcher = (RegExp | string);
 type TokenTransform = (token: string) => ?Token;
-type Transform = {
-  match: TokenMatcher,
+type TokenizerSpecEntry = {
+  match: RegExp | string,
   penalty: number,
-  token?: TokenTransform | Token,
+  token?: TokenTransform | ?Token,
   push?: string[],
   pop?: boolean | number,
+  updateState?: (state: Object) => Object
 };
-type TransformRef = {
+type TokenizerSpecEntryRef = {
   ref: string,
-  match?: TokenMatcher,
+  match?: RegExp | string,
   penalty?: number,
-  token?: TokenTransform | Token,
+  token?: TokenTransform | ?Token,
   push?: string[],
   pop?: boolean | number,
+  updateState?: (state: Object) => Object
 }
 
-type TokenizerSpec = ({ [key:string]: (Transform | TransformRef)[] });
+type TokenizerSpec = ({ [key:string]: (TokenizerSpecEntry | TokenizerSpecEntryRef)[] });
 type TokenizerState = {
   character: number,
   stack: string[],
@@ -50,14 +56,15 @@ type TokenizerState = {
   tokens: Token[],
 };
 
-const defaultState = {
+const defaultTokenizerState = {
   character: 0,
   stack: ['default'],
   penalty: 0,
   remainingText: '',
   tokens: [],
+  userState: {},
 };
-const createTokenizer = (inputSpec: TokenizerSpec) => {
+const createTokenizer = (inputSpec: TokenizerSpec, defaultUserState = {}) => {
   const flattenRefs = flatMap(option => (
     !option.ref
       ? option
@@ -93,9 +100,16 @@ const createTokenizer = (inputSpec: TokenizerSpec) => {
       if (!matchedText) continue;
 
       const token = typeof option.token === 'function'
-        ? option.token(matchedText)
+        ? option.token(matchedText, state.userState)
         : option.token;
 
+      /*
+      FIXME:
+      Currently the behaviour is if the token is null, don't advance the parser
+      If it's undefined, do advance the parser, but don't log the token
+      Otherwise log the token and advance the parser
+      We need all three of these cases, but it needs to be more explicit
+      */
       if (token === null) continue;
 
       const end = state.character + matchedText.length;
@@ -104,10 +118,15 @@ const createTokenizer = (inputSpec: TokenizerSpec) => {
         ? [...state.tokens, token]
         : state.tokens;
 
-      let stack = state.stack;
+      let { stack, userState } = state;
+
       if (typeof option.pop === 'boolean') stack = stack.slice(0, -1);
       if (typeof option.pop === 'number') stack = stack.slice(0, -option.pop);
       if (option.push) stack = stack.concat(option.push);
+
+      if (typeof option.updateState === 'function') {
+        userState = { ...userState, ...option.updateState(userState) };
+      }
 
       yield* tokenizer({
         penalty: state.penalty + option.penalty,
@@ -115,15 +134,17 @@ const createTokenizer = (inputSpec: TokenizerSpec) => {
         character: end,
         stack,
         tokens,
+        userState,
       });
     }
   }
   /* eslint-enable */
 
 
-  return text => {
+  return (text, initialUserState = {}) => {
     let results = [];
-    for (const result of tokenizer({ ...defaultState, remainingText: text })) {
+    const userState = { ...defaultUserState, ...initialUserState };
+    for (const result of tokenizer({ ...defaultTokenizerState, userState, remainingText: text })) {
       results.push(result);
     }
     results = flow(
@@ -134,8 +155,43 @@ const createTokenizer = (inputSpec: TokenizerSpec) => {
   };
 };
 
-const twoWordUnits = ['degrees celsius', 'degree celsius'];
-const oneWordUnits = ['meters', 'meter', 'yard', 'yards', 'inches'];
+const twoWordUnits = {
+  'degrees celsius': 'celsius',
+  'degree celsius': 'celsius',
+};
+const oneWordUnits = {
+  meters: 'meter',
+  meter: 'meter',
+  yard: 'yard',
+  yards: 'yard',
+  inches: 'inch',
+  second: 'second',
+};
+
+const unitPrefixes = {
+  per: -1,
+  square: 2,
+  cubic: 3,
+};
+const unitSuffixes = {
+  squared: 2,
+  cubed: 3,
+};
+
+const when = curry((fn, transform) => value => (fn(value) ? transform(value) : null));
+
+const wordRegexpCreator = flow(
+  range(0),
+  map(() => '[a-z]+'),
+  join('\\s+'),
+  str => new RegExp(str, 'i')
+);
+
+const wordMatcher = ({ words, type, dictionary, penalty }) => ({
+  token: when(has(__, dictionary), token => ({ type, value: dictionary[token] })),
+  match: wordRegexpCreator(words),
+  penalty,
+});
 
 /* eslint-disable max-len */
 const tokenizer = createTokenizer({
@@ -152,19 +208,27 @@ const tokenizer = createTokenizer({
     { match: '%', token: { type: TOKEN_OPERATOR, value: OPERATOR_MODULO }, penalty: -1000 },
   ],
   unit: [
-    {
-      match: /[a-z]+\s+[a-z]+/i,
-      token: token => (includes(token, twoWordUnits) ? ({ type: TOKEN_UNIT, value: token }) : null),
-      penalty: -120,
-    },
-    {
-      match: /[a-z]+/i,
-      token: token => (includes(token, oneWordUnits) ? ({ type: TOKEN_UNIT, value: token }) : null),
-      penalty: -100,
-    },
+    wordMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
+    wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: oneWordUnits, penalty: -400 }),
+    wordMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
+    wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
   ],
   color: [
     { match: /#[0-9a-f]{3,8}/, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -500 },
+  ],
+  brackets: [
+    {
+      match: '(',
+      token: (token, state) => ({ type: TOKEN_OPEN_BRAKET, value: state.bracketLevel }),
+      penalty: -1000,
+      updateState: state => ({ bracketLevel: state.bracketLevel + 1 }),
+    },
+    {
+      match: ')',
+      token: (token, state) => ({ type: TOKEN_CLOSE_BRAKET, value: state.bracketLevel - 1 }),
+      penalty: -1000,
+      updateState: state => ({ bracketLevel: state.bracketLevel - 1 }),
+    },
   ],
   noop: [
     { match: /[a-z]+/i, token: { type: TOKEN_NOOP }, penalty: 10 },
@@ -173,44 +237,59 @@ const tokenizer = createTokenizer({
     { match: /\s+/, penalty: 0 },
   ],
   otherCharacter: [
-    // No numbers, whitespace, or operators (the less this catches, the better the perf)
-    { match: /[^\w\s*^/+\-%]/, penalty: 1000 },
+    // No numbers, whitespace, operators, or brackets
+    // the less this catches, the better the perf
+    { match: /[^\w\s*^/+\-%()\[\]]/, penalty: 1000 },
   ],
-  vectorComma: [
-    { match: ',', token: { type: TOKEN_VECTOR_SEPARATOR }, penalty: 0, pop: true },
-    { ref: 'vectorMisc' },
-  ],
-  vectorNumber: [
-    { ref: 'number', push: ['vectorComma'] },
-    { ref: 'vectorMisc' },
-  ],
-  vectorMisc: [
-    { match: ']', token: { type: TOKEN_VECTOR_END }, penalty: 0, pop: true },
+  // vectorElementSeparator: [
+  //   { match: ',', token: { type: TOKEN_VECTOR_SEPARATOR }, penalty: 0, pop: true },
+  //   { ref: 'vectorMisc' },
+  // ],
+  // vectorElement: [
+  //   { ref: 'vector' },
+  //   { ref: 'number', push: ['vectorElementSeparator'] },
+  //   { ref: 'vectorMisc' },
+  // ],
+  // vectorMisc: [
+  //   { match: ']', token: { type: TOKEN_VECTOR_END }, penalty: 0, pop: true },
+  //   { ref: 'whitespace' },
+  // ],
+  // vector: [
+  //   { match: '[', token: { type: TOKEN_VECTOR_START }, penalty: -500, push: ['vectorElement'] },
+  // ],
+  vectorBody: [
+    { ref: 'vector' },
+    { ref: 'number' },
     { ref: 'whitespace' },
+    { match: ',', token: { type: TOKEN_VECTOR_SEPARATOR }, penalty: 0 },
+    { match: ']', token: { type: TOKEN_VECTOR_END }, penalty: 0, pop: true },
   ],
   vector: [
-    { match: '[', token: { type: TOKEN_VECTOR_START }, penalty: -500, push: ['vectorNumber'] },
+    { match: '[', token: { type: TOKEN_VECTOR_START }, penalty: -500, push: ['vectorBody'] },
   ],
   default: [
     { ref: 'operator' },
     { ref: 'number' },
     { ref: 'unit' },
     { ref: 'color' },
+    { ref: 'brackets' },
     { ref: 'vector' },
     { ref: 'noop' },
     { ref: 'whitespace' },
     { ref: 'otherCharacter' },
   ],
+}, {
+  bracketLevel: 0,
 });
 /* eslint-enable */
 
-const input = '1 meter + 1 yard to inches';
+const input = '[[1, 2], [3, 4]]';
 console.time('first run');
 console.log(tokenizer(input));
 console.timeEnd('first run');
-console.time('second run');
-tokenizer(input);
-console.timeEnd('second run');
-console.time('third run');
-tokenizer(input);
-console.timeEnd('third run');
+// console.time('second run');
+// tokenizer(input);
+// console.timeEnd('second run');
+// console.time('third run');
+// tokenizer(input);
+// console.timeEnd('third run');
