@@ -171,7 +171,9 @@ export class Wildcard extends BaseMatcher {
 export class Pattern extends BaseMatcher {
   * getSubmatches(iteration, remainingPatterns, index, captureRanges, array) {
     if (array.length === 0) {
-      if (remainingPatterns.length === 0) yield { index, captureRanges, array };
+      if (remainingPatterns.length === 0 && iteration >= this.start) {
+        yield { index, captureRanges, array };
+      }
       return;
     }
 
@@ -186,7 +188,7 @@ export class Pattern extends BaseMatcher {
           match.array
         );
       }
-    } else {
+    } else if (iteration < this.end) {
       yield* this.getSubmatches(
         iteration + 1,
         this.pattern,
@@ -198,7 +200,7 @@ export class Pattern extends BaseMatcher {
   }
 
   * getMatches(index: number, captureRanges: IndexRange[], array: string[]) {
-    yield* this.getSubmatches(0, this.pattern, index, captureRanges, array);
+    yield* this.getSubmatches(1, this.pattern, index, captureRanges, array);
   }
 }
 
