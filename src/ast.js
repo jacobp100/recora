@@ -215,13 +215,3 @@ console.log(
     ])
   )
 );
-
-// const transform = [
-//   new Pattern([
-//     new Element(TOKEN_OPERATOR).negate().any(),
-//     new Pattern([
-//       new Element(TOKEN_OPERATOR),
-//       new Element(TOKEN_OPERATOR).negate().any(),
-//     ]).oneOrMore(),
-//   ]),
-// ];
