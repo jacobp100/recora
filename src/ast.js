@@ -1,6 +1,6 @@
 // @flow
 /* eslint-disable no-unused-vars */
-import { first, last, reduce, zip, flow, map, propertyOf } from 'lodash/fp';
+import { first, last, reduce, zip, flow, map, propertyOf, some, isEmpty } from 'lodash/fp';
 import {
   TOKEN_OPERATOR_EXPONENT,
   TOKEN_OPERATOR_MULTIPLY,
@@ -20,7 +20,8 @@ import {
   TOKEN_VECTOR_SEPARATOR,
   TOKEN_VECTOR_END,
   TAG_BRACKETS,
-  TAG_BILINEAR_OPERATION,
+  TAG_OPERATOR_UNARY,
+  TAG_OPERATOR_BILINEAR,
 } from './types';
 /* eslint-enable */
 import type { Token } from './types'; // eslint-disable-line
@@ -92,8 +93,18 @@ const evenNumbers = everyOtherFrom(0);
 const oddNumbers = everyOtherFrom(1);
 
 const bileanerOperationTypes = {
-  [TOKEN_OPERATOR_MULTIPLY]: 'multiply',
-  [TOKEN_OPERATOR_DIVIDE]: 'divide',
+  [TOKEN_OPERATOR_NEGATE]: {
+    tagType: TAG_OPERATOR_UNARY,
+    operatorType: 'negate',
+  },
+  [TOKEN_OPERATOR_MULTIPLY]: {
+    tagType: TAG_OPERATOR_BILINEAR,
+    operatorType: 'multiply',
+  },
+  [TOKEN_OPERATOR_DIVIDE]: {
+    tagType: TAG_OPERATOR_BILINEAR,
+    operatorType: 'multiply',
+  },
 };
 
 const getOperatorTypes = flow(
@@ -103,32 +114,41 @@ const getOperatorTypes = flow(
   map(propertyOf(bileanerOperationTypes)),
 );
 
-const multiplyDivideTransform = {
+const createOperatorTransform = operators => ({
   pattern: new Pattern([
-    new ElementOptions([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]).negate().lazy().any(),
+    new ElementOptions(operators).negate().lazy().any(),
     new Pattern([
-      new ElementOptions([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
-      new ElementOptions([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]).negate().lazy().any(),
+      new ElementOptions(operators),
+      new ElementOptions(operators).negate().lazy().any(),
     ]).oneOrMore(),
   ]),
   transform: (captureGroups, transform) => transform(evenNumbers(captureGroups), segments => {
+    /*
+    FIXME:
+      * Add direction support
+      * Don't ignore lhs on unary
+        * I think it's inevitable that we'll just have to pass in at arbitrary transform function
+          for this
+    */
+
+    // if (some(isEmpty, segments)) return null;
+
     const operatorTypes = getOperatorTypes(captureGroups);
     const [firstSegment, ...remainingSegments] = segments;
 
-    return reduce((lhs, [operatorType, rhs]) => ({
-      type: TAG_BILINEAR_OPERATION,
-      value: {
-        type: operatorType,
-        lhs,
-        rhs,
-      },
+    return reduce((lhs, [{ tagType, operatorType }, rhs]) => ({
+      type: tagType,
+      value: tagType === TAG_OPERATOR_UNARY
+        ? { type: operatorType, value: rhs }
+        : { type: operatorType, lhs, rhs },
     }), firstSegment, zip(operatorTypes, remainingSegments));
   }),
-};
+});
 
 const transformTokens = createTransformer([
   bracketTransform,
-  multiplyDivideTransform,
+  createOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
+  createOperatorTransform([TOKEN_OPERATOR_NEGATE]),
 ]);
 
 console.log(
@@ -141,6 +161,7 @@ console.log(
       { type: TOKEN_BRACKET_OPEN },
       { type: TOKEN_NUMBER },
       { type: TOKEN_OPERATOR_MULTIPLY },
+      { type: TOKEN_OPERATOR_NEGATE },
       { type: TOKEN_NUMBER },
       { type: TOKEN_BRACKET_CLOSE },
       { type: TOKEN_UNIT_NAME },
