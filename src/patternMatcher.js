@@ -31,6 +31,14 @@ class BaseMatcher {
     return this.from(1).to(Infinity);
   }
 
+  negate() {
+    return set('isNegative', true, this);
+  }
+
+  lazy() {
+    return set('isLazy', true, this);
+  }
+
   match(tokens) {
     const types = map('type', tokens);
 
@@ -49,14 +57,6 @@ class BaseMatcher {
 }
 
 class BaseElementMatcher extends BaseMatcher {
-  negate() {
-    return set('isNegative', true, this);
-  }
-
-  lazy() {
-    return set('isLazy', true, this);
-  }
-
   * getLazyMatchesFrom(
     startI: number,
     end: number,
@@ -151,32 +151,50 @@ export class Wildcard extends BaseElementMatcher {
 
 export class Pattern extends BaseMatcher {
   * getSubmatches(iteration, remainingPatterns, index, captureRanges, array) {
-    if (array.length === 0) {
-      if (remainingPatterns.length === 0 && iteration >= this.start) {
+    const numRemainingPatterns = remainingPatterns.length;
+    const isLastPattern = numRemainingPatterns === 1;
+
+    if (numRemainingPatterns === 0) {
+      if (iteration >= this.start) {
+        // Completed an iteration and we completed the minimum number of iterations
         yield { index, captureRanges, array };
       }
-      return;
-    }
 
-    if (remainingPatterns.length > 0) {
-      const remainingPattern = remainingPatterns[0];
-      for (const match of remainingPattern.getMatches(index, captureRanges, array)) {
+      if (iteration < this.end) {
         yield* this.getSubmatches(
-          iteration,
-          remainingPatterns.slice(1),
-          match.index,
-          match.captureRanges,
-          match.array
+          iteration + 1,
+          this.pattern,
+          index,
+          captureRanges,
+          array
         );
       }
-    } else if (iteration < this.end) {
-      yield* this.getSubmatches(
-        iteration + 1,
-        this.pattern,
-        index,
-        captureRanges,
-        array
-      );
+    } else if (numRemainingPatterns > 0) {
+      const remainingPattern = remainingPatterns[0];
+      let didMatchSubCase = false;
+
+      for (const match of remainingPattern.getMatches(index, captureRanges, array)) {
+        didMatchSubCase = true;
+
+        if (isLastPattern && match.array.length === 0) {
+          yield match;
+        } else {
+          yield* this.getSubmatches(
+            iteration,
+            remainingPatterns.slice(1),
+            match.index,
+            match.captureRanges,
+            match.array
+          );
+        }
+      }
+
+      const matchedNothing = !didMatchSubCase && remainingPatterns.length === this.pattern.length;
+
+      if (matchedNothing && iteration >= this.start) {
+        // Pattern matched nothing and that is permitted (new Pattern().any())
+        yield { index, captureRanges, array };
+      }
     }
   }
 

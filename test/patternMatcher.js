@@ -284,3 +284,269 @@ test(
   [{ type: TOKEN_NUMBER }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
 );
+
+test(
+  'Pattern should match with wildcards',
+  shouldMatch,
+  new Pattern([new Element(TOKEN_COLOR), new Wildcard().any(), new Element(TOKEN_COLOR)]),
+  {
+    input: [
+      { type: TOKEN_COLOR },
+      { type: TOKEN_UNIT_NAME },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+    ],
+    expected: [
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_UNIT_NAME }, { type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+    ],
+  },
+);
+
+test(
+  'Patterns should be able to repeat',
+  shouldMatch,
+  new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_NUMBER)]).any(),
+  {
+    input: [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
+    expected: [[{ type: TOKEN_COLOR }], [{ type: TOKEN_NUMBER }]],
+  },
+  {
+    input: [
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+    ],
+    expected: [
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+    ],
+    expected: [
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+    ],
+  },
+);
+
+test(
+  'Patterns should be able to match sub patterns',
+  shouldMatch,
+  new Pattern([
+    new Element(TOKEN_BRACKET_OPEN),
+    new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_NUMBER)]).any(),
+    new Element(TOKEN_BRACKET_CLOSE),
+  ]),
+  {
+    input: [{ type: TOKEN_BRACKET_OPEN }, { type: TOKEN_BRACKET_CLOSE }],
+    expected: [[{ type: TOKEN_BRACKET_OPEN }], [{ type: TOKEN_BRACKET_CLOSE }]],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+);
+
+test(
+  'Patterns should not incorrectly sub patterns',
+  shouldNotMatch,
+  new Pattern([
+    new Element(TOKEN_BRACKET_OPEN),
+    new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_NUMBER)]).any(),
+    new Element(TOKEN_BRACKET_CLOSE),
+  ]),
+  [
+    { type: TOKEN_BRACKET_OPEN },
+  ],
+  [
+    { type: TOKEN_BRACKET_OPEN },
+    { type: TOKEN_COLOR },
+    { type: TOKEN_BRACKET_CLOSE },
+  ],
+  [
+    { type: TOKEN_BRACKET_OPEN },
+    { type: TOKEN_COLOR },
+    { type: TOKEN_NUMBER },
+  ],
+  [
+    { type: TOKEN_BRACKET_OPEN },
+    { type: TOKEN_COLOR },
+    { type: TOKEN_NUMBER },
+    { type: TOKEN_COLOR },
+    { type: TOKEN_BRACKET_CLOSE },
+  ],
+  [
+    { type: TOKEN_BRACKET_OPEN },
+    { type: TOKEN_COLOR },
+    { type: TOKEN_NUMBER },
+    { type: TOKEN_NUMBER },
+    { type: TOKEN_COLOR },
+    { type: TOKEN_NUMBER },
+    { type: TOKEN_BRACKET_CLOSE },
+  ],
+);
+
+test(
+  'Patterns should be able to match sub-sub-patterns',
+  shouldMatch,
+  new Pattern([
+    new Element(TOKEN_BRACKET_OPEN),
+    new Pattern([
+      new Element(TOKEN_COLOR),
+      new Pattern([
+        new Element(TOKEN_UNIT_PREFIX),
+        new Element(TOKEN_UNIT_NAME),
+        new Element(TOKEN_UNIT_SUFFIX),
+      ]).any(),
+      new Element(TOKEN_NUMBER),
+    ]).any(),
+    new Element(TOKEN_BRACKET_CLOSE),
+  ]),
+  {
+    input: [{ type: TOKEN_BRACKET_OPEN }, { type: TOKEN_BRACKET_CLOSE }],
+    expected: [[{ type: TOKEN_BRACKET_OPEN }], [{ type: TOKEN_BRACKET_CLOSE }]],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_UNIT_PREFIX },
+      { type: TOKEN_UNIT_NAME },
+      { type: TOKEN_UNIT_SUFFIX },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_UNIT_PREFIX }],
+      [{ type: TOKEN_UNIT_NAME }],
+      [{ type: TOKEN_UNIT_SUFFIX }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_COLOR },
+      { type: TOKEN_UNIT_PREFIX },
+      { type: TOKEN_UNIT_NAME },
+      { type: TOKEN_UNIT_SUFFIX },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_UNIT_PREFIX }],
+      [{ type: TOKEN_UNIT_NAME }],
+      [{ type: TOKEN_UNIT_SUFFIX }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+);

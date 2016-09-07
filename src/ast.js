@@ -18,7 +18,7 @@ console.log(
     new Element(TOKEN_BRACKET_OPEN),
     new ElementOptions([TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE]).negate().lazy().any(),
     new Element(TOKEN_BRACKET_CLOSE),
-    new Wildcard().lazy(),
+    new Wildcard().any().lazy(),
   ])).match([
     { type: TOKEN_NUMBER },
     { type: TOKEN_NUMBER },
