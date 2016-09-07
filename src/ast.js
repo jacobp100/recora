@@ -94,21 +94,29 @@ const everyOtherFrom = from => array => {
 const evenNumbers = everyOtherFrom(0);
 const oddNumbers = everyOtherFrom(1);
 
+const NO_DIRECTION = 0;
+const FORWARD = 0;
+const BACKWARD = 1;
+
 const bileanerOperationTypes = {
   [TOKEN_OPERATOR_NEGATE]: {
     tagType: TAG_OPERATOR_UNARY,
+    arity: FORWARD,
     operatorType: 'negate',
   },
   [TOKEN_OPERATOR_EXPONENT]: {
     tagType: TAG_OPERATOR_BILINEAR,
+    arity: NO_DIRECTION,
     operatorType: 'exponent',
   },
   [TOKEN_OPERATOR_MULTIPLY]: {
     tagType: TAG_OPERATOR_BILINEAR,
+    arity: NO_DIRECTION,
     operatorType: 'multiply',
   },
   [TOKEN_OPERATOR_DIVIDE]: {
     tagType: TAG_OPERATOR_BILINEAR,
+    arity: NO_DIRECTION,
     operatorType: 'multiply',
   },
 };
@@ -120,15 +128,21 @@ const getOperatorTypes = flow(
   map(propertyOf(bileanerOperationTypes)),
 );
 
-const FORWARD = 0;
-const BACKWARD = 1;
+const createBilinearTag = (type, lhs, rhs) => (
+  (isEmpty(lhs) || isEmpty(rhs))
+    ? null
+    : { type: TAG_OPERATOR_BILINEAR, value: { type, lhs, rhs } }
+);
 
-const createTag = ({ tagType, operatorType }, lhs, rhs) => ({
-  type: tagType,
-  value: tagType === TAG_OPERATOR_UNARY
-    ? { type: operatorType, value: rhs }
-    : { type: operatorType, lhs, rhs },
-});
+const createUnaryTag = (type, value) => ({ type: TAG_OPERATOR_UNARY, value: { type, value } });
+
+const createTag = ({ tagType, arity, operatorType }, lhs, rhs) => (
+  tagType === TAG_OPERATOR_UNARY
+    ? createUnaryTag(tagType, arity === FORWARD ? rhs : lhs)
+    : createBilinearTag(tagType, lhs, rhs)
+);
+
+const propagateNull = cb => (accum, value) => ((accum === null) ? null : cb(accum, value));
 
 const createOperatorTransform = (operators, direction) => ({
   pattern: new Pattern([
@@ -141,11 +155,8 @@ const createOperatorTransform = (operators, direction) => ({
   transform: (captureGroups, transform) => transform(evenNumbers(captureGroups), segments => {
     /*
     FIXME: Don't ignore lhs on unary. I think it's inevitable that we'll just have to pass in at
-    arbitrary transform function for this. Also fix the return value for blops when segments are
-    empty.
+    arbitrary transform function for this.
     */
-
-    // if (some(isEmpty, segments)) return null;
 
     const operatorTypes = getOperatorTypes(captureGroups);
 
@@ -153,17 +164,17 @@ const createOperatorTransform = (operators, direction) => ({
       const initialSegment = last(segments);
       const remainingSegments = dropRight(1, segments);
 
-      return reduceRight((lhs, [operator, rhs]) => (
+      return reduceRight(propagateNull((lhs, [operator, rhs]) => (
         createTag(operator, rhs, lhs)
-      ), initialSegment, zip(operatorTypes, remainingSegments));
+      )), initialSegment, zip(operatorTypes, remainingSegments));
     }
 
 
     const [initialSegment, ...remainingSegments] = segments;
 
-    return reduce((lhs, [operator, rhs]) => (
+    return reduce(propagateNull((lhs, [operator, rhs]) => (
       createTag(operator, lhs, rhs)
-    ), initialSegment, zip(operatorTypes, remainingSegments));
+    )), initialSegment, zip(operatorTypes, remainingSegments));
   }),
 });
 
