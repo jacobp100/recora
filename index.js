@@ -3,30 +3,13 @@ import {
   __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy, has, curry, join,
   range,
 } from 'lodash/fp';
-
-const OPERATOR_EXPONENT = 'exponent';
-const OPERATOR_MULTIPLY = 'multiply';
-const OPERATOR_DIVIDE = 'divide';
-const OPERATOR_ADD = 'add';
-const OPERATOR_SUBTRACT = 'subtract';
-const OPERATOR_NEGATE = 'negate';
-
-type TokenType = string;
-
-const TOKEN_OPERATOR: TokenType = 'operator';
-const TOKEN_NUMBER: TokenType = 'number';
-const TOKEN_UNIT_NAME: TokenType = 'unit-name';
-const TOKEN_UNIT_PREFIX: TokenType = 'unit-prefix';
-const TOKEN_UNIT_SUFFIX: TokenType = 'unit-suffix';
-const TOKEN_OPEN_BRAKET: TokenType = 'open-bracket';
-const TOKEN_CLOSE_BRAKET: TokenType = 'close-bracket';
-const TOKEN_COLOR: TokenType = 'color';
-const TOKEN_NOOP: TokenType = 'noop';
-const TOKEN_VECTOR_START: TokenType = 'vector-start';
-const TOKEN_VECTOR_SEPARATOR: TokenType = 'vector-separator';
-const TOKEN_VECTOR_END: TokenType = 'vector-end';
-
-type Token = { type: TokenType, value?: any, start?: number, end?: number };
+import {
+  OPERATOR_EXPONENT, OPERATOR_MULTIPLY, OPERATOR_DIVIDE, OPERATOR_ADD, OPERATOR_SUBTRACT,
+  OPERATOR_NEGATE, TOKEN_OPERATOR, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX,
+  TOKEN_UNIT_SUFFIX, TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE, TOKEN_COLOR, TOKEN_NOOP,
+  TOKEN_VECTOR_START, TOKEN_VECTOR_SEPARATOR, TOKEN_VECTOR_END,
+} from './types';
+import type { Token } from './types'; // eslint-disable-line
 
 type TokenTransform = (token: string) => ?Token;
 type TokenizerSpecEntry = {
@@ -220,13 +203,13 @@ const tokenizer = createTokenizer({
   brackets: [
     {
       match: '(',
-      token: (token, state) => ({ type: TOKEN_OPEN_BRAKET, value: state.bracketLevel }),
+      token: (token, state) => ({ type: TOKEN_BRACKET_OPEN, value: state.bracketLevel }),
       penalty: -1000,
       updateState: state => ({ bracketLevel: state.bracketLevel + 1 }),
     },
     {
       match: ')',
-      token: (token, state) => ({ type: TOKEN_CLOSE_BRAKET, value: state.bracketLevel - 1 }),
+      token: (token, state) => ({ type: TOKEN_BRACKET_CLOSE, value: state.bracketLevel - 1 }),
       penalty: -1000,
       updateState: state => ({ bracketLevel: state.bracketLevel - 1 }),
     },
