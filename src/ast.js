@@ -134,12 +134,15 @@ const createBilinearTag = (type, lhs, rhs) => (
     : { type: TAG_OPERATOR_BILINEAR, value: { type, lhs, rhs } }
 );
 
-const createUnaryTag = (type, value) => ({ type: TAG_OPERATOR_UNARY, value: { type, value } });
+const createUnaryTag = (type, argument) => ({
+  type: TAG_OPERATOR_UNARY,
+  value: { type, argument },
+});
 
 const createTag = ({ tagType, arity, operatorType }, lhs, rhs) => (
   tagType === TAG_OPERATOR_UNARY
-    ? createUnaryTag(tagType, arity === FORWARD ? rhs : lhs)
-    : createBilinearTag(tagType, lhs, rhs)
+    ? createUnaryTag(operatorType, arity === FORWARD ? rhs : lhs)
+    : createBilinearTag(operatorType, lhs, rhs)
 );
 
 const propagateNull = cb => (accum, value) => ((accum === null) ? null : cb(accum, value));
@@ -180,9 +183,9 @@ const createOperatorTransform = (operators, direction) => ({
 
 const transformTokens = createTransformer([
   bracketTransform,
+  createOperatorTransform([TOKEN_OPERATOR_ADD, TOKEN_OPERATOR_SUBTRACT], FORWARD),
   createOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE], FORWARD),
-  createOperatorTransform([TOKEN_OPERATOR_NEGATE], FORWARD),
-  createOperatorTransform([TOKEN_OPERATOR_EXPONENT], BACKWARD),
+  createOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE], BACKWARD),
 ]);
 
 console.log(
@@ -195,11 +198,11 @@ console.log(
       { type: TOKEN_BRACKET_OPEN },
       { type: TOKEN_NUMBER, value: 2 },
       { type: TOKEN_OPERATOR_EXPONENT },
+      { type: TOKEN_OPERATOR_NEGATE },
       { type: TOKEN_NUMBER, value: 3 },
       { type: TOKEN_OPERATOR_EXPONENT },
       { type: TOKEN_NUMBER, value: 4 },
       { type: TOKEN_OPERATOR_MULTIPLY },
-      { type: TOKEN_OPERATOR_NEGATE },
       { type: TOKEN_NUMBER },
       { type: TOKEN_BRACKET_CLOSE },
       { type: TOKEN_UNIT_NAME },
