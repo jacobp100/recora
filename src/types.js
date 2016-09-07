@@ -1,25 +1,25 @@
 // @flow
 
-export const OPERATOR_EXPONENT = 'exponent';
-export const OPERATOR_MULTIPLY = 'multiply';
-export const OPERATOR_DIVIDE = 'divide';
-export const OPERATOR_ADD = 'add';
-export const OPERATOR_SUBTRACT = 'subtract';
-export const OPERATOR_NEGATE = 'negate';
-
 export type TokenType = string;
-
-export const TOKEN_OPERATOR: TokenType = 'operator';
-export const TOKEN_NUMBER: TokenType = 'number';
-export const TOKEN_UNIT_NAME: TokenType = 'unit-name';
-export const TOKEN_UNIT_PREFIX: TokenType = 'unit-prefix';
-export const TOKEN_UNIT_SUFFIX: TokenType = 'unit-suffix';
-export const TOKEN_BRACKET_OPEN: TokenType = 'open-bracket';
-export const TOKEN_BRACKET_CLOSE: TokenType = 'close-bracket';
-export const TOKEN_COLOR: TokenType = 'color';
-export const TOKEN_NOOP: TokenType = 'noop';
-export const TOKEN_VECTOR_START: TokenType = 'vector-start';
-export const TOKEN_VECTOR_SEPARATOR: TokenType = 'vector-separator';
-export const TOKEN_VECTOR_END: TokenType = 'vector-end';
-
 export type Token = { type: TokenType, value?: any, start?: number, end?: number };
+
+export const TOKEN_OPERATOR_EXPONENT: TokenType = 'TOKEN_OPERATOR_EXPONENT';
+export const TOKEN_OPERATOR_MULTIPLY: TokenType = 'TOKEN_OPERATOR_MULTIPLY';
+export const TOKEN_OPERATOR_DIVIDE: TokenType = 'TOKEN_OPERATOR_DIVIDE';
+export const TOKEN_OPERATOR_ADD: TokenType = 'TOKEN_OPERATOR_ADD';
+export const TOKEN_OPERATOR_SUBTRACT: TokenType = 'TOKEN_OPERATOR_SUBTRACT';
+export const TOKEN_OPERATOR_NEGATE: TokenType = 'TOKEN_OPERATOR_NEGATE';
+export const TOKEN_NUMBER: TokenType = 'TOKEN_NUMBER';
+export const TOKEN_UNIT_NAME: TokenType = 'TOKEN_UNIT_NAME';
+export const TOKEN_UNIT_PREFIX: TokenType = 'TOKEN_UNIT_PREFIX';
+export const TOKEN_UNIT_SUFFIX: TokenType = 'TOKEN_UNIT_SUFFIX';
+export const TOKEN_BRACKET_OPEN: TokenType = 'TOKEN_BRACKET_OPEN';
+export const TOKEN_BRACKET_CLOSE: TokenType = 'TOKEN_BRACKET_CLOSE';
+export const TOKEN_COLOR: TokenType = 'TOKEN_COLOR';
+export const TOKEN_NOOP: TokenType = 'TOKEN_NOOP';
+export const TOKEN_VECTOR_START: TokenType = 'TOKEN_VECTOR_START';
+export const TOKEN_VECTOR_SEPARATOR: TokenType = 'TOKEN_VECTOR_SEPARATOR';
+export const TOKEN_VECTOR_END: TokenType = 'TOKEN_VECTOR_END';
+
+export const TAG_BRACKETS: TokenType = 'TAG_BRACKETS';
+export const TAG_BILINEAR_OPERATION: TokenType = 'TAG_BILINEAR_OPERATION';

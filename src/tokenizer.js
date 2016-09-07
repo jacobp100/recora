@@ -4,10 +4,23 @@ import {
   range,
 } from 'lodash/fp';
 import {
-  OPERATOR_EXPONENT, OPERATOR_MULTIPLY, OPERATOR_DIVIDE, OPERATOR_ADD, OPERATOR_SUBTRACT,
-  OPERATOR_NEGATE, TOKEN_OPERATOR, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX,
-  TOKEN_UNIT_SUFFIX, TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE, TOKEN_COLOR, TOKEN_NOOP,
-  TOKEN_VECTOR_START, TOKEN_VECTOR_SEPARATOR, TOKEN_VECTOR_END,
+  TOKEN_OPERATOR_EXPONENT,
+  TOKEN_OPERATOR_MULTIPLY,
+  TOKEN_OPERATOR_DIVIDE,
+  TOKEN_OPERATOR_ADD,
+  TOKEN_OPERATOR_SUBTRACT,
+  TOKEN_OPERATOR_NEGATE,
+  TOKEN_NUMBER,
+  TOKEN_UNIT_NAME,
+  TOKEN_UNIT_PREFIX,
+  TOKEN_UNIT_SUFFIX,
+  TOKEN_BRACKET_OPEN,
+  TOKEN_BRACKET_CLOSE,
+  TOKEN_COLOR,
+  TOKEN_NOOP,
+  TOKEN_VECTOR_START,
+  TOKEN_VECTOR_SEPARATOR,
+  TOKEN_VECTOR_END,
 } from './types';
 import type { Token } from './types'; // eslint-disable-line
 
@@ -183,13 +196,13 @@ const tokenizer = createTokenizer({
     { match: /\d+/, token: token => ({ type: TOKEN_NUMBER, value: Number(token) }), penalty: -1000 },
   ],
   operator: [
-    { match: '**', token: { type: TOKEN_OPERATOR, value: OPERATOR_EXPONENT }, penalty: -1000 },
-    { match: '^', token: { type: TOKEN_OPERATOR, value: OPERATOR_EXPONENT }, penalty: -1000 },
-    { match: /\*(?!\*)/, token: { type: TOKEN_OPERATOR, value: OPERATOR_MULTIPLY }, penalty: -1000 },
-    { match: '/', token: { type: TOKEN_OPERATOR, value: OPERATOR_DIVIDE }, penalty: -1000 },
-    { match: '+', token: { type: TOKEN_OPERATOR, value: OPERATOR_ADD }, penalty: -1000 },
-    { match: '-', token: { type: TOKEN_OPERATOR, value: OPERATOR_SUBTRACT }, penalty: -1000 },
-    { match: '-', token: { type: TOKEN_OPERATOR, value: OPERATOR_NEGATE }, penalty: -500 },
+    { match: '**', token: { type: TOKEN_OPERATOR_EXPONENT }, penalty: -1000 },
+    { match: '^', token: { type: TOKEN_OPERATOR_EXPONENT }, penalty: -1000 },
+    { match: /\*(?!\*)/, token: { type: TOKEN_OPERATOR_MULTIPLY }, penalty: -1000 },
+    { match: '/', token: { type: TOKEN_OPERATOR_DIVIDE }, penalty: -1000 },
+    { match: '+', token: { type: TOKEN_OPERATOR_ADD }, penalty: -1000 },
+    { match: '-', token: { type: TOKEN_OPERATOR_SUBTRACT }, penalty: -1000 },
+    { match: '-', token: { type: TOKEN_OPERATOR_NEGATE }, penalty: -500 },
   ],
   unit: [
     wordMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
