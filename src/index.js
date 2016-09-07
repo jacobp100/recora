@@ -11,7 +11,7 @@ import {
 } from './types';
 import type { Token } from './types'; // eslint-disable-line
 
-type TokenTransform = (token: string) => ?Token;
+type TokenTransform = (token: string, state: Object) => ?Token;
 type TokenizerSpecEntry = {
   match: RegExp | string,
   penalty: number,
@@ -37,6 +37,7 @@ type TokenizerState = {
   penalty: number,
   remainingText: string,
   tokens: Token[],
+  userState: Object,
 };
 
 const defaultTokenizerState = {

@@ -1,14 +1,19 @@
+// @flow
+/* globals Generator */
 import { set, map, includes } from 'lodash/fp';
 
-type IndexRange = [number, number];
+type CaptureRange = [number, number];
+type MatchStack = { index: number, captureRanges: CaptureRange[], array: string[] }
 
 class BaseMatcher {
+  pattern: any = null;
+  isNegative = false;
+  isLazy = false;
+  start = 1;
+  end = 1;
+
   constructor(pattern) {
     this.pattern = pattern;
-    this.isNegative = false;
-    this.isLazy = false;
-    this.start = 1;
-    this.end = 1;
   }
 
   from(start) {
@@ -42,8 +47,9 @@ class BaseMatcher {
   match(tokens) {
     const types = map('type', tokens);
 
+    const matchStack = { index: 0, captureRanges: [], array: types };
     const minIndex = tokens.length;
-    for (const result of this.getMatches(0, [], types)) {
+    for (const result of this.getMatches(matchStack)) {
       if (result.index >= minIndex) {
         const capturedTokens = map(captureRange => (
           tokens.slice(captureRange[0], captureRange[1])
@@ -54,16 +60,22 @@ class BaseMatcher {
     }
     return null;
   }
+
+  * getMatches(matchStack: MatchStack) { // eslint-disable-line
+    throw new Error('Not implemented');
+  }
 }
 
 class BaseElementMatcher extends BaseMatcher {
+  conforms(element: string, pattern: any) { // eslint-disable-line
+    throw new Error('Not implemented');
+  }
+
   * getLazyMatchesFrom(
     startI: number,
     end: number,
     lastElementIndex: number,
-    index: number,
-    captureRanges: IndexRange[],
-    array: string[]
+    { index, captureRanges, array }: MatchStack
   ) {
     const { pattern, isNegative } = this;
 
@@ -83,9 +95,7 @@ class BaseElementMatcher extends BaseMatcher {
     startI: number,
     end: number,
     lastElementIndex: number,
-    index: number,
-    captureRanges: IndexRange[],
-    array: string[]
+    { index, captureRanges, array }: MatchStack
   ) {
     const { pattern, isNegative } = this;
 
@@ -101,7 +111,8 @@ class BaseElementMatcher extends BaseMatcher {
     }
   }
 
-  * getMatches(index: number, captureRanges: IndexRange[], array: string[]) {
+  * getMatches(matchStack: MatchStack) {
+    const { index, captureRanges, array } = matchStack;
     const { pattern, isNegative, isLazy, start } = this;
 
     if (start > array.length) return;
@@ -124,21 +135,21 @@ class BaseElementMatcher extends BaseMatcher {
     const lastElementIndex = array.length;
     const end = Math.min(this.end, lastElementIndex);
     if (isLazy) {
-      yield* this.getLazyMatchesFrom(i, end, lastElementIndex, index, captureRanges, array);
+      yield* this.getLazyMatchesFrom(i, end, lastElementIndex, matchStack);
     } else {
-      yield* this.getNonLazyMatchesFrom(i, end, lastElementIndex, index, captureRanges, array);
+      yield* this.getNonLazyMatchesFrom(i, end, lastElementIndex, matchStack);
     }
   }
 }
 
 export class Element extends BaseElementMatcher {
-  conforms(element, pattern) {
+  conforms(element: string, pattern: any) {
     return element === pattern;
   }
 }
 
 export class ElementOptions extends BaseElementMatcher {
-  conforms(element, pattern) {
+  conforms(element: string, pattern: any) {
     return includes(element, pattern);
   }
 }
@@ -150,23 +161,21 @@ export class Wildcard extends BaseElementMatcher {
 }
 
 export class Pattern extends BaseMatcher {
-  * getSubmatches(iteration, remainingPatterns, index, captureRanges, array) {
+  * getSubmatches(
+    iteration: number,
+    remainingPatterns: any[],
+    matchStack: MatchStack
+  ): Generator<MatchStack, void, void> {
     const numRemainingPatterns = remainingPatterns.length;
 
     if (numRemainingPatterns === 0) {
       if (iteration >= this.start) {
         // Completed an iteration and we completed the minimum number of iterations
-        yield { index, captureRanges, array };
+        yield matchStack;
       }
 
       if (iteration < this.end - 1) {
-        yield* this.getSubmatches(
-          iteration + 1,
-          this.pattern,
-          index,
-          captureRanges,
-          array
-        );
+        yield* this.getSubmatches(iteration + 1, this.pattern, matchStack);
       }
     } else if (numRemainingPatterns > 0) {
       const remainingPattern = remainingPatterns[0];
@@ -174,19 +183,13 @@ export class Pattern extends BaseMatcher {
       const isLastPattern = numRemainingPatterns === 1;
       let didMatchSubCase = false;
 
-      for (const match of remainingPattern.getMatches(index, captureRanges, array)) {
+      for (const match of remainingPattern.getMatches(matchStack)) {
         didMatchSubCase = true;
 
         if (isLastPattern && match.array.length === 0) {
           yield match;
         } else {
-          yield* this.getSubmatches(
-            iteration,
-            remainingPatterns.slice(1),
-            match.index,
-            match.captureRanges,
-            match.array
-          );
+          yield* this.getSubmatches(iteration, remainingPatterns.slice(1), match);
         }
       }
 
@@ -194,12 +197,12 @@ export class Pattern extends BaseMatcher {
 
       if (matchedNothing && iteration === 0 && this.start === 0) {
         // Pattern matched nothing and that is permitted (new Pattern().any())
-        yield { index, captureRanges, array };
+        yield matchStack;
       }
     }
   }
 
-  * getMatches(index: number, captureRanges: IndexRange[], array: string[]) {
-    yield* this.getSubmatches(0, this.pattern, index, captureRanges, array);
+  * getMatches(matchStack: MatchStack): Generator<MatchStack, void, void> {
+    yield* this.getSubmatches(0, this.pattern, matchStack);
   }
 }

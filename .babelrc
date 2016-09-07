@@ -2,6 +2,7 @@
   "presets": ["babel-preset-node6"],
   "plugins": [
     "babel-plugin-transform-flow-strip-types",
-    "babel-plugin-transform-object-rest-spread"
+    "babel-plugin-transform-object-rest-spread",
+    "transform-class-properties"
   ]
 }
