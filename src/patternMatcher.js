@@ -152,7 +152,6 @@ export class Wildcard extends BaseElementMatcher {
 export class Pattern extends BaseMatcher {
   * getSubmatches(iteration, remainingPatterns, index, captureRanges, array) {
     const numRemainingPatterns = remainingPatterns.length;
-    const isLastPattern = numRemainingPatterns === 1;
 
     if (numRemainingPatterns === 0) {
       if (iteration >= this.start) {
@@ -160,7 +159,7 @@ export class Pattern extends BaseMatcher {
         yield { index, captureRanges, array };
       }
 
-      if (iteration < this.end) {
+      if (iteration < this.end - 1) {
         yield* this.getSubmatches(
           iteration + 1,
           this.pattern,
@@ -171,6 +170,8 @@ export class Pattern extends BaseMatcher {
       }
     } else if (numRemainingPatterns > 0) {
       const remainingPattern = remainingPatterns[0];
+      const isFirstPattern = numRemainingPatterns === this.pattern.length;
+      const isLastPattern = numRemainingPatterns === 1;
       let didMatchSubCase = false;
 
       for (const match of remainingPattern.getMatches(index, captureRanges, array)) {
@@ -189,9 +190,9 @@ export class Pattern extends BaseMatcher {
         }
       }
 
-      const matchedNothing = !didMatchSubCase && remainingPatterns.length === this.pattern.length;
+      const matchedNothing = !didMatchSubCase && isFirstPattern;
 
-      if (matchedNothing && iteration >= this.start) {
+      if (matchedNothing && iteration === 0 && this.start === 0) {
         // Pattern matched nothing and that is permitted (new Pattern().any())
         yield { index, captureRanges, array };
       }
@@ -199,6 +200,6 @@ export class Pattern extends BaseMatcher {
   }
 
   * getMatches(index: number, captureRanges: IndexRange[], array: string[]) {
-    yield* this.getSubmatches(1, this.pattern, index, captureRanges, array);
+    yield* this.getSubmatches(0, this.pattern, index, captureRanges, array);
   }
 }
