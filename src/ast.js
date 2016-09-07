@@ -14,7 +14,7 @@ import { Pattern, Wildcard, Element, ElementOptions, matchPatterns } from './pat
 // ], [{ type: TOKEN_NUMBER }, { type: TOKEN_NUMBER }, { type: TOKEN_NUMBER }]));
 console.log(
   (new Pattern([
-    new Wildcard(),
+    new Wildcard().any(),
     new Element(TOKEN_BRACKET_OPEN),
     new ElementOptions([TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE]).negate().lazy().any(),
     new Element(TOKEN_BRACKET_CLOSE),

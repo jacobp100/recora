@@ -11,11 +11,48 @@ import {
 /* eslint-enable */
 
 
-const baseMatcherAssertion = (fnName, transform) => (t, patternMatcher, ...inputs) => {
+/*
+Testing notes:
+We use macros for every test here. The most basic is shouldMatch and shouldNotMatch. Each take a
+test object in the form { input, expected }, and does a test. You can use as many test objects as
+you like in a single test. I.e.
+
+```js
+test('', matcher, shouldMatch, { input: ..., expected: ... }, { input: ..., expected: ... }, ...);
+```
+
+If you expect your output is a single capture group, where that capture group that should equal the
+input, you can instead use an array to represent both the input and output. I.e.
+
+```js
+test('title', matcher, shouldMatch, [{ type: TOKEN_COLOR }]);
+```
+
+Lastly, we have a few more helpers. element{Should,ShouldNot}Match takes a matcher, and evaluates
+the test both when the matcher is and is not lazy.
+
+elementDerivatives{Should,ShouldNot}Match takes a function that will be used to create both lazy
+and non-lazy versions of both Element and ElementOptions. I.e.
+
+```js
+test('title', elementDerivativesShouldNotMatch, makeElement => makeElement(TOKEN_NUMBER), ...);
+```
+*/
+
+const baseMatcherAssertion = (shouldMatch, transform) => (t, patternMatcher, ...inputs) => {
   const callAssertionsWithPatternMatcher = patternMatcher => {
-    forEach(input => {
+    forEach(inputValue => {
+      const { input, expected } = 'input' in inputValue
+        ? inputValue
+        : { input: inputValue, expected: [inputValue] };
+
       const captureGroups = patternMatcher.match(input);
-      t[fnName](captureGroups, [input]);
+
+      if (shouldMatch) {
+        t.deepEqual(captureGroups, expected);
+      } else {
+        t.is(captureGroups, null);
+      }
     }, inputs);
   };
 
@@ -29,8 +66,8 @@ const withLazy = patternMatcher => [
   patternMatcher,
   patternMatcher.lazy(),
 ];
-const elementShouldMatch = baseMatcherAssertion('deepEqual', withLazy);
-const elementShouldNotMatch = baseMatcherAssertion('notDeepEqual', withLazy);
+const elementShouldMatch = baseMatcherAssertion(true, withLazy);
+const elementShouldNotMatch = baseMatcherAssertion(false, withLazy);
 
 const elementFactory = elementFactoryHandler => [
   elementFactoryHandler(pattern => new Element(pattern)),
@@ -38,14 +75,12 @@ const elementFactory = elementFactoryHandler => [
   elementFactoryHandler(pattern => new ElementOptions([pattern])),
   elementFactoryHandler(pattern => new ElementOptions([pattern])).lazy(),
 ];
-const elementDerivativesShouldMatch = baseMatcherAssertion('deepEqual', elementFactory);
-const elementDerivativesShouldNotMatch = baseMatcherAssertion('notDeepEqual', elementFactory);
+const elementDerivativesShouldMatch = baseMatcherAssertion(true, elementFactory);
+const elementDerivativesShouldNotMatch = baseMatcherAssertion(false, elementFactory);
 
-const createArray = patternMatcher => [
-  patternMatcher,
-];
-const patternMatcherSingleEntryShouldMatch = baseMatcherAssertion('deepEqual', createArray);
-const patternMatcherSingleEntryShouldNotMatch = baseMatcherAssertion('notDeepEqual', createArray);
+const createArray = patternMatcher => [patternMatcher];
+const shouldMatch = baseMatcherAssertion(true, createArray);
+const shouldNotMatch = baseMatcherAssertion(false, createArray);
 
 
 test(
@@ -156,8 +191,44 @@ test(
 );
 
 test(
+  'Wildcard should match a single element',
+  shouldMatch,
+  new Wildcard(),
+  [{ type: TOKEN_COLOR }]
+);
+
+test(
+  'Wildcard should match no more than a single element',
+  shouldNotMatch,
+  new Wildcard(),
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+);
+
+test(
+  'Wildcard should with `any` match all elements',
+  shouldMatch,
+  new Wildcard().any(),
+  [{ type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+);
+
+test(
+  'Wildcard should with `any` match all elements when lazy',
+  shouldMatch,
+  new Wildcard().any().lazy(),
+  [{ type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+);
+
+test(
   'Pattern should match a single non-lazy entry if the entry matches the items',
-  patternMatcherSingleEntryShouldMatch,
+  shouldMatch,
   new Pattern([new Element(TOKEN_COLOR).oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -167,7 +238,7 @@ test(
 
 test(
   'Pattern should not match a single non-lazy entry if the entry does not match the items',
-  patternMatcherSingleEntryShouldNotMatch,
+  shouldNotMatch,
   new Pattern([new Element(TOKEN_NUMBER).oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -177,7 +248,7 @@ test(
 
 test(
   'Pattern should match a single lazy entry if the entry matches the items',
-  patternMatcherSingleEntryShouldMatch,
+  shouldMatch,
   new Pattern([new Element(TOKEN_COLOR).lazy().oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -187,10 +258,29 @@ test(
 
 test(
   'Pattern should not match a single lazy entry if the entry does not match the items',
-  patternMatcherSingleEntryShouldNotMatch,
+  shouldNotMatch,
   new Pattern([new Element(TOKEN_NUMBER).lazy().oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+);
+
+test(
+  'Pattern should match a two entries if every entry matches the items',
+  shouldMatch,
+  new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_COLOR)]),
+  {
+    input: [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+    expected: [[{ type: TOKEN_COLOR }], [{ type: TOKEN_COLOR }]],
+  },
+);
+
+test(
+  'Pattern should not match a two entries if any entry does not match the items',
+  shouldNotMatch,
+  new Pattern([new Element(TOKEN_NUMBER), new Element(TOKEN_NUMBER)]),
+  [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_NUMBER }, { type: TOKEN_COLOR }],
+  [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
 );

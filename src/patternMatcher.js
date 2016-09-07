@@ -143,28 +143,9 @@ export class ElementOptions extends BaseElementMatcher {
   }
 }
 
-export class Wildcard extends BaseMatcher {
-  lazy() {
-    return set('isLazy', true, this);
-  }
-
-  * getMatches(index: number, captureRanges: IndexRange[], array: string[]) {
-    const end = index + array.length;
-    if (this.isLazy) {
-      yield {
-        index: end,
-        captureRanges: captureRanges.concat([[index, end]]),
-        array: [],
-      };
-    } else {
-      for (let i = index; i <= end; i += 1) {
-        yield {
-          index: i,
-          captureRanges: captureRanges.concat([[index, i]]),
-          array: array.slice(i),
-        };
-      }
-    }
+export class Wildcard extends BaseElementMatcher {
+  conforms() {
+    return true;
   }
 }
 
@@ -203,4 +184,3 @@ export class Pattern extends BaseMatcher {
     yield* this.getSubmatches(1, this.pattern, index, captureRanges, array);
   }
 }
-
