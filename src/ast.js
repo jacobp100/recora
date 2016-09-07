@@ -1,6 +1,8 @@
 // @flow
 /* eslint-disable no-unused-vars */
-import { first, last, reduce, zip, flow, map, propertyOf, some, isEmpty } from 'lodash/fp';
+import {
+  first, last, reduce, zip, flow, map, propertyOf, some, isEmpty, dropRight, reduceRight,
+} from 'lodash/fp';
 import {
   TOKEN_OPERATOR_EXPONENT,
   TOKEN_OPERATOR_MULTIPLY,
@@ -97,6 +99,10 @@ const bileanerOperationTypes = {
     tagType: TAG_OPERATOR_UNARY,
     operatorType: 'negate',
   },
+  [TOKEN_OPERATOR_EXPONENT]: {
+    tagType: TAG_OPERATOR_BILINEAR,
+    operatorType: 'exponent',
+  },
   [TOKEN_OPERATOR_MULTIPLY]: {
     tagType: TAG_OPERATOR_BILINEAR,
     operatorType: 'multiply',
@@ -114,7 +120,17 @@ const getOperatorTypes = flow(
   map(propertyOf(bileanerOperationTypes)),
 );
 
-const createOperatorTransform = operators => ({
+const FORWARD = 0;
+const BACKWARD = 1;
+
+const createTag = ({ tagType, operatorType }, lhs, rhs) => ({
+  type: tagType,
+  value: tagType === TAG_OPERATOR_UNARY
+    ? { type: operatorType, value: rhs }
+    : { type: operatorType, lhs, rhs },
+});
+
+const createOperatorTransform = (operators, direction) => ({
   pattern: new Pattern([
     new ElementOptions(operators).negate().lazy().any(),
     new Pattern([
@@ -124,31 +140,38 @@ const createOperatorTransform = operators => ({
   ]),
   transform: (captureGroups, transform) => transform(evenNumbers(captureGroups), segments => {
     /*
-    FIXME:
-      * Add direction support
-      * Don't ignore lhs on unary
-        * I think it's inevitable that we'll just have to pass in at arbitrary transform function
-          for this
+    FIXME: Don't ignore lhs on unary. I think it's inevitable that we'll just have to pass in at
+    arbitrary transform function for this. Also fix the return value for blops when segments are
+    empty.
     */
 
     // if (some(isEmpty, segments)) return null;
 
     const operatorTypes = getOperatorTypes(captureGroups);
-    const [firstSegment, ...remainingSegments] = segments;
 
-    return reduce((lhs, [{ tagType, operatorType }, rhs]) => ({
-      type: tagType,
-      value: tagType === TAG_OPERATOR_UNARY
-        ? { type: operatorType, value: rhs }
-        : { type: operatorType, lhs, rhs },
-    }), firstSegment, zip(operatorTypes, remainingSegments));
+    if (direction === BACKWARD) {
+      const initialSegment = last(segments);
+      const remainingSegments = dropRight(1, segments);
+
+      return reduceRight((lhs, [operator, rhs]) => (
+        createTag(operator, rhs, lhs)
+      ), initialSegment, zip(operatorTypes, remainingSegments));
+    }
+
+
+    const [initialSegment, ...remainingSegments] = segments;
+
+    return reduce((lhs, [operator, rhs]) => (
+      createTag(operator, lhs, rhs)
+    ), initialSegment, zip(operatorTypes, remainingSegments));
   }),
 });
 
 const transformTokens = createTransformer([
   bracketTransform,
-  createOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
-  createOperatorTransform([TOKEN_OPERATOR_NEGATE]),
+  createOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE], FORWARD),
+  createOperatorTransform([TOKEN_OPERATOR_NEGATE], FORWARD),
+  createOperatorTransform([TOKEN_OPERATOR_EXPONENT], BACKWARD),
 ]);
 
 console.log(
@@ -159,7 +182,11 @@ console.log(
       { type: TOKEN_BRACKET_OPEN },
       { type: TOKEN_NUMBER },
       { type: TOKEN_BRACKET_OPEN },
-      { type: TOKEN_NUMBER },
+      { type: TOKEN_NUMBER, value: 2 },
+      { type: TOKEN_OPERATOR_EXPONENT },
+      { type: TOKEN_NUMBER, value: 3 },
+      { type: TOKEN_OPERATOR_EXPONENT },
+      { type: TOKEN_NUMBER, value: 4 },
       { type: TOKEN_OPERATOR_MULTIPLY },
       { type: TOKEN_OPERATOR_NEGATE },
       { type: TOKEN_NUMBER },
