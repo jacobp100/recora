@@ -66,7 +66,7 @@ class BaseMatcher {
   }
 }
 
-class BaseElementMatcher extends BaseMatcher {
+class BaseCaptureMatcher extends BaseMatcher {
   conforms(element: string, pattern: any) { // eslint-disable-line
     throw new Error('Not implemented');
   }
@@ -142,19 +142,19 @@ class BaseElementMatcher extends BaseMatcher {
   }
 }
 
-export class Element extends BaseElementMatcher {
+export class CaptureElement extends BaseCaptureMatcher {
   conforms(element: string, pattern: any) {
     return element === pattern;
   }
 }
 
-export class ElementOptions extends BaseElementMatcher {
+export class CaptureOptions extends BaseCaptureMatcher {
   conforms(element: string, pattern: any) {
     return includes(element, pattern);
   }
 }
 
-export class Wildcard extends BaseElementMatcher {
+export class CaptureWildcard extends BaseCaptureMatcher {
   conforms() {
     return true;
   }
@@ -197,6 +197,7 @@ export class Pattern extends BaseMatcher {
 
       if (matchedNothing && iteration === 0 && this.start === 0) {
         // Pattern matched nothing and that is permitted (new Pattern().any())
+        // Should this match? Pattern itself is not a capture group
         yield matchStack;
       }
     }

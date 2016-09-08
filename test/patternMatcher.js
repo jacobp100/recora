@@ -1,6 +1,8 @@
 import test from 'ava';
 import { forEach } from 'lodash/fp';
-import { Pattern, Wildcard, Element, ElementOptions } from '../src/patternMatcher';
+import {
+  Pattern, CaptureWildcard, CaptureElement, CaptureOptions,
+} from '../src/modules/patternMatcher';
 /* eslint-disable no-unused-vars */
 import {
   OPERATOR_EXPONENT, OPERATOR_MULTIPLY, OPERATOR_DIVIDE, OPERATOR_ADD, OPERATOR_SUBTRACT,
@@ -28,14 +30,14 @@ input, you can instead use an array to represent both the input and output. I.e.
 test('title', matcher, shouldMatch, [{ type: TOKEN_COLOR }]);
 ```
 
-Lastly, we have a few more helpers. element{Should,ShouldNot}Match takes a matcher, and evaluates
+Lastly, we have a few more helpers. capture{Should,ShouldNot}Match takes a matcher, and evaluates
 the test both when the matcher is and is not lazy.
 
-elementDerivatives{Should,ShouldNot}Match takes a function that will be used to create both lazy
-and non-lazy versions of both Element and ElementOptions. I.e.
+captureDerivatives{Should,ShouldNot}Match takes a function that will be used to create both lazy
+and non-lazy versions of both CaptureElement and CaptureOptions. I.e.
 
 ```js
-test('title', elementDerivativesShouldNotMatch, makeElement => makeElement(TOKEN_NUMBER), ...);
+test('title', captureDerivativesShouldNotMatch, makeCapture => makeCapture(TOKEN_NUMBER), ...);
 ```
 */
 
@@ -66,17 +68,17 @@ const withLazy = patternMatcher => [
   patternMatcher,
   patternMatcher.lazy(),
 ];
-const elementShouldMatch = baseMatcherAssertion(true, withLazy);
-const elementShouldNotMatch = baseMatcherAssertion(false, withLazy);
+const captureShouldMatch = baseMatcherAssertion(true, withLazy);
+const captureShouldNotMatch = baseMatcherAssertion(false, withLazy);
 
-const elementFactory = elementFactoryHandler => [
-  elementFactoryHandler(pattern => new Element(pattern)),
-  elementFactoryHandler(pattern => new Element(pattern)).lazy(),
-  elementFactoryHandler(pattern => new ElementOptions([pattern])),
-  elementFactoryHandler(pattern => new ElementOptions([pattern])).lazy(),
+const captureFactory = captureFactoryHandler => [
+  captureFactoryHandler(pattern => new CaptureElement(pattern)),
+  captureFactoryHandler(pattern => new CaptureElement(pattern)).lazy(),
+  captureFactoryHandler(pattern => new CaptureOptions([pattern])),
+  captureFactoryHandler(pattern => new CaptureOptions([pattern])).lazy(),
 ];
-const elementDerivativesShouldMatch = baseMatcherAssertion(true, elementFactory);
-const elementDerivativesShouldNotMatch = baseMatcherAssertion(false, elementFactory);
+const captureDerivativesShouldMatch = baseMatcherAssertion(true, captureFactory);
+const captureDerivativesShouldNotMatch = baseMatcherAssertion(false, captureFactory);
 
 const createArray = patternMatcher => [patternMatcher];
 const shouldMatch = baseMatcherAssertion(true, createArray);
@@ -84,132 +86,132 @@ const shouldNotMatch = baseMatcherAssertion(false, createArray);
 
 
 test(
-  "Element matches a single item if it's type is the same as the element's",
-  elementDerivativesShouldMatch,
-  makeElement => makeElement(TOKEN_COLOR),
+  "CaptureElement matches a single item if it's type is the same as the capture's",
+  captureDerivativesShouldMatch,
+  makeCapture => makeCapture(TOKEN_COLOR),
   [{ type: TOKEN_COLOR }],
 );
 
 test(
-  "Element does not match a single item if it's type is the different the element's",
-  elementDerivativesShouldNotMatch,
-  makeElement => makeElement(TOKEN_COLOR),
+  "CaptureElement does not match a single item if it's type is the different the capture's",
+  captureDerivativesShouldNotMatch,
+  makeCapture => makeCapture(TOKEN_COLOR),
   [{ type: TOKEN_NUMBER }],
 );
 
 test(
-  "Element matches all items of the if they are all the same type as the element's",
-  elementDerivativesShouldMatch,
-  makeElement => makeElement(TOKEN_COLOR).any(),
+  "CaptureElement matches all items of the if they are all the same type as the capture's",
+  captureDerivativesShouldMatch,
+  makeCapture => makeCapture(TOKEN_COLOR).any(),
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
 );
 
 test(
-  "Element matches no items of the if any are a different type to the element's",
-  elementDerivativesShouldNotMatch,
-  makeElement => makeElement(TOKEN_COLOR).any(),
+  "CaptureElement matches no items of the if any are a different type to the capture's",
+  captureDerivativesShouldNotMatch,
+  makeCapture => makeCapture(TOKEN_COLOR).any(),
   [{ type: TOKEN_NUMBER }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
 );
 
 test(
-  "Negating an element matches a single item if it's type is different to the element's",
-  elementDerivativesShouldMatch,
-  makeElement => makeElement(TOKEN_NUMBER).negate(),
+  "Negating an capture matches a single item if it's type is different to the capture's",
+  captureDerivativesShouldMatch,
+  makeCapture => makeCapture(TOKEN_NUMBER).negate(),
   [{ type: TOKEN_COLOR }],
 );
 
 test(
-  "Negating an element does not match a single item if it's type is the same as the element's",
-  elementDerivativesShouldNotMatch,
-  makeElement => makeElement(TOKEN_NUMBER).negate(),
+  "Negating an capture does not match a single item if it's type is the same as the capture's",
+  captureDerivativesShouldNotMatch,
+  makeCapture => makeCapture(TOKEN_NUMBER).negate(),
   [{ type: TOKEN_NUMBER }],
 );
 
 test(
-  "Negating an element matches all items if they all have a different type to the element's",
-  elementDerivativesShouldMatch,
-  makeElement => makeElement(TOKEN_NUMBER).negate(),
+  "Negating an capture matches all items if they all have a different type to the capture's",
+  captureDerivativesShouldMatch,
+  makeCapture => makeCapture(TOKEN_NUMBER).negate(),
   [{ type: TOKEN_COLOR }],
 );
 
 test(
-  "Negating an element matches no items if any are the same type as the element's",
-  elementDerivativesShouldNotMatch,
-  makeElement => makeElement(TOKEN_NUMBER).negate().any(),
+  "Negating an capture matches no items if any are the same type as the capture's",
+  captureDerivativesShouldNotMatch,
+  makeCapture => makeCapture(TOKEN_NUMBER).negate().any(),
   [{ type: TOKEN_NUMBER }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
 );
 
 test(
-  "Setting `from` on an element will match items if the items' length is longer than `from`",
-  elementDerivativesShouldMatch,
-  makeElement => makeElement(TOKEN_COLOR).from(3).to(Infinity),
+  "Setting `from` on an capture will match items if the items' length is longer than `from`",
+  captureDerivativesShouldMatch,
+  makeCapture => makeCapture(TOKEN_COLOR).from(3).to(Infinity),
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
 );
 
 test(
-  "Setting `from` on an element will not match items if the items' length is shorter than `from`",
-  elementDerivativesShouldNotMatch,
-  makeElement => makeElement(TOKEN_COLOR).from(3).to(Infinity),
+  "Setting `from` on an capture will not match items if the items' length is shorter than `from`",
+  captureDerivativesShouldNotMatch,
+  makeCapture => makeCapture(TOKEN_COLOR).from(3).to(Infinity),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
 );
 
 test(
-  "Setting `to` on an element will match items if the items' length is longer than `to`",
-  elementDerivativesShouldMatch,
-  makeElement => makeElement(TOKEN_COLOR).to(2),
+  "Setting `to` on an capture will match items if the items' length is longer than `to`",
+  captureDerivativesShouldMatch,
+  makeCapture => makeCapture(TOKEN_COLOR).to(2),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
 );
 
 test(
-  "Setting `to` on an element will not match items if the items' length is shorter than `to`",
-  elementDerivativesShouldNotMatch,
-  makeElement => makeElement(TOKEN_COLOR).to(2),
+  "Setting `to` on an capture will not match items if the items' length is shorter than `to`",
+  captureDerivativesShouldNotMatch,
+  makeCapture => makeCapture(TOKEN_COLOR).to(2),
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
 );
 
 test(
-  "Element options matches a single item if it's type is included in the element's",
-  elementShouldMatch,
-  new ElementOptions([TOKEN_COLOR, TOKEN_NUMBER]),
+  "CaptureElement options matches a single item if it's type is included in the capture's",
+  captureShouldMatch,
+  new CaptureOptions([TOKEN_COLOR, TOKEN_NUMBER]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_NUMBER }],
 );
 
 test(
-  "Element options does not match a single item if it's type is not included in the element's",
-  elementShouldNotMatch,
-  new ElementOptions([TOKEN_COLOR, TOKEN_NUMBER]),
+  "CaptureElement options does not match a single item if it's type is not in the capture's",
+  captureShouldNotMatch,
+  new CaptureOptions([TOKEN_COLOR, TOKEN_NUMBER]),
   [{ type: TOKEN_OPERATOR }],
 );
 
 test(
-  'Wildcard should match a single element',
+  'CaptureWildcard should match a single capture',
   shouldMatch,
-  new Wildcard(),
+  new CaptureWildcard(),
   [{ type: TOKEN_COLOR }]
 );
 
 test(
-  'Wildcard should match no more than a single element',
+  'CaptureWildcard should match no more than a single capture',
   shouldNotMatch,
-  new Wildcard(),
+  new CaptureWildcard(),
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
 );
 
 test(
-  'Wildcard should with `any` match all elements',
+  'CaptureWildcard should with `any` match all captures',
   shouldMatch,
-  new Wildcard().any(),
+  new CaptureWildcard().any(),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -217,9 +219,9 @@ test(
 );
 
 test(
-  'Wildcard should with `any` match all elements when lazy',
+  'CaptureWildcard should with `any` match all captures when lazy',
   shouldMatch,
-  new Wildcard().any().lazy(),
+  new CaptureWildcard().any().lazy(),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -229,7 +231,7 @@ test(
 test(
   'Pattern should match a single non-lazy entry if the entry matches the items',
   shouldMatch,
-  new Pattern([new Element(TOKEN_COLOR).oneOrMore()]),
+  new Pattern([new CaptureElement(TOKEN_COLOR).oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -239,7 +241,7 @@ test(
 test(
   'Pattern should not match a single non-lazy entry if the entry does not match the items',
   shouldNotMatch,
-  new Pattern([new Element(TOKEN_NUMBER).oneOrMore()]),
+  new Pattern([new CaptureElement(TOKEN_NUMBER).oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -249,7 +251,7 @@ test(
 test(
   'Pattern should match a single lazy entry if the entry matches the items',
   shouldMatch,
-  new Pattern([new Element(TOKEN_COLOR).lazy().oneOrMore()]),
+  new Pattern([new CaptureElement(TOKEN_COLOR).lazy().oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -259,7 +261,7 @@ test(
 test(
   'Pattern should not match a single lazy entry if the entry does not match the items',
   shouldNotMatch,
-  new Pattern([new Element(TOKEN_NUMBER).lazy().oneOrMore()]),
+  new Pattern([new CaptureElement(TOKEN_NUMBER).lazy().oneOrMore()]),
   [{ type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
@@ -269,7 +271,7 @@ test(
 test(
   'Pattern should match a two entries if every entry matches the items',
   shouldMatch,
-  new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_COLOR)]),
+  new Pattern([new CaptureElement(TOKEN_COLOR), new CaptureElement(TOKEN_COLOR)]),
   {
     input: [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
     expected: [[{ type: TOKEN_COLOR }], [{ type: TOKEN_COLOR }]],
@@ -279,7 +281,7 @@ test(
 test(
   'Pattern should not match a two entries if any entry does not match the items',
   shouldNotMatch,
-  new Pattern([new Element(TOKEN_NUMBER), new Element(TOKEN_NUMBER)]),
+  new Pattern([new CaptureElement(TOKEN_NUMBER), new CaptureElement(TOKEN_NUMBER)]),
   [{ type: TOKEN_COLOR }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_NUMBER }, { type: TOKEN_COLOR }],
   [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
@@ -288,7 +290,11 @@ test(
 test(
   'Pattern should match with wildcards',
   shouldMatch,
-  new Pattern([new Element(TOKEN_COLOR), new Wildcard().any(), new Element(TOKEN_COLOR)]),
+  new Pattern([
+    new CaptureElement(TOKEN_COLOR),
+    new CaptureWildcard().any(),
+    new CaptureElement(TOKEN_COLOR),
+  ]),
   {
     input: [
       { type: TOKEN_COLOR },
@@ -307,7 +313,7 @@ test(
 test(
   'Patterns should be able to repeat',
   shouldMatch,
-  new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_NUMBER)]).any(),
+  new Pattern([new CaptureElement(TOKEN_COLOR), new CaptureElement(TOKEN_NUMBER)]).any(),
   {
     input: [{ type: TOKEN_COLOR }, { type: TOKEN_NUMBER }],
     expected: [[{ type: TOKEN_COLOR }], [{ type: TOKEN_NUMBER }]],
@@ -350,9 +356,9 @@ test(
   'Patterns should be able to match sub patterns',
   shouldMatch,
   new Pattern([
-    new Element(TOKEN_BRACKET_OPEN),
-    new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_NUMBER)]).any(),
-    new Element(TOKEN_BRACKET_CLOSE),
+    new CaptureElement(TOKEN_BRACKET_OPEN),
+    new Pattern([new CaptureElement(TOKEN_COLOR), new CaptureElement(TOKEN_NUMBER)]).any(),
+    new CaptureElement(TOKEN_BRACKET_CLOSE),
   ]),
   {
     input: [{ type: TOKEN_BRACKET_OPEN }, { type: TOKEN_BRACKET_CLOSE }],
@@ -418,9 +424,9 @@ test(
   'Patterns should not incorrectly sub patterns',
   shouldNotMatch,
   new Pattern([
-    new Element(TOKEN_BRACKET_OPEN),
-    new Pattern([new Element(TOKEN_COLOR), new Element(TOKEN_NUMBER)]).any(),
-    new Element(TOKEN_BRACKET_CLOSE),
+    new CaptureElement(TOKEN_BRACKET_OPEN),
+    new Pattern([new CaptureElement(TOKEN_COLOR), new CaptureElement(TOKEN_NUMBER)]).any(),
+    new CaptureElement(TOKEN_BRACKET_CLOSE),
   ]),
   [
     { type: TOKEN_BRACKET_OPEN },
@@ -457,17 +463,17 @@ test(
   'Patterns should be able to match sub-sub-patterns',
   shouldMatch,
   new Pattern([
-    new Element(TOKEN_BRACKET_OPEN),
+    new CaptureElement(TOKEN_BRACKET_OPEN),
     new Pattern([
-      new Element(TOKEN_COLOR),
+      new CaptureElement(TOKEN_COLOR),
       new Pattern([
-        new Element(TOKEN_UNIT_PREFIX),
-        new Element(TOKEN_UNIT_NAME),
-        new Element(TOKEN_UNIT_SUFFIX),
+        new CaptureElement(TOKEN_UNIT_PREFIX),
+        new CaptureElement(TOKEN_UNIT_NAME),
+        new CaptureElement(TOKEN_UNIT_SUFFIX),
       ]).any(),
-      new Element(TOKEN_NUMBER),
+      new CaptureElement(TOKEN_NUMBER),
     ]).any(),
-    new Element(TOKEN_BRACKET_CLOSE),
+    new CaptureElement(TOKEN_BRACKET_CLOSE),
   ]),
   {
     input: [{ type: TOKEN_BRACKET_OPEN }, { type: TOKEN_BRACKET_CLOSE }],
