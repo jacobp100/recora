@@ -1,7 +1,8 @@
 // @flow
 /* eslint-disable no-unused-vars */
 import {
-  first, last, reduce, zip, flow, map, propertyOf, some, isEmpty, dropRight, reduceRight,
+  first, last, reduce, zip, flow, map, propertyOf, some, isEmpty, dropRight, reduceRight, update,
+  add, concat, set, flatten, isEqual, compact,
 } from 'lodash/fp';
 import {
   TOKEN_OPERATOR_EXPONENT,
@@ -21,9 +22,11 @@ import {
   TOKEN_VECTOR_START,
   TOKEN_VECTOR_SEPARATOR,
   TOKEN_VECTOR_END,
-  TAG_BRACKETS,
-  TAG_OPERATOR_UNARY,
-  TAG_OPERATOR_BILINEAR,
+  NODE_BRACKETS,
+  NODE_OPERATOR_UNARY,
+  NODE_OPERATOR_BILINEAR,
+  NODE_ENTITY,
+  NODE_MISC_GROUP,
 } from './types';
 /* eslint-enable */
 import type { Token } from './types'; // eslint-disable-line
@@ -80,7 +83,7 @@ const bracketTransform = {
     new Wildcard().any().lazy(),
   ]),
   transform: (captureGroups, transform) => transform([captureGroups[2]], ([bracketGroup]) => (
-    [...first(captureGroups), { type: TAG_BRACKETS, value: bracketGroup }, ...last(captureGroups)]
+    [...first(captureGroups), { type: NODE_BRACKETS, value: bracketGroup }, ...last(captureGroups)]
   )),
 };
 
@@ -100,23 +103,23 @@ const BACKWARD = 1;
 
 const bileanerOperationTypes = {
   [TOKEN_OPERATOR_NEGATE]: {
-    tagType: TAG_OPERATOR_UNARY,
-    arity: FORWARD,
+    tagType: NODE_OPERATOR_UNARY,
+    bindingDirection: FORWARD,
     operatorType: 'negate',
   },
   [TOKEN_OPERATOR_EXPONENT]: {
-    tagType: TAG_OPERATOR_BILINEAR,
-    arity: NO_DIRECTION,
+    tagType: NODE_OPERATOR_BILINEAR,
+    bindingDirection: NO_DIRECTION,
     operatorType: 'exponent',
   },
   [TOKEN_OPERATOR_MULTIPLY]: {
-    tagType: TAG_OPERATOR_BILINEAR,
-    arity: NO_DIRECTION,
+    tagType: NODE_OPERATOR_BILINEAR,
+    bindingDirection: NO_DIRECTION,
     operatorType: 'multiply',
   },
   [TOKEN_OPERATOR_DIVIDE]: {
-    tagType: TAG_OPERATOR_BILINEAR,
-    arity: NO_DIRECTION,
+    tagType: NODE_OPERATOR_BILINEAR,
+    bindingDirection: NO_DIRECTION,
     operatorType: 'multiply',
   },
 };
@@ -131,19 +134,49 @@ const getOperatorTypes = flow(
 const createBilinearTag = (type, lhs, rhs) => (
   (isEmpty(lhs) || isEmpty(rhs))
     ? null
-    : { type: TAG_OPERATOR_BILINEAR, value: { type, lhs, rhs } }
+    : { type: NODE_OPERATOR_BILINEAR, value: { type, lhs, rhs } }
 );
 
 const createUnaryTag = (type, argument) => ({
-  type: TAG_OPERATOR_UNARY,
+  type: NODE_OPERATOR_UNARY,
   value: { type, argument },
 });
 
-const createTag = ({ tagType, arity, operatorType }, lhs, rhs) => (
-  tagType === TAG_OPERATOR_UNARY
-    ? createUnaryTag(operatorType, arity === FORWARD ? rhs : lhs)
-    : createBilinearTag(operatorType, lhs, rhs)
-);
+const compactMiscGroup = node => {
+  if (node.type !== NODE_MISC_GROUP || node.value.length > 1) {
+    return node;
+  } else if (node.value.length === 1) {
+    return node.value[0];
+  }
+  return null;
+};
+
+const createTag = ({ tagType, bindingDirection, operatorType }, lhs, rhs) => {
+  if (tagType !== NODE_OPERATOR_UNARY) return createBilinearTag(operatorType, lhs, rhs);
+
+  let leftSide = !isEmpty(lhs) ? lhs : null;
+  let rightSide = !isEmpty(rhs) ? rhs : null;
+  let argument;
+
+  if (bindingDirection === FORWARD && rightSide && rightSide.type === NODE_MISC_GROUP) {
+    argument = first(rightSide.value);
+    rightSide = compactMiscGroup({ type: NODE_MISC_GROUP, value: rightSide.value.slice(1) });
+  } else if (bindingDirection === FORWARD) {
+    argument = rightSide;
+    rightSide = null;
+  } else if (leftSide && leftSide.type === NODE_MISC_GROUP) {
+    argument = last(leftSide.value);
+    leftSide = compactMiscGroup({ type: NODE_MISC_GROUP, value: leftSide.value.slice(1) });
+  } else {
+    argument = leftSide;
+    leftSide = null;
+  }
+
+  const tag = createUnaryTag(operatorType, argument);
+  const group = compact([leftSide, tag, rightSide]);
+
+  return compactMiscGroup({ type: NODE_MISC_GROUP, value: group });
+};
 
 const propagateNull = cb => (accum, value) => ((accum === null) ? null : cb(accum, value));
 
@@ -181,37 +214,116 @@ const createOperatorTransform = (operators, direction) => ({
   }),
 });
 
+const getEntities = segment => {
+  const INTERMEDIATE_UNIT = 'INTERMEDIATE_UNIT';
+
+  let segmentWithIntermediateUnits = map(tag => (
+    tag.type === TOKEN_UNIT_NAME
+      ? ({ type: INTERMEDIATE_UNIT, name: tag.value, power: 1 })
+      : tag
+  ), segment);
+
+  segmentWithIntermediateUnits = reduce(propagateNull((accum, tag) => {
+    if (tag.type !== TOKEN_UNIT_SUFFIX) {
+      return [...accum, tag];
+    } else if (last(accum.type) === INTERMEDIATE_UNIT) {
+      return update([accum.length - 1, 'power'], add(tag.power), accum);
+    }
+    return null;
+  }), [], segmentWithIntermediateUnits);
+
+  segmentWithIntermediateUnits = reduceRight(propagateNull((accum, tag) => {
+    if (tag.type !== TOKEN_UNIT_SUFFIX) {
+      return [tag, ...accum];
+    } else if (first(accum.type) === INTERMEDIATE_UNIT) {
+      return update([0, 'power'], add(tag.power), accum);
+    }
+    return null;
+  }), [], segmentWithIntermediateUnits);
+
+  if (segmentWithIntermediateUnits === null) return null;
+
+  const baseEntityValue = { quantity: undefined, units: [] };
+  const entityValues = reduce((accum, tag) => {
+    if (tag.type === INTERMEDIATE_UNIT) {
+      const unit = { name: tag.name, power: tag.power };
+      return update([accum.length - 1, 'units'], concat([unit]), accum);
+    } else if (tag.type === TOKEN_NUMBER && last(accum).quantity === undefined) {
+      return set([accum.length - 1, 'quantity'], tag.value, accum);
+    } else if (tag.type === TOKEN_NUMBER) {
+      const newEntityValue = set(['value', 'quantity'], tag.value, baseEntityValue);
+      return concat(accum, newEntityValue);
+    }
+    return accum;
+  }, [baseEntityValue], segmentWithIntermediateUnits);
+
+  if (entityValues.length === 1 && isEqual(last(entityValues), baseEntityValue)) return [];
+
+  const entities = map(value => ({ type: NODE_ENTITY, value }), entityValues);
+
+  return entities;
+};
+
+const unitParts = [TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX];
+const unitsTransform = {
+  pattern: new Pattern([
+    new ElementOptions(unitParts).negate().lazy().any(),
+    new Pattern([
+      new ElementOptions(unitParts).lazy().oneOrMore(),
+      new ElementOptions(unitParts).negate().lazy().any(),
+    ]).oneOrMore(),
+  ]),
+  transform: (captureGroups, transform) => transform(evenNumbers(captureGroups), segments => {
+    const unitSegments = oddNumbers(captureGroups);
+
+    let zippedSegments = segments[0];
+    for (let i = 0; i < unitSegments.length; i += 1) {
+      const entitiesOfSegment = getEntities(unitSegments[i]);
+      if (entitiesOfSegment === null) return null;
+      zippedSegments = zippedSegments.concat(entitiesOfSegment, segments[i + 1]);
+    }
+
+    if (zippedSegments.length === 0) {
+      return null;
+    } else if (zippedSegments.length === 1) {
+      return first(zippedSegments);
+    }
+    return { type: NODE_MISC_GROUP, value: zippedSegments };
+  }),
+};
+
 const transformTokens = createTransformer([
   bracketTransform,
   createOperatorTransform([TOKEN_OPERATOR_ADD, TOKEN_OPERATOR_SUBTRACT], FORWARD),
   createOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE], FORWARD),
   createOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE], BACKWARD),
+  unitsTransform,
 ]);
 
 console.log(
   JSON.stringify(
     transformTokens([
-      { type: TOKEN_NUMBER },
-      { type: TOKEN_NUMBER },
-      { type: TOKEN_BRACKET_OPEN },
-      { type: TOKEN_NUMBER },
-      { type: TOKEN_BRACKET_OPEN },
-      { type: TOKEN_NUMBER, value: 2 },
-      { type: TOKEN_OPERATOR_EXPONENT },
+      // { type: TOKEN_NUMBER, value: 10 },
+      // { type: TOKEN_NUMBER, value: 10 },
+      // { type: TOKEN_BRACKET_OPEN },
+      // { type: TOKEN_NUMBER, value: 10 },
+      // { type: TOKEN_BRACKET_OPEN },
+      // { type: TOKEN_NUMBER, value: 2 },
+      // { type: TOKEN_OPERATOR_EXPONENT },
+      { type: TOKEN_NUMBER, value: 3 },
       { type: TOKEN_OPERATOR_NEGATE },
       { type: TOKEN_NUMBER, value: 3 },
-      { type: TOKEN_OPERATOR_EXPONENT },
-      { type: TOKEN_NUMBER, value: 4 },
-      { type: TOKEN_OPERATOR_MULTIPLY },
-      { type: TOKEN_NUMBER },
-      { type: TOKEN_BRACKET_CLOSE },
-      { type: TOKEN_UNIT_NAME },
-      { type: TOKEN_NUMBER },
-      { type: TOKEN_COLOR },
-      { type: TOKEN_BRACKET_CLOSE },
-      { type: TOKEN_COLOR },
-      { type: TOKEN_COLOR },
-      { type: TOKEN_NUMBER },
+      { type: TOKEN_NUMBER, value: 3 },
+      // { type: TOKEN_OPERATOR_EXPONENT },
+      // { type: TOKEN_NUMBER, value: 4 },
+      // { type: TOKEN_OPERATOR_MULTIPLY },
+      // { type: TOKEN_NUMBER, value: 10 },
+      // { type: TOKEN_UNIT_NAME, value: 'meter' },
+      // { type: TOKEN_BRACKET_CLOSE },
+      // { type: TOKEN_UNIT_NAME },
+      // { type: TOKEN_NUMBER, value: 10 },
+      // { type: TOKEN_BRACKET_CLOSE },
+      // { type: TOKEN_NUMBER, value: 10 },
     ])
   )
 );

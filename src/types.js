@@ -21,6 +21,8 @@ export const TOKEN_VECTOR_START: TokenType = 'TOKEN_VECTOR_START';
 export const TOKEN_VECTOR_SEPARATOR: TokenType = 'TOKEN_VECTOR_SEPARATOR';
 export const TOKEN_VECTOR_END: TokenType = 'TOKEN_VECTOR_END';
 
-export const TAG_BRACKETS: TokenType = 'TAG_BRACKETS';
-export const TAG_OPERATOR_UNARY: TokenType = 'TAG_OPERATOR_UNARY';
-export const TAG_OPERATOR_BILINEAR: TokenType = 'TAG_OPERATOR_BILINEAR';
+export const NODE_BRACKETS: TokenType = 'NODE_BRACKETS';
+export const NODE_OPERATOR_UNARY: TokenType = 'NODE_OPERATOR_UNARY';
+export const NODE_OPERATOR_BILINEAR: TokenType = 'NODE_OPERATOR_BILINEAR';
+export const NODE_ENTITY: TokenType = 'NODE_ENTITY';
+export const NODE_MISC_GROUP: TokenType = 'NODE_MISC_GROUP';
