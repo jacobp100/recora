@@ -61,7 +61,7 @@ const wordMatcher = ({ words, type, dictionary, penalty }) => ({
 });
 
 /* eslint-disable max-len */
-const tokenizer = createTokenizer({
+export default createTokenizer({
   number: [
     { match: /\d+/, token: token => ({ type: TOKEN_NUMBER, value: Number(token) }), penalty: -1000 },
   ],
@@ -150,14 +150,3 @@ const tokenizer = createTokenizer({
   bracketLevel: 0,
 });
 /* eslint-enable */
-
-const input = '[[1, 2], [3, 4]]';
-console.time('first run');
-console.log(tokenizer(input));
-console.timeEnd('first run');
-// console.time('second run');
-// tokenizer(input);
-// console.timeEnd('second run');
-// console.time('third run');
-// tokenizer(input);
-// console.timeEnd('third run');
