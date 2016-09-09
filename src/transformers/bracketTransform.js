@@ -10,7 +10,7 @@ import {
   TOKEN_BRACKET_OPEN,
   TOKEN_BRACKET_CLOSE,
   NODE_BRACKETS,
-} from '../types';
+} from '../tokenNodeTypes';
 
 const bracketTransform: Transformer = {
   pattern: new Pattern([

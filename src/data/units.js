@@ -7,6 +7,7 @@ export type UnitName = string;
 export type UnitValue = number;
 export type Units = { [key: UnitName]: UnitValue };
 export type ConversionDescriptor = [number | DimensionTransformer, Units];
+export type ConversionDescriptors = { [key: UnitName]: ConversionDescriptor };
 
 const BASE_TIME = 'second';
 const BASE_LENGTH = 'meter';
@@ -30,7 +31,7 @@ const noDimensions = {};
 // TODO: Copy from https://github.com/gentooboontoo/js-quantities/blob/master/src/quantities.js
 
 /* eslint-disable quote-props, no-multi-spaces, indent, max-len */
-const conversionDescriptors: { [key: UnitName]: ConversionDescriptor } = {
+const conversionDescriptors: ConversionDescriptors = {
                'second': [1,                             timeDimensions],
                'minute': [60,                            timeDimensions],
                  'hour': [3600,                          timeDimensions],

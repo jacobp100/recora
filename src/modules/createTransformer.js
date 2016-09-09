@@ -1,14 +1,14 @@
 // @flow
-import type { Token } from '../types';
+import type { TokenNode } from '../tokenNodeTypes';
 import { Pattern, CaptureWildcard, CaptureElement, CaptureOptions } from './patternMatcher';
 
-export type TransformResult = Token[] | Token;
+export type TransformResult = TokenNode[] | TokenNode;
 export type TransformFunction = (captureGroups: TransformResult[]) => ?TransformResult
 export type TransformTokenFunction =
   (captureGroupsToTransform: TransformResult[], transform: TransformFunction) => void;
 export type Transformer = {
   pattern: Pattern | CaptureWildcard | CaptureElement | CaptureOptions,
-  transform: (captureGroups: Token[], transform: TransformTokenFunction) => void
+  transform: (captureGroups: TokenNode[], transform: TransformTokenFunction) => void
 };
 
 export default (transforms: Transformer[]) => {
@@ -42,5 +42,5 @@ export default (transforms: Transformer[]) => {
     return tokens;
   };
 
-  return (tokens: Token[]) => iter(tokens, 0);
+  return (tokens: TokenNode[]) => iter(tokens, 0);
 };

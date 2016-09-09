@@ -2,10 +2,10 @@
 import {
   first, last, reduce, map, reduceRight, update, add, concat, set, isEqual, castArray,
 } from 'lodash/fp';
-import { combineUnits } from '../math/types/entity';
+import { combineUnits } from '../types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TransformResult } from '../modules/createTransformer';
-import type { Units } from '../math/data/units';
+import type { Units } from '../data/units';
 import {
   TOKEN_NUMBER,
   TOKEN_UNIT_NAME,
@@ -13,7 +13,7 @@ import {
   TOKEN_UNIT_SUFFIX,
   NODE_MISC_GROUP,
   NODE_ENTITY,
-} from '../types';
+} from '../tokenNodeTypes';
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 
 

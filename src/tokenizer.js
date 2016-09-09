@@ -18,7 +18,7 @@ import {
   TOKEN_VECTOR_START,
   TOKEN_VECTOR_SEPARATOR,
   TOKEN_VECTOR_END,
-} from './types';
+} from './tokenNodeTypes';
 import createTokenizer from './modules/createTokenizer';
 
 

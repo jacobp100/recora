@@ -2,13 +2,13 @@
 import {
   __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy,
 } from 'lodash/fp';
-import type { Token } from '../types'; // eslint-disable-line
+import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
 
-type TokenTransform = (token: string, state: Object) => ?Token;
+type TokenTransform = (token: string, state: Object) => ?TokenNode;
 type TokenizerSpecEntry = {
   match: RegExp | string,
   penalty: number,
-  token?: TokenTransform | ?Token,
+  token?: TokenTransform | ?TokenNode,
   push?: string[],
   pop?: boolean | number,
   updateState?: (state: Object) => Object
@@ -17,7 +17,7 @@ type TokenizerSpecEntryRef = {
   ref: string,
   match?: RegExp | string,
   penalty?: number,
-  token?: TokenTransform | ?Token,
+  token?: TokenTransform | ?TokenNode,
   push?: string[],
   pop?: boolean | number,
   updateState?: (state: Object) => Object
@@ -29,7 +29,7 @@ type TokenizerState = {
   stack: string[],
   penalty: number,
   remainingText: string,
-  tokens: Token[],
+  tokens: TokenNode[],
   userState: Object,
 };
 

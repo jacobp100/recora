@@ -2,17 +2,22 @@
 import { matchesProperty, mapValues, update, multiply, isEmpty } from 'lodash/fp';
 import { convertTo, combineUnits, siUnits, isLinear } from '../types/entity';
 import type { Entity } from '../types/entity'; // eslint-disable-line
+import type { ResolveContext } from '../resolverTypes';
 
 const isZero = matchesProperty('quantity', 0);
 const zeroEntity = { quantity: 0, units: {} };
 const hasUnits = entity => !isEmpty(entity.units);
 
-const addSubtractFactory = direction => (left: Entity, right: Entity) => {
-  if (!isLinear(left.units) || !isLinear(right.units)) return null;
+const addSubtractFactory = direction => (
+  context: ResolveContext,
+  left: Entity,
+  right: Entity
+) => {
+  if (!isLinear(context, left.units) || !isLinear(context, right.units)) return null;
   if (isZero(right)) return left;
   if (isZero(left)) return update('quantity', multiply(direction), right);
 
-  const rightWithLhsUnits = convertTo(left.units, right);
+  const rightWithLhsUnits = convertTo(context, left.units, right);
   if (!rightWithLhsUnits) return null;
 
   const quantity = left.quantity + (rightWithLhsUnits.quantity * direction);
@@ -20,7 +25,11 @@ const addSubtractFactory = direction => (left: Entity, right: Entity) => {
   return { quantity, units };
 };
 
-const multiplyDivideFactory = direction => (left: Entity, right: Entity) => {
+const multiplyDivideFactory = direction => (
+  context: ResolveContext,
+  left: Entity,
+  right: Entity
+) => {
   if (isZero(left)) return zeroEntity;
   if (isZero(right)) return direction === 1 ? zeroEntity : null; // No division by zero
 
@@ -36,9 +45,9 @@ const multiplyDivideFactory = direction => (left: Entity, right: Entity) => {
   return { units, quantity };
 };
 
-const exponentMath = (left: Entity, right: Entity) => {
+const exponentMath = (context: ResolveContext, left: Entity, right: Entity) => {
   // Note: done for minor perf
-  if (hasUnits(right) && hasUnits(siUnits(right))) return null;
+  if (hasUnits(right) && hasUnits(siUnits(context, right))) return null;
 
   const quantity = Math.pow(left.quantity, right.quantity);
   const units = mapValues(multiply(right.quantity), left.units);

@@ -13,7 +13,7 @@ import {
   TOKEN_OPERATOR_NEGATE,
   NODE_FUNCTION,
   NODE_MISC_GROUP,
-} from '../types';
+} from '../tokenNodeTypes';
 import {
   FUNCTION_ADD,
   FUNCTION_SUBTRACT,
@@ -21,8 +21,8 @@ import {
   FUNCTION_DIVIDE,
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
-} from '../math/functions';
-import type { Token, TokenType } from '../types'; // eslint-disable-line
+} from '../functions';
+import type { TokenNode, TokenNodeType } from '../tokenNodeTypes'; // eslint-disable-line
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
@@ -83,14 +83,14 @@ const createNode = (operatorType, lhs, rhs) => {
 
   if (bindingDirection === FORWARD && rightSide && rightSide.type === NODE_MISC_GROUP) {
     argument = first(rightSide.value);
-    const miscGroup: Token = { type: NODE_MISC_GROUP, value: rightSide.value.slice(1) };
+    const miscGroup: TokenNode = { type: NODE_MISC_GROUP, value: rightSide.value.slice(1) };
     rightSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === FORWARD) {
     argument = rightSide;
     rightSide = null;
   } else if (bindingDirection === BACKWARD && leftSide && leftSide.type === NODE_MISC_GROUP) {
     argument = last(leftSide.value);
-    const miscGroup: Token = { type: NODE_MISC_GROUP, value: leftSide.value.slice(1) };
+    const miscGroup: TokenNode = { type: NODE_MISC_GROUP, value: leftSide.value.slice(1) };
     leftSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === BACKWARD) {
     argument = leftSide;
@@ -99,13 +99,13 @@ const createNode = (operatorType, lhs, rhs) => {
 
   const node = createUnaryNode(type, argument);
   const group = compact([leftSide, node, rightSide]);
-  const miscGroup: Token = { type: NODE_MISC_GROUP, value: group };
+  const miscGroup: TokenNode = { type: NODE_MISC_GROUP, value: group };
   const value = compactMiscGroup(miscGroup);
 
   return value;
 };
 
-const createPattern = (operators: TokenType[]) => (
+const createPattern = (operators: TokenNodeType[]) => (
   new Pattern([
     new CaptureOptions(operators).negate().lazy().any(),
     new Pattern([
@@ -115,7 +115,7 @@ const createPattern = (operators: TokenType[]) => (
   ])
 );
 
-export const createForwardOperatorTransform = (operators: TokenType[]): Transformer => ({
+export const createForwardOperatorTransform = (operators: TokenNodeType[]): Transformer => ({
   pattern: createPattern(operators),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
     const operatorTypes = getOperatorTypes(captureGroups);
@@ -127,7 +127,7 @@ export const createForwardOperatorTransform = (operators: TokenType[]): Transfor
   }),
 });
 
-export const createBackwardOperatorTransform = (operators: TokenType[]): Transformer => ({
+export const createBackwardOperatorTransform = (operators: TokenNodeType[]): Transformer => ({
   pattern: createPattern(operators),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
     const operatorTypes = getOperatorTypes(captureGroups);

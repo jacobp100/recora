@@ -1,14 +1,17 @@
 // @flow
 import { set, get, map } from 'lodash/fp';
 import { FUNCTION_ADD } from './functions';
-import { NODE_FUNCTION, NODE_ENTITY } from '../types';
-import type { Token } from '../types'; // eslint-disable-line
+import { NODE_FUNCTION, NODE_ENTITY } from './tokenNodeTypes';
+import type { TokenNode } from './tokenNodeTypes'; // eslint-disable-line
 import { add as addEntityToEntity } from './math/entity';
-import { mapUnlessNull } from '../util';
+import { mapUnlessNull } from './util';
 
 const math = {
   functionTrie: {},
-  config: {},
+  context: {},
+  setContext(context) {
+    return set('context', context, this);
+  },
   extendFunction(functionName, types, fn) {
     return set(['functionTrie', functionName, ...types, '_fn'], fn, this);
   },
@@ -21,9 +24,9 @@ const math = {
     const resolvedArgs = mapUnlessNull(arg => this.resolve(arg), args);
     if (!resolvedArgs) return null;
 
-    return func(...resolvedArgs);
+    return func(this.context, ...resolvedArgs);
   },
-  resolve(value: Token): ?Token {
+  resolve(value: TokenNode): ?TokenNode {
     switch (value.type) {
       case NODE_FUNCTION:
         return this.executeFunction(value.value);
