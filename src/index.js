@@ -47,6 +47,6 @@ class Recora {
 }
 
 
-const test = '2 cubic meters + 10000 litres';
+const test = 'blah blah 2 cubic meters BLAH BLAH + blah blah 10000 litres blah';
 const output = new Recora().parse(test);
 console.log(JSON.stringify(output && output.result));

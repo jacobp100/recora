@@ -1,12 +1,14 @@
 // @flow
 import {
   first, last, reduce, map, reduceRight, update, multiply, concat, set, isEqual, castArray, get,
+  reject,
 } from 'lodash/fp';
 import { combineUnits } from '../types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TransformResult } from '../modules/createTransformer';
 import type { Units } from '../data/units';
 import {
+  TOKEN_NOOP,
   TOKEN_NUMBER,
   TOKEN_UNIT_NAME,
   TOKEN_UNIT_PREFIX,
@@ -15,6 +17,7 @@ import {
   NODE_ENTITY,
 } from '../tokenNodeTypes';
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
+import { compactMiscGroup } from '../nodeUtil';
 
 
 const getEntities = segment => {
@@ -102,12 +105,9 @@ const entityTransform: Transformer = {
       zippedSegments = zippedSegments.concat(entitiesOfSegment, segments[i + 1]);
     }
 
-    if (zippedSegments.length === 0) {
-      return null;
-    } else if (zippedSegments.length === 1) {
-      return first(zippedSegments);
-    }
-    return { type: NODE_MISC_GROUP, value: zippedSegments };
+    zippedSegments = reject({ type: TOKEN_NOOP }, zippedSegments);
+
+    return compactMiscGroup({ type: NODE_MISC_GROUP, value: zippedSegments });
   }),
 };
 export default entityTransform;
