@@ -1,7 +1,9 @@
 // @flow
 import { flow, reject, map, pick } from 'lodash/fp';
+import type { Tokenizer } from './modules/createTokenizer';
 import { TOKEN_NOOP } from './tokenNodeTypes';
-import tokenizer from './tokenizer';
+import createTokenizerWithLocale from './tokenizer';
+import enTokenizerLocale from './tokenizerLocales/en';
 import transformer from './transformer';
 import resolver from './resolver';
 import { defaultContext, setUnits } from './resolverContext';
@@ -13,15 +15,19 @@ const cleanTokens = flow(
 );
 
 class Recora {
+  tokenizer: Tokenizer
   resolver: resolver
 
   constructor() {
+    const tokenizer = createTokenizerWithLocale(enTokenizerLocale);
+    this.tokenizer = tokenizer;
+
     const resolverContext = setUnits(defaultContext, units);
     this.resolver = resolver.setContext(resolverContext);
   }
 
   parse(text: string) {
-    const { resolver } = this;
+    const { tokenizer, resolver } = this;
 
     const tokenOptions = tokenizer(text);
     let result;

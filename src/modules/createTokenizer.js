@@ -4,8 +4,8 @@ import {
 } from 'lodash/fp';
 import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
 
-type TokenTransform = (token: string, state: Object) => ?TokenNode;
-type TokenizerSpecEntry = {
+export type TokenTransform = (token: string, state: Object) => ?TokenNode;
+export type TokenizerSpecEntry = {
   match: RegExp | string,
   penalty: number,
   token?: TokenTransform | ?TokenNode,
@@ -13,7 +13,7 @@ type TokenizerSpecEntry = {
   pop?: boolean | number,
   updateState?: (state: Object) => Object
 };
-type TokenizerSpecEntryRef = {
+export type TokenizerSpecEntryRef = {
   ref: string,
   match?: RegExp | string,
   penalty?: number,
@@ -23,8 +23,8 @@ type TokenizerSpecEntryRef = {
   updateState?: (state: Object) => Object
 }
 
-type TokenizerSpec = ({ [key:string]: (TokenizerSpecEntry | TokenizerSpecEntryRef)[] });
-type TokenizerState = {
+export type TokenizerSpec = ({ [key:string]: (TokenizerSpecEntry | TokenizerSpecEntryRef)[] });
+export type TokenizerState = {
   character: number,
   stack: string[],
   penalty: number,
@@ -32,6 +32,8 @@ type TokenizerState = {
   tokens: TokenNode[],
   userState: Object,
 };
+
+export type Tokenizer = (text: string, initialUserState: ?Object) => (TokenNode[])[];
 
 const defaultTokenizerState = {
   character: 0,
@@ -41,7 +43,7 @@ const defaultTokenizerState = {
   tokens: [],
   userState: {},
 };
-export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}) => {
+export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokenizer => {
   const flattenRefs = flatMap(option => (
     !option.ref
       ? option
@@ -117,7 +119,7 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}) => {
   /* eslint-enable */
 
 
-  return (text: string, initialUserState: Object = {}) => {
+  return (text, initialUserState = {}) => {
     let results = [];
     const userState = { ...defaultUserState, ...initialUserState };
     for (const result of tokenizer({ ...defaultTokenizerState, userState, remainingText: text })) {
