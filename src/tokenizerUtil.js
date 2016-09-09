@@ -1,6 +1,5 @@
 // @flow
 import { map, flow, has, join, range } from 'lodash/fp';
-import type { TokenNodeType } from './tokenNodeTypes';
 import type { TokenizerSpecEntry } from './modules/createTokenizer';
 
 const wordRegexpCreator = flow(
@@ -12,7 +11,7 @@ const wordRegexpCreator = flow(
 
 type WordMatcher = {
   words: number,
-  type: TokenNodeType,
+  type: string,
   dictionary: Object,
   penalty: number,
 };

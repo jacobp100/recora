@@ -16,6 +16,7 @@ import {
   NODE_MISC_GROUP,
   NODE_ENTITY,
 } from '../tokenNodeTypes';
+import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
@@ -64,8 +65,8 @@ const getEntities = segment => {
   unit1 number1 unit2 number2 unit3
     => [Entity(number1 unit1 unit2), Entity(number2 unit3)]
   */
-  const baseEntityValue = { quantity: undefined, units: {} };
-  const entityValues = reduce((accum, tag) => {
+  const baseEntityValue = { type: NODE_ENTITY, quantity: undefined, units: {} };
+  const maybeEntities = reduce((accum, tag) => {
     if (tag.type === INTERMEDIATE_UNIT) {
       const unit: Units = { [tag.name]: tag.power };
       return update([accum.length - 1, 'units'], combineUnits(unit), accum);
@@ -78,10 +79,9 @@ const getEntities = segment => {
     return accum;
   }, [baseEntityValue], segmentWithIntermediateUnits);
 
-  if (entityValues.length === 1 && isEqual(last(entityValues), baseEntityValue)) return [];
+  if (maybeEntities.length === 1 && isEqual(last(maybeEntities), baseEntityValue)) return [];
 
-  const entities = map(value => ({ type: NODE_ENTITY, value }), entityValues);
-
+  const entities: EntityNode = maybeEntities;
   return entities;
 };
 

@@ -2,7 +2,8 @@
 import type { Units } from './data/units';
 
 export type TokenNode = Object;
-export type Token = TokenNode & { value?: any, start: number, end: number }
+export type TokenBase = TokenNode & { value?: any };
+export type Token = TokenBase & { start: number, end: number }
 
 export const TOKEN_OPERATOR_EXPONENT = 'TOKEN_OPERATOR_EXPONENT';
 export const TOKEN_OPERATOR_MULTIPLY = 'TOKEN_OPERATOR_MULTIPLY';
@@ -23,10 +24,10 @@ export const TOKEN_VECTOR_SEPARATOR = 'TOKEN_VECTOR_SEPARATOR';
 export const TOKEN_VECTOR_END = 'TOKEN_VECTOR_END';
 
 export const NODE_BRACKETS = 'NODE_BRACKETS';
-export type NodeBrackets = TokenNode & { type: 'NODE_BRACKETS', value: TokenNode };
+export type BracketsNode = TokenNode & { type: 'NODE_BRACKETS', value: TokenNode };
 export const NODE_FUNCTION = 'NODE_FUNCTION';
-export type NodeFunction = TokenNode & { type: 'NODE_FUNCTION', name: string, args: TokenNode[] };
+export type FunctionNode = TokenNode & { type: 'NODE_FUNCTION', name: string, args: TokenNode[] };
 export const NODE_MISC_GROUP = 'NODE_MISC_GROUP';
-export type NodeMiscGroup = TokenNode & { type: 'NODE_MISC_GROUP', value: TokenNode[] };
+export type MiscGroupNode = TokenNode & { type: 'NODE_MISC_GROUP', value: TokenNode[] };
 export const NODE_ENTITY = 'NODE_ENTITY';
-export type NodeEntity = TokenNode & { type: 'NODE_ENTITY', quantity: number, units: Units };
+export type EntityNode = TokenNode & { type: 'NODE_ENTITY', quantity: number, units: Units };

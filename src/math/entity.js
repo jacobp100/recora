@@ -1,18 +1,19 @@
 // @flow
 import { matchesProperty, mapValues, update, multiply, isEmpty } from 'lodash/fp';
 import { convertTo, combineUnits, toFundamentalUnits, unitsAreLinear } from '../types/entity';
-import type { Entity } from '../types/entity'; // eslint-disable-line
+import { NODE_ENTITY } from '../tokenNodeTypes';
+import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
 import type { ResolverContext } from '../resolverContext';
 
 const isZero = matchesProperty('quantity', 0);
-const zeroEntity = { quantity: 0, units: {} };
+const zeroEntity = { type: NODE_ENTITY, quantity: 0, units: {} };
 const hasUnits = entity => !isEmpty(entity.units);
 
 const addSubtractFactory = direction => (
   context: ResolverContext,
-  left: Entity,
-  right: Entity
-) => {
+  left: EntityNode,
+  right: EntityNode
+): ?EntityNode => {
   if (!unitsAreLinear(context, left.units) || !unitsAreLinear(context, right.units)) return null;
   if (isZero(right)) return left;
   if (isZero(left)) return update('quantity', multiply(direction), right);
@@ -22,14 +23,14 @@ const addSubtractFactory = direction => (
 
   const quantity = left.quantity + (rightWithLhsUnits.quantity * direction);
   const units = left.units;
-  return { quantity, units };
+  return { type: NODE_ENTITY, quantity, units };
 };
 
 const multiplyDivideFactory = direction => (
   context: ResolverContext,
-  left: Entity,
-  right: Entity
-) => {
+  left: EntityNode,
+  right: EntityNode
+): ?EntityNode => {
   if (isZero(left)) return zeroEntity;
   if (isZero(right)) return direction === 1 ? zeroEntity : null; // No division by zero
 
@@ -42,16 +43,16 @@ const multiplyDivideFactory = direction => (
 
   const quantity = left.quantity * Math.pow(right.quantity, direction);
   const units = combineUnits(left.units, rightEffectiveUnits);
-  return { units, quantity };
+  return { type: NODE_ENTITY, quantity, units };
 };
 
-const exponentMath = (context: ResolverContext, left: Entity, right: Entity) => {
+const exponentMath = (context: ResolverContext, left: EntityNode, right: EntityNode): ?EntityNode => {
   // Note: done for minor perf
   if (hasUnits(right) && hasUnits(toFundamentalUnits(context, right))) return null;
 
   const quantity = Math.pow(left.quantity, right.quantity);
   const units = mapValues(multiply(right.quantity), left.units);
-  return { quantity, units };
+  return { type: NODE_ENTITY, quantity, units };
 };
 
 const addMath = addSubtractFactory(1);

@@ -3,10 +3,10 @@ import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, every, curry,
 } from 'lodash/fp';
 import type { ConversionDescriptor, UnitName, Units } from '../data/units';
+import { NODE_ENTITY } from '../tokenNodeTypes';
+import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
 import type { Curry2, Curry3 } from '../utilTypes';
 import type { ResolverContext } from '../resolverContext';
-
-export type Entity = { quantity: number, units: Units };
 
 const getConversionDescriptor = (
   context: ResolverContext,
@@ -62,17 +62,21 @@ const calculateConversionValue = (
   return siUnitValue.convertToBase(quantity);
 }, quantity, keys(units));
 
-export const convertTo = (context: ResolverContext, units: Units, entity: Entity): ?Entity => {
+export const convertTo = (
+  context: ResolverContext,
+  units: Units,
+  entity: EntityNode
+): ?EntityNode => {
   if (isEqual(units, entity.units)) return entity;
   if (!unitsAreCompatable(context, units, entity.units)) return null;
   const quantity = flow(
     calculateConversionValue(context, conversionValueNumerator, entity.units),
     calculateConversionValue(context, conversionValueDenominator, units)
   )(entity.quantity);
-  return { quantity, units };
+  return { type: NODE_ENTITY, quantity, units };
 };
 
 export const convertToFundamentalUnits = (
   context: ResolverContext,
-  entity: Entity,
-): ?Entity => convertTo(context, toFundamentalUnits(entity.units), entity);
+  entity: EntityNode,
+): ?EntityNode => convertTo(context, toFundamentalUnits(context, entity.units), entity);

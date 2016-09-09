@@ -1,5 +1,5 @@
 // @flow
-import { set, get, flow, map, every } from 'lodash/fp';
+import { set, get, flow, map } from 'lodash/fp';
 import {
   FUNCTION_ADD,
   FUNCTION_SUBTRACT,
@@ -9,7 +9,7 @@ import {
 } from './functions';
 import { NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY } from './tokenNodeTypes';
 import type { // eslint-disable-line
-  TokenNode, NodeBrackets, NodeFunction, NodeMiscGroup,
+  TokenNode, BracketsNode, FunctionNode, MiscGroupNode,
 } from './tokenNodeTypes';
 import {
   add as addEntityToEntity,
@@ -37,11 +37,11 @@ const resolver = {
   resolve(value: TokenNode): ?TokenNode {
     switch (value.type) {
       case NODE_BRACKETS: {
-        const bracketsNode: NodeBrackets = value;
+        const bracketsNode: BracketsNode = value;
         return this.resolve(bracketsNode);
       }
       case NODE_FUNCTION: {
-        const functionNode: NodeFunction = value;
+        const functionNode: FunctionNode = value;
         return this.executeFunction(functionNode);
       }
       case NODE_MISC_GROUP: {
@@ -56,12 +56,10 @@ const resolver = {
         Also, what about when this needs to take more than entities: dates were handled in the
         previous version. Should nodes really be the type themselves?
         */
-        const miscGroupNode: NodeMiscGroup = value;
+        const miscGroupNode: MiscGroupNode = value;
         const values = mapUnlessNull(value => this.resolve(value), miscGroupNode.value);
         if (!values) return null;
-        if (!every({ type: NODE_ENTITY }, values)) return null;
-        const entities = map('value', values);
-        return resolveMiscGroup(this.context, entities);
+        return resolveMiscGroup(this.context, values);
       }
       case NODE_ENTITY:
         return value;
@@ -76,14 +74,10 @@ const resolver = {
     if (!args) return null;
 
     const triePath = map('type', args);
-    const { _fn: func, _type: type } = get(['functionTrie', name, ...triePath], this);
+    const func = get(['functionTrie', name, ...triePath, '_fn'], this);
     if (!func) return null;
 
-    const argValues = map('value', args);
-    const value = func(this.context, ...argValues);
-    if (!value) return null;
-
-    return { type, value };
+    return func(this.context, ...args);
   },
 };
 

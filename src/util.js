@@ -3,7 +3,7 @@ type EveryOtherForm<T> = (startIndex: number) => (array: T[]) => T[];
 type PropagateNull<S, T> = (cb: (accum: T, value: S) => ?(T)) => (accum: T, value: S) => ?(T);
 type MapUnlessNull<T> = (cb: (value: any) => ?T, array: any[]) => ?(T[]);
 
-const everyOtherFrom: EveryOtherForm<*> = startIndex => array => {
+const everyOtherFrom: EveryOtherForm<any> = startIndex => array => {
   const accum = [];
   for (let i = startIndex; i < array.length; i += 2) {
     accum.push(array[i]);
@@ -13,10 +13,10 @@ const everyOtherFrom: EveryOtherForm<*> = startIndex => array => {
 export const evenIndexElements = everyOtherFrom(0);
 export const oddIndexElements = everyOtherFrom(1);
 
-export const propagateNull: PropagateNull<*, *> = cb =>
+export const propagateNull: PropagateNull<any, any> = cb =>
   (accum, value) => ((accum === null) ? null : cb(accum, value));
 
-export const mapUnlessNull: MapUnlessNull<*> = (cb, array) => {
+export const mapUnlessNull: MapUnlessNull<any> = (cb, array) => {
   const accum = [];
   for (let i = 0; i < array.length; i += 1) {
     const value = cb(array[i]);

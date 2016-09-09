@@ -22,7 +22,7 @@ import {
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
 } from '../functions';
-import type { TokenNode, TokenNodeType } from '../tokenNodeTypes'; // eslint-disable-line
+import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
@@ -105,7 +105,7 @@ const createNode = (operatorType, lhs, rhs) => {
   return value;
 };
 
-const createPattern = (operators: TokenNodeType[]) => (
+const createPattern = (operators: string[]) => (
   new Pattern([
     new CaptureOptions(operators).negate().lazy().any(),
     new Pattern([
@@ -115,7 +115,7 @@ const createPattern = (operators: TokenNodeType[]) => (
   ])
 );
 
-export const createForwardOperatorTransform = (operators: TokenNodeType[]): Transformer => ({
+export const createForwardOperatorTransform = (operators: string[]): Transformer => ({
   pattern: createPattern(operators),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
     const operatorTypes = getOperatorTypes(captureGroups);
@@ -127,7 +127,7 @@ export const createForwardOperatorTransform = (operators: TokenNodeType[]): Tran
   }),
 });
 
-export const createBackwardOperatorTransform = (operators: TokenNodeType[]): Transformer => ({
+export const createBackwardOperatorTransform = (operators: string[]): Transformer => ({
   pattern: createPattern(operators),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
     const operatorTypes = getOperatorTypes(captureGroups);
