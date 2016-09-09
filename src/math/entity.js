@@ -46,7 +46,11 @@ const multiplyDivideFactory = direction => (
   return { type: NODE_ENTITY, quantity, units };
 };
 
-const exponentMath = (context: ResolverContext, left: EntityNode, right: EntityNode): ?EntityNode => {
+const exponentMath = (
+  context: ResolverContext,
+  left: EntityNode,
+  right: EntityNode
+): ?EntityNode => {
   // Note: done for minor perf
   if (hasUnits(right) && hasUnits(toFundamentalUnits(context, right))) return null;
 
@@ -54,6 +58,12 @@ const exponentMath = (context: ResolverContext, left: EntityNode, right: EntityN
   const units = mapValues(multiply(right.quantity), left.units);
   return { type: NODE_ENTITY, quantity, units };
 };
+
+const negateMath = (context: ResolverContext, value: EntityNode): ?EntityNode => ({
+  type: NODE_ENTITY,
+  quantity: -value.quantity,
+  units: value.units,
+});
 
 const addMath = addSubtractFactory(1);
 const subtractMath = addSubtractFactory(-1);
@@ -66,4 +76,5 @@ export {
   multiplyMath as multiply,
   divideMath as divide,
   exponentMath as exponent,
+  negateMath as negate,
 };

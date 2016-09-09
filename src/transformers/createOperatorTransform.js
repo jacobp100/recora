@@ -22,7 +22,7 @@ import {
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
 } from '../functions';
-import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
+import type { TokenNode, FunctionNode } from '../tokenNodeTypes'; // eslint-disable-line
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
@@ -59,15 +59,16 @@ const getOperatorTypes = flow(
   map('type'),
 );
 
-const createBilinearNode = (name, lhs, rhs) => (
+const createBilinearNode = (name, lhs, rhs): ?FunctionNode => (
   (isEmpty(lhs) || isEmpty(rhs))
     ? null
-    : { type: NODE_FUNCTION, value: { name, args: [lhs, rhs] } }
+    : { type: NODE_FUNCTION, name, args: [lhs, rhs] }
 );
 
-const createUnaryNode = (name, argument) => ({
+const createUnaryNode = (name, argument): ?FunctionNode => ({
   type: NODE_FUNCTION,
-  value: { name, args: [argument] },
+  name,
+  args: [argument],
 });
 
 const createNode = (operatorType, lhs, rhs) => {
@@ -96,6 +97,8 @@ const createNode = (operatorType, lhs, rhs) => {
     argument = leftSide;
     leftSide = null;
   }
+
+  if (!argument) return null;
 
   const node = createUnaryNode(type, argument);
   const group = compact([leftSide, node, rightSide]);

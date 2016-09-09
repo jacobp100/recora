@@ -14,7 +14,7 @@ const cleanTokens = flow(
   map(pick(['type', 'start', 'end']))
 );
 
-class Recora {
+export default class Recora {
   tokenizer: Tokenizer
   resolver: resolver
 
@@ -45,8 +45,3 @@ class Recora {
     return null;
   }
 }
-
-
-const test = '3 foot 7 inches';
-const output = new Recora().parse(test);
-console.log(JSON.stringify(output && output.result));

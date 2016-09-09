@@ -6,6 +6,7 @@ import {
   FUNCTION_MULTIPLY,
   FUNCTION_DIVIDE,
   FUNCTION_EXPONENT,
+  FUNCTION_NEGATE,
 } from './functions';
 import { NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY } from './tokenNodeTypes';
 import type { // eslint-disable-line
@@ -17,6 +18,7 @@ import {
   multiply as multiplyEntityByEntity,
   divide as divideEntityByEntity,
   exponent as exponentEntityByEntity,
+  negate as negateEntity,
 } from './math/entity';
 import { resolveMiscGroup } from './types/miscGroup';
 import { mapUnlessNull } from './util';
@@ -52,9 +54,6 @@ const resolver = {
 
         A lot of places create misc groups and then compact them---making it a function could add a
         lot of overhead
-
-        Also, what about when this needs to take more than entities: dates were handled in the
-        previous version. Should nodes really be the type themselves?
         */
         const miscGroupNode: MiscGroupNode = value;
         const values = mapUnlessNull(value => this.resolve(value), miscGroupNode.value);
@@ -87,5 +86,6 @@ export default resolver
   .extendFunction(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, subtractEntityFromEntity)
   .extendFunction(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, multiplyEntityByEntity)
   .extendFunction(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, divideEntityByEntity)
-  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, exponentEntityByEntity);
+  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, exponentEntityByEntity)
+  .extendFunction(FUNCTION_NEGATE, [NODE_ENTITY], NODE_ENTITY, negateEntity);
 /* eslint-enable */
