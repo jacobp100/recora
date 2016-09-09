@@ -12,9 +12,11 @@ import bracketTransform from './transformers/bracketTransform';
 import {
   createForwardOperatorTransform, createBackwardOperatorTransform,
 } from './transformers/createOperatorTransform';
+import conversionTransform from './transformers/conversionTransform';
 import entityTransform from './transformers/entityTransform';
 
 export default createTransformer([
+  conversionTransform,
   bracketTransform,
   createForwardOperatorTransform([TOKEN_OPERATOR_ADD, TOKEN_OPERATOR_SUBTRACT]),
   createForwardOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),

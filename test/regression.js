@@ -9,57 +9,65 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
   t.plan(3);
   const actual = recora.parse(input);
 
-  t.truthy(actual, `Expected to get a result for ${input}`);
+  t.truthy(actual, `Expected to get a result for "${input}"`);
 
   const quantity = get(['result', 'quantity'], actual);
   t.true(
     quantity.toFixed(2) === expectedQuantity.toFixed(2),
-    `Expected ${quantity} to equal ${expectedQuantity} for ${input}`
+    `Expected ${quantity} to equal ${expectedQuantity} for "${input}"`
   );
 
   const units = get(['result', 'units'], actual);
   t.deepEqual(
     expectedUnits,
     units,
-    `Expected ${JSON.stringify(units)} to equal ${expectedUnits} for ${input}`
+    `Expected ${JSON.stringify(units)} to equal ${JSON.stringify(expectedUnits)} for "${input}"`
   );
 };
 
-test('test', entityResult, '5', 5);
-test('test', entityResult, '100', 100);
-test('test', entityResult, '-3', -3);
-test('test', entityResult, '1 + 2', 3);
-test('test', entityResult, '5 - 2', 3);
-test('test', entityResult, '3 * 3', 9);
-test('test', entityResult, '9 / 3', 3);
-test('test', entityResult, '3 * -3', -9);
-test('test', entityResult, '3 ** 2', 9);
-test('test', entityResult, '3 ^ 2', 9);
-test('test', entityResult, '1.5 + 2.77', 4.27);
-test('test', entityResult, '1.5 * 1.77', 2.66);
-test('test', entityResult, '7 / 2.4', 2.92);
-test('test', entityResult, '2 * 1 + 1', 3);
-test('test', entityResult, '2 * 1 - 1', 1);
-test('test', entityResult, '1 + 1 * 2', 3);
-test('test', entityResult, '1 - 1 * 2', -1);
-test('test', entityResult, '1 + 4 / 2', 3);
-// test('perform exponentiation right-to-left', entityResult, '4 ** 3 ** 2', 262144);
-// test('perform exponentiation after negation', entityResult, '4 ** 3 ** -2', 1.17);
-// test('perform exponentiation after negation', entityResult, '4 ** -3 ** -2', 0.857);
-// test('perform exponentiation after negation', entityResult, '4 ** -3 ** 2', 0.00000381);
-// test('perform exponentiation after negation', entityResult, '-4 ** -3 ** 2', -0.00000381);
-// test('perform exponentiation after negation', entityResult, '-4 ** 3 ** 2', -262144);
-// test('test', entityResult, '1 meter to yards', 1.09, { yards: 1 });
-// test('test', entityResult, '1 minute to seconds', 60, { seconds: 1 });
-// test('test', entityResult, '3 feet 4 inches to cm', 102, { centimeters: 1 });
-// test('test', entityResult, '1 meter + 1 yard to centimeters', 191, { centimeters: 1 });
-// test('test', entityResult, 'kilometers in 1 mile', 1.61, { kilometers: 1 });
-// test('test', entityResult, 'ounces in 1kg', 35.3, { ounces: 1 });
-// test('test', entityResult, '1 meter + 1 yard', 1.91, { meters: 1 });
-// test('test', entityResult, '1kg - 1 ounce', 972, { grams: 1 });
-// test('not add', entityResult, '1 meter + 1', );
-// test('test', entityResult, '3 + -1', 2);
-// test('test', entityResult, '3 + - 1', 2);
+// const noResult = (t, input) => {
+//   t.plan(1);
+//   const actual = recora.parse(input);
+//   t.is(actual, null);
+// };
+
+test('basic maths', entityResult, '5', 5);
+test('basic maths', entityResult, '100', 100);
+test('basic maths', entityResult, '-3', -3);
+test('basic maths', entityResult, '1 + 2', 3);
+test('basic maths', entityResult, '5 - 2', 3);
+test('basic maths', entityResult, '3 * 3', 9);
+test('basic maths', entityResult, '9 / 3', 3);
+test('basic maths', entityResult, '3 * -3', -9);
+test('basic maths', entityResult, '3 ** 2', 9);
+test('basic maths', entityResult, '3 ^ 2', 9);
+test('basic maths', entityResult, '1.5 + 2.77', 4.27);
+test('basic maths', entityResult, '1.5 * 1.77', 2.66);
+test('basic maths', entityResult, '7 / 2.4', 2.92);
+test('basic maths', entityResult, '2 * 1 + 1', 3);
+test('basic maths', entityResult, '2 * 1 - 1', 1);
+test('basic maths', entityResult, '1 + 1 * 2', 3);
+test('basic maths', entityResult, '1 - 1 * 2', -1);
+test('basic maths', entityResult, '1 + 4 / 2', 3);
+test('basic maths', entityResult, '3 + -1', 2);
+test('basic maths', entityResult, '3 + - 1', 2);
+test('awkward expressions', entityResult, '-------4', -4);
+test('awkward expressions', entityResult, '1------1', 2);
+test('exponentiation', entityResult, '4 ** 3 ** 2', 262144);
+test('exponentiation with negation', entityResult, '4 ** 3 ** -2', 1.17);
+test('exponentiation with negation', entityResult, '4 ** -3 ** -2', 0.857);
+test('exponentiation with negation', entityResult, '4 ** -3 ** 2', 0.00000381);
+test('exponentiation with negation', entityResult, '-4 ** -3 ** 2', -0.00000381);
+test('exponentiation with negation', entityResult, '-4 ** 3 ** 2', -262144);
+test('conversion', entityResult, '1 meter to yards', 1.09, { yard: 1 });
+test('conversion', entityResult, '1 minute to seconds', 60, { second: 1 });
+test('conversion', entityResult, '3 feet 4 inches to cm', 101.6, { centimeter: 1 });
+test('conversion', entityResult, '1 meter + 1 yard to centimeters', 191.44, { centimeter: 1 });
+test('conversion', entityResult, 'kilometers in 1 mile', 1.61, { kilometer: 1 });
+test('conversion', entityResult, 'ounces in 1kg', 35.27, { ounce: 1 });
+test('conversion', entityResult, '1 meter + 1 yard', 1.91, { meter: 1 });
+test('conversion', entityResult, '1kg - 1 ounce', 0.97, { kilogram: 1 });
+// test('does not add', noResult, '1 meter + 1');
 // test('test', entityResult, '100 celsius to kelvin', 373, { Kelvin: 1 });
 // test('test', entityResult, '180 celsius to fahrenheit', 356, { Fahrenheit: 1 });
 // test('test', entityResult, '180 centigrade to celsius', 180, { Celsius: 1 });
@@ -67,8 +75,6 @@ test('test', entityResult, '1 + 4 / 2', 3);
 // test('test', entityResult, '4 gas mark to celsius', 180, { Celsius: 1 });
 // test('test', entityResult, '180 degrees centigrade to gas mark', 4, { 'gas mark': 1 });
 // test('test', entityResult, '3 feet 4 inches to centimetres', 102, { centimeters: 1 });
-// test('test', entityResult, '-------4', -4);
-// test('test', entityResult, '1------1', 2);
 // test('test', entityResult, '5!', 120);
 // test('test', entityResult, '4.5!', 52.3);
 // test('test', entityResult, '4!', 24);

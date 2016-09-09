@@ -8,9 +8,11 @@ import {
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
 } from './functions';
-import { NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY } from './tokenNodeTypes';
+import {
+  NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY, NODE_CONVERSION,
+} from './tokenNodeTypes';
 import type { // eslint-disable-line
-  TokenNode, BracketsNode, FunctionNode, MiscGroupNode,
+  TokenNode, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
 } from './tokenNodeTypes';
 import {
   add as addEntityToEntity,
@@ -20,7 +22,8 @@ import {
   exponent as exponentEntityByEntity,
   negate as negateEntity,
 } from './math/entity';
-import { resolveMiscGroup } from './types/miscGroup';
+import { resolve as resolveMiscGroup } from './types/miscGroup';
+import { convert } from './types/conversion';
 import { mapUnlessNull } from './util';
 
 const resolver = {
@@ -60,10 +63,17 @@ const resolver = {
         if (!values) return null;
         return resolveMiscGroup(this.context, values);
       }
-      case NODE_ENTITY:
-        return value;
+      case NODE_CONVERSION: {
+        const { context } = this;
+        const conversionNode: ConversionNode = value;
+
+        const resolvedValue = this.resolve(conversionNode.value);
+        if (!resolvedValue) return null;
+
+        return convert(context, value.units, resolvedValue);
+      }
       default:
-        return null;
+        return value;
     }
   },
   executeFunction(fn) {

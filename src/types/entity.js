@@ -19,33 +19,32 @@ const getConversionDescriptor = (
 
 const addUnitValues = (lhsUnitValue, rhsUnitValue) => ((lhsUnitValue || 0) + (rhsUnitValue || 0));
 
+const unitIsLinear: Curry2<ResolverContext, UnitName, boolean> =
+  curry((context, unitName) => typeof getConversionDescriptor(context, unitName)[0] === 'number');
+
 export const combineUnits: Curry2<Units, Units, Units> =
   curry((units1, units2) => flow(mergeWith(addUnitValues), omitBy(eq(0)))(units1, units2));
 
-export const toFundamentalUnits = (
-  context: ResolverContext,
-  units: Units
-): Units => reduce((accum, [unitName, unitValue]) => {
-  const siUnitDimensions = getConversionDescriptor(context, unitName)[1];
-  const scaledSiUnitDimensions = mapValues(multiply(unitValue), siUnitDimensions);
-  return combineUnits(scaledSiUnitDimensions, accum);
-}, {}, toPairs(units));
+export const toFundamentalUnits: Curry2<ResolverContext, Units, Units> = curry((context, units) => (
+  reduce((accum, [unitName, unitValue]) => {
+    const siUnitDimensions = getConversionDescriptor(context, unitName)[1];
+    const scaledSiUnitDimensions = mapValues(multiply(unitValue), siUnitDimensions);
+    return combineUnits(scaledSiUnitDimensions, accum);
+  }, {}, toPairs(units))
+));
+
+export const unitsAreLinear: Curry2<ResolverContext, Units, boolean> =
+  curry((context, units) => flow(keys, every(unitIsLinear(context)))(units));
 
 export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> =
   curry((context, units1, units2) => (
     isEqual(toFundamentalUnits(context, units1), toFundamentalUnits(context, units2))
   ));
 
-export const unitIsLinear: Curry2<ResolverContext, UnitName, boolean> =
-  curry((context, unitName) => typeof getConversionDescriptor(context, unitName)[0] === 'number');
-
-export const unitsAreLinear: Curry2<ResolverContext, Units, boolean> =
-  curry((context, units) => flow(keys, every(unitIsLinear(context)))(units));
-
-
 type ConversionDirection = number;
 const conversionValueNumerator = 1;
 const conversionValueDenominator = -1;
+
 
 const calculateConversionValue = (
   context: ResolverContext,
@@ -75,8 +74,3 @@ export const convertTo = (
   )(entity.quantity);
   return { type: NODE_ENTITY, quantity, units };
 };
-
-export const convertToFundamentalUnits = (
-  context: ResolverContext,
-  entity: EntityNode,
-): ?EntityNode => convertTo(context, toFundamentalUnits(context, entity.units), entity);

@@ -1,8 +1,5 @@
 // @flow
-import {
-  first, last, reduce, map, reduceRight, update, multiply, concat, set, isEqual, castArray, get,
-  reject,
-} from 'lodash/fp';
+import { last, reduce, update, concat, set, some, castArray, reject } from 'lodash/fp';
 import { combineUnits } from '../types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TransformResult } from '../modules/createTransformer';
@@ -17,39 +14,13 @@ import {
   NODE_ENTITY,
 } from '../tokenNodeTypes';
 import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
-import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
+import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
+import { evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
 
 const getEntities = segment => {
-  const INTERMEDIATE_UNIT = 'INTERMEDIATE_UNIT';
-
-  let segmentWithIntermediateUnits = map(tag => (
-    tag.type === TOKEN_UNIT_NAME
-      ? ({ type: INTERMEDIATE_UNIT, name: tag.value, power: 1 })
-      : tag
-  ), segment);
-
-  // Combine unit suffixes with intermediate unit powers
-  segmentWithIntermediateUnits = reduce(propagateNull((accum, tag) => {
-    if (tag.type !== TOKEN_UNIT_SUFFIX) {
-      return [...accum, tag];
-    } else if (get('type', last(accum)) === INTERMEDIATE_UNIT) {
-      return update([accum.length - 1, 'power'], multiply(tag.value), accum);
-    }
-    return null;
-  }), [], segmentWithIntermediateUnits);
-
-  // Combine unit prefixes with intermediate unit powers
-  segmentWithIntermediateUnits = reduceRight(propagateNull((accum, tag) => {
-    if (tag.type !== TOKEN_UNIT_PREFIX) {
-      return [tag, ...accum];
-    } else if (get('type', first(accum)) === INTERMEDIATE_UNIT) {
-      return update([0, 'power'], multiply(tag.value), accum);
-    }
-    return null;
-  }), [], segmentWithIntermediateUnits);
-
+  const segmentWithIntermediateUnits = combineUnitNamesPrefixesSuffixes(segment);
   if (segmentWithIntermediateUnits === null) return null;
 
   /*
@@ -79,7 +50,7 @@ const getEntities = segment => {
     return accum;
   }, [baseEntityValue], segmentWithIntermediateUnits);
 
-  if (maybeEntities.length === 1 && isEqual(last(maybeEntities), baseEntityValue)) return [];
+  if (some(entity => entity.quantity === undefined, maybeEntities)) return null;
 
   const entities: EntityNode = maybeEntities;
   return entities;

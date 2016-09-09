@@ -25,7 +25,11 @@ const unitSuffixes = {
 /* eslint-disable max-len */
 const enLocale: TokenizerSpec = {
   number: [
-    { match: /\d+(?:\.\d+)?/, token: token => ({ type: TOKEN_NUMBER, value: Number(token) }), penalty: -1000 },
+    {
+      match: /\d[\d,]*(?:\.\d+)?/,
+      token: token => ({ type: TOKEN_NUMBER, value: Number(token.replace(',')) }),
+      penalty: -1000,
+    },
   ],
   unit: [
     wordMatcher({ words: 3, type: TOKEN_UNIT_NAME, dictionary: threeWordUnits, penalty: -600 }),

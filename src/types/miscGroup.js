@@ -49,7 +49,7 @@ const combineValues = (context: ResolverContext) => (
   return null;
 };
 
-export const resolveMiscGroup = ( // eslint-disable-line
+export const resolve = ( // eslint-disable-line
   context: ResolverContext,
   values: TokenNode[]
 ): ?TokenNode => reduce(
