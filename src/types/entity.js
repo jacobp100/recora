@@ -4,7 +4,7 @@ import {
 } from 'lodash/fp';
 import type { ConversionDescriptor, UnitName, Units } from '../data/units'; // eslint-disable-line
 import type { Curry2, Curry3 } from '../utilTypes';
-import type { ResolveContext } from '../resolverTypes';
+import type { ResolverContext } from '../resolverContext';
 
 export type Entity = { quantity: number, units: Units };
 
@@ -15,7 +15,7 @@ export const combineUnits: CombineUnits = curry((units1, units2) => flow(
 )(units1, units2));
 
 const getConversionDescriptor = (
-  context: ResolveContext,
+  context: ResolverContext,
   unitName: UnitName,
 ): ConversionDescriptor => {
   const siUnitDescriptor = context.conversionDescriptors[unitName];
@@ -25,7 +25,7 @@ const getConversionDescriptor = (
 
 // FIXME: Is this the correct name?
 export const siUnits = (
-  context: ResolveContext,
+  context: ResolverContext,
   units: Units
 ): Units => reduce((accum, [unitName, unitValue]) => {
   const siUnitDimensions = getConversionDescriptor(context, unitName)[1];
@@ -33,13 +33,13 @@ export const siUnits = (
   return combineUnits(scaledSiUnitDimensions, accum);
 }, {}, toPairs(units));
 
-export const isCompatable: Curry3<ResolveContext, Units, Units, boolean> =
+export const isCompatable: Curry3<ResolverContext, Units, Units, boolean> =
   curry((context, units1, units2) => isEqual(siUnits(context, units1), siUnits(context, units2)));
 
-export const unitIsLinear: Curry2<ResolveContext, UnitName, boolean> =
+export const unitIsLinear: Curry2<ResolverContext, UnitName, boolean> =
   curry((context, unitName) => typeof getConversionDescriptor(context, unitName)[0] === 'number');
 
-export const isLinear: Curry2<ResolveContext, Units, boolean> =
+export const isLinear: Curry2<ResolverContext, Units, boolean> =
   curry((context, units) => flow(keys, every(unitIsLinear(context)))(units));
 
 
@@ -48,7 +48,7 @@ const conversionValueNumerator = 1;
 const conversionValueDenominator = -1;
 
 const calculateConversionValue = (
-  context: ResolveContext,
+  context: ResolverContext,
   direction: ConversionDirection,
   units: Units
 ) => (quantity: number) => reduce((quantity, unitName) => {
@@ -62,7 +62,7 @@ const calculateConversionValue = (
   return siUnitValue.convertToBase(quantity);
 }, quantity, keys(units));
 
-export const convertTo = (context: ResolveContext, units: Units, entity: Entity): ?Entity => {
+export const convertTo = (context: ResolverContext, units: Units, entity: Entity): ?Entity => {
   if (isEqual(units, entity.units)) return entity;
   if (!isCompatable(context, units, entity.units)) return null;
   const quantity = flow(

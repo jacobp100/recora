@@ -2,14 +2,14 @@
 import { matchesProperty, mapValues, update, multiply, isEmpty } from 'lodash/fp';
 import { convertTo, combineUnits, siUnits, isLinear } from '../types/entity';
 import type { Entity } from '../types/entity'; // eslint-disable-line
-import type { ResolveContext } from '../resolverTypes';
+import type { ResolverContext } from '../resolverContext';
 
 const isZero = matchesProperty('quantity', 0);
 const zeroEntity = { quantity: 0, units: {} };
 const hasUnits = entity => !isEmpty(entity.units);
 
 const addSubtractFactory = direction => (
-  context: ResolveContext,
+  context: ResolverContext,
   left: Entity,
   right: Entity
 ) => {
@@ -26,7 +26,7 @@ const addSubtractFactory = direction => (
 };
 
 const multiplyDivideFactory = direction => (
-  context: ResolveContext,
+  context: ResolverContext,
   left: Entity,
   right: Entity
 ) => {
@@ -45,7 +45,7 @@ const multiplyDivideFactory = direction => (
   return { units, quantity };
 };
 
-const exponentMath = (context: ResolveContext, left: Entity, right: Entity) => {
+const exponentMath = (context: ResolverContext, left: Entity, right: Entity) => {
   // Note: done for minor perf
   if (hasUnits(right) && hasUnits(siUnits(context, right))) return null;
 

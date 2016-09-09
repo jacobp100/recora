@@ -1,33 +1,46 @@
 // @flow
+import { flow, reject, map, pick } from 'lodash/fp';
+import { TOKEN_NOOP } from './tokenNodeTypes';
 import tokenizer from './tokenizer';
 import transformer from './transformer';
 import resolver from './resolver';
-import conversionDescriptors from './data/units';
+import { defaultContext, setUnits } from './resolverContext';
+import units from './data/units';
+
+const cleanTokens = flow(
+  reject({ type: TOKEN_NOOP }),
+  map(pick(['type', 'start', 'end']))
+);
 
 class Recora {
   resolver: resolver
 
   constructor() {
-    this.resolver = resolver.setContext({ conversionDescriptors });
+    const resolverContext = setUnits(defaultContext, units);
+    this.resolver = resolver.setContext(resolverContext);
   }
 
   parse(text: string) {
-    const tokenOptions = tokenizer(text);
+    const { resolver } = this;
 
-    /* eslint-disable no-continue */
+    const tokenOptions = tokenizer(text);
+    let result;
+
     for (const tokenOption of tokenOptions) {
       const ast = transformer(tokenOption);
-      if (!ast) continue;
-      const result = this.resolver.resolve(ast);
-      if (!result) continue;
-      return result;
+      result = ast ? resolver.resolve(ast) : null;
+
+      if (result) {
+        const tokens = cleanTokens(tokenOption);
+        return { result, tokens };
+      }
     }
-    /* eslint-enable */
 
     return null;
   }
 }
 
 
-const test = '1 meter + 2 yard';
-console.log(JSON.stringify(new Recora().parse(test)));
+const test = '1 meter + 3 * 2 yard';
+const output = new Recora().parse(test);
+console.log(JSON.stringify(output && output.result));

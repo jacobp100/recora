@@ -91,8 +91,7 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}) => {
 
       const end = state.character + matchedText.length;
       const tokens = token
-        // ? [...state.tokens, { ...token, start: state.character, end }]
-        ? [...state.tokens, token]
+        ? [...state.tokens, { ...token, start: state.character, end }]
         : state.tokens;
 
       let { stack, userState } = state;
