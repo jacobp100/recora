@@ -84,10 +84,10 @@ const conversionDescriptors: ConversionDescriptors = {
                 'therm': [1055000000,                    energyDimensions],
 
                          // We also have absolute temperatures below
-       'degrees kelvin': [1.4e-23,                       energyDimensions],
-      'degrees celsius': [1.4e-23,                       energyDimensions],
-   'degrees fahrenheit': [7.7777777778e-23,              energyDimensions],
-      'degrees rankine': [7.7777777778e-23,              energyDimensions],
+       'degrees Kelvin': [1.4e-23,                       energyDimensions],
+      'degrees Celsius': [1.4e-23,                       energyDimensions],
+   'degrees Fahrenheit': [7.7777777778e-23,              energyDimensions],
+      'degrees Rankine': [7.7777777778e-23,              energyDimensions],
 
                  'Watt': [1,                             powerDimensions],
 
@@ -211,12 +211,12 @@ const conversionDescriptors: ConversionDescriptors = {
             'arcsecond': [4.848136811095359935899141e-6, noDimensions],
 
                          // TODO: Rankine
-               'kelvin': [1.4e-23,                       absoluteTemperatureDimensions],
-              'celsius': [{
+               'Kelvin': [1.4e-23,                       absoluteTemperatureDimensions],
+              'Celsius': [{
                            convertToBase: value => value - 273.15,
                            convertFromBase: value => value + 273.15,
                          }, absoluteTemperatureDimensions],
-           'fahrenheit': [{
+           'Fahrenheit': [{
                            convertToBase: value => ((value - 273.15) * 1.8) + 32,
                            convertFromBase: value => ((value - 32) / 1.8) + 273.15,
                          }, absoluteTemperatureDimensions],

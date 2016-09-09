@@ -19,21 +19,12 @@ import {
   TOKEN_VECTOR_SEPARATOR,
   TOKEN_VECTOR_END,
 } from './tokenNodeTypes';
+import oneWordUnits from './data/en/1-word-units';
+import twoWordUnits from './data/en/2-word-units';
+import threeWordUnits from './data/en/3-word-units';
+import abbreviations from './data/en/abbreviations';
 import createTokenizer from './modules/createTokenizer';
 
-
-const twoWordUnits = {
-  'degrees celsius': 'celsius',
-  'degree celsius': 'celsius',
-};
-const oneWordUnits = {
-  meters: 'meter',
-  meter: 'meter',
-  yard: 'yard',
-  yards: 'yard',
-  inches: 'inch',
-  second: 'second',
-};
 
 const unitPrefixes = {
   per: -1,
@@ -75,8 +66,10 @@ export default createTokenizer({
     { match: '-', token: { type: TOKEN_OPERATOR_NEGATE }, penalty: -500 },
   ],
   unit: [
+    wordMatcher({ words: 3, type: TOKEN_UNIT_NAME, dictionary: threeWordUnits, penalty: -600 }),
     wordMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: oneWordUnits, penalty: -400 }),
+    wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: abbreviations, penalty: -200 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
     { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },

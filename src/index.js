@@ -34,6 +34,7 @@ class Recora {
         const tokens = cleanTokens(tokenOption);
         return { result, tokens };
       }
+      return null;
     }
 
     return null;
@@ -41,6 +42,6 @@ class Recora {
 }
 
 
-const test = '1 meter + 3 * 2 yard';
+const test = '2 cubic meters + 10000 litres';
 const output = new Recora().parse(test);
 console.log(JSON.stringify(output && output.result));

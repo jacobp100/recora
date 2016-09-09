@@ -2,17 +2,11 @@
 import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, every, curry,
 } from 'lodash/fp';
-import type { ConversionDescriptor, UnitName, Units } from '../data/units'; // eslint-disable-line
+import type { ConversionDescriptor, UnitName, Units } from '../data/units';
 import type { Curry2, Curry3 } from '../utilTypes';
 import type { ResolverContext } from '../resolverContext';
 
 export type Entity = { quantity: number, units: Units };
-
-type CombineUnits = Curry2<Units, Units, Units>;
-export const combineUnits: CombineUnits = curry((units1, units2) => flow(
-  mergeWith((lhsUnitValue, rhsUnitValue) => ((lhsUnitValue || 0) + (rhsUnitValue || 0))),
-  omitBy(eq(0))
-)(units1, units2));
 
 const getConversionDescriptor = (
   context: ResolverContext,
@@ -23,8 +17,12 @@ const getConversionDescriptor = (
   return siUnitDescriptor;
 };
 
-// FIXME: Is this the correct name?
-export const siUnits = (
+const addUnitValues = (lhsUnitValue, rhsUnitValue) => ((lhsUnitValue || 0) + (rhsUnitValue || 0));
+
+export const combineUnits: Curry2<Units, Units, Units> =
+  curry((units1, units2) => flow(mergeWith(addUnitValues), omitBy(eq(0)))(units1, units2));
+
+export const toFundamentalUnits = (
   context: ResolverContext,
   units: Units
 ): Units => reduce((accum, [unitName, unitValue]) => {
@@ -33,13 +31,15 @@ export const siUnits = (
   return combineUnits(scaledSiUnitDimensions, accum);
 }, {}, toPairs(units));
 
-export const isCompatable: Curry3<ResolverContext, Units, Units, boolean> =
-  curry((context, units1, units2) => isEqual(siUnits(context, units1), siUnits(context, units2)));
+export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> =
+  curry((context, units1, units2) => (
+    isEqual(toFundamentalUnits(context, units1), toFundamentalUnits(context, units2))
+  ));
 
 export const unitIsLinear: Curry2<ResolverContext, UnitName, boolean> =
   curry((context, unitName) => typeof getConversionDescriptor(context, unitName)[0] === 'number');
 
-export const isLinear: Curry2<ResolverContext, Units, boolean> =
+export const unitsAreLinear: Curry2<ResolverContext, Units, boolean> =
   curry((context, units) => flow(keys, every(unitIsLinear(context)))(units));
 
 
@@ -64,7 +64,7 @@ const calculateConversionValue = (
 
 export const convertTo = (context: ResolverContext, units: Units, entity: Entity): ?Entity => {
   if (isEqual(units, entity.units)) return entity;
-  if (!isCompatable(context, units, entity.units)) return null;
+  if (!unitsAreCompatable(context, units, entity.units)) return null;
   const quantity = flow(
     calculateConversionValue(context, conversionValueNumerator, entity.units),
     calculateConversionValue(context, conversionValueDenominator, units)

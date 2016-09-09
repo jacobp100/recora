@@ -1,6 +1,6 @@
 // @flow
 import {
-  first, last, reduce, map, reduceRight, update, add, concat, set, isEqual, castArray,
+  first, last, reduce, map, reduceRight, update, multiply, concat, set, isEqual, castArray, get,
 } from 'lodash/fp';
 import { combineUnits } from '../types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
@@ -30,18 +30,18 @@ const getEntities = segment => {
   segmentWithIntermediateUnits = reduce(propagateNull((accum, tag) => {
     if (tag.type !== TOKEN_UNIT_SUFFIX) {
       return [...accum, tag];
-    } else if (last(accum.type) === INTERMEDIATE_UNIT) {
-      return update([accum.length - 1, 'power'], add(tag.power), accum);
+    } else if (get('type', last(accum)) === INTERMEDIATE_UNIT) {
+      return update([accum.length - 1, 'power'], multiply(tag.value), accum);
     }
     return null;
   }), [], segmentWithIntermediateUnits);
 
   // Combine unit prefixes with intermediate unit powers
   segmentWithIntermediateUnits = reduceRight(propagateNull((accum, tag) => {
-    if (tag.type !== TOKEN_UNIT_SUFFIX) {
+    if (tag.type !== TOKEN_UNIT_PREFIX) {
       return [tag, ...accum];
-    } else if (first(accum.type) === INTERMEDIATE_UNIT) {
-      return update([0, 'power'], add(tag.power), accum);
+    } else if (get('type', first(accum)) === INTERMEDIATE_UNIT) {
+      return update([0, 'power'], multiply(tag.value), accum);
     }
     return null;
   }), [], segmentWithIntermediateUnits);

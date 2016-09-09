@@ -1,6 +1,6 @@
 // @flow
 import { matchesProperty, mapValues, update, multiply, isEmpty } from 'lodash/fp';
-import { convertTo, combineUnits, siUnits, isLinear } from '../types/entity';
+import { convertTo, combineUnits, toFundamentalUnits, unitsAreLinear } from '../types/entity';
 import type { Entity } from '../types/entity'; // eslint-disable-line
 import type { ResolverContext } from '../resolverContext';
 
@@ -13,7 +13,7 @@ const addSubtractFactory = direction => (
   left: Entity,
   right: Entity
 ) => {
-  if (!isLinear(context, left.units) || !isLinear(context, right.units)) return null;
+  if (!unitsAreLinear(context, left.units) || !unitsAreLinear(context, right.units)) return null;
   if (isZero(right)) return left;
   if (isZero(left)) return update('quantity', multiply(direction), right);
 
@@ -47,7 +47,7 @@ const multiplyDivideFactory = direction => (
 
 const exponentMath = (context: ResolverContext, left: Entity, right: Entity) => {
   // Note: done for minor perf
-  if (hasUnits(right) && hasUnits(siUnits(context, right))) return null;
+  if (hasUnits(right) && hasUnits(toFundamentalUnits(context, right))) return null;
 
   const quantity = Math.pow(left.quantity, right.quantity);
   const units = mapValues(multiply(right.quantity), left.units);
