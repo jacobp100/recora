@@ -1,4 +1,3 @@
-// @flow
 /* globals Generator */
 import { set, map, includes } from 'lodash/fp';
 

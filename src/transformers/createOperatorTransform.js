@@ -1,4 +1,3 @@
-// @flow
 import {
   first, last, reduce, zip, flow, map, isEmpty, dropRight, reduceRight, compact,
 } from 'lodash/fp';
@@ -11,36 +10,45 @@ import {
   TOKEN_OPERATOR_ADD,
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_OPERATOR_NEGATE,
-  NODE_OPERATOR_UNARY,
-  NODE_OPERATOR_BILINEAR,
+  NODE_FUNCTION,
   NODE_MISC_GROUP,
 } from '../types';
+import {
+  FUNCTION_ADD,
+  FUNCTION_SUBTRACT,
+  FUNCTION_MULTIPLY,
+  FUNCTION_DIVIDE,
+  FUNCTION_EXPONENT,
+  FUNCTION_NEGATE,
+} from '../math/functions';
 import type { TokenType } from '../types'; // eslint-disable-line
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
+import { compactMiscGroup } from '../nodeUtil';
 
 type Direction = number;
-export const FORWARD: Direction = 0;
-export const BACKWARD: Direction = 1;
+const FORWARD: Direction = 0;
+const BACKWARD: Direction = 1;
 
 const operatorArity = {
-  [TOKEN_OPERATOR_EXPONENT]: NODE_OPERATOR_BILINEAR,
-  [TOKEN_OPERATOR_MULTIPLY]: NODE_OPERATOR_BILINEAR,
-  [TOKEN_OPERATOR_DIVIDE]: NODE_OPERATOR_BILINEAR,
-  [TOKEN_OPERATOR_ADD]: NODE_OPERATOR_BILINEAR,
-  [TOKEN_OPERATOR_SUBTRACT]: NODE_OPERATOR_BILINEAR,
-  [TOKEN_OPERATOR_NEGATE]: NODE_OPERATOR_UNARY,
+  [TOKEN_OPERATOR_EXPONENT]: 2,
+  [TOKEN_OPERATOR_MULTIPLY]: 2,
+  [TOKEN_OPERATOR_DIVIDE]: 2,
+  [TOKEN_OPERATOR_ADD]: 2,
+  [TOKEN_OPERATOR_SUBTRACT]: 2,
+  [TOKEN_OPERATOR_NEGATE]: 1,
 };
 
 const operatorTypes = {
-  [TOKEN_OPERATOR_EXPONENT]: 'exponent',
-  [TOKEN_OPERATOR_MULTIPLY]: 'multiply',
-  [TOKEN_OPERATOR_DIVIDE]: 'divide',
-  [TOKEN_OPERATOR_ADD]: 'add',
-  [TOKEN_OPERATOR_SUBTRACT]: 'subtract',
-  [TOKEN_OPERATOR_NEGATE]: 'negate',
+  [TOKEN_OPERATOR_ADD]: FUNCTION_ADD,
+  [TOKEN_OPERATOR_SUBTRACT]: FUNCTION_SUBTRACT,
+  [TOKEN_OPERATOR_MULTIPLY]: FUNCTION_MULTIPLY,
+  [TOKEN_OPERATOR_DIVIDE]: FUNCTION_DIVIDE,
+  [TOKEN_OPERATOR_EXPONENT]: FUNCTION_EXPONENT,
+  [TOKEN_OPERATOR_NEGATE]: FUNCTION_NEGATE,
 };
 
 const unaryBindingDirections = {
+  // Factorial is backwards
   [TOKEN_OPERATOR_NEGATE]: FORWARD,
 };
 
@@ -50,31 +58,22 @@ const getOperatorTypes = flow(
   map('type'),
 );
 
-const createBilinearTag = (type, lhs, rhs) => (
+const createBilinearNode = (name, lhs, rhs) => (
   (isEmpty(lhs) || isEmpty(rhs))
     ? null
-    : { type: NODE_OPERATOR_BILINEAR, value: { type, lhs, rhs } }
+    : { type: NODE_FUNCTION, value: { name, args: [lhs, rhs] } }
 );
 
-const createUnaryTag = (type, argument) => ({
-  type: NODE_OPERATOR_UNARY,
-  value: { type, argument },
+const createUnaryNode = (name, argument) => ({
+  type: NODE_FUNCTION,
+  value: { name, args: [argument] },
 });
 
-const compactMiscGroup = node => {
-  if (node.type !== NODE_MISC_GROUP || node.value.length > 1) {
-    return node;
-  } else if (node.value.length === 1) {
-    return node.value[0];
-  }
-  return null;
-};
-
-const createTag = (operatorType, lhs, rhs) => {
+const createNode = (operatorType, lhs, rhs) => {
   const arity = operatorArity[operatorType];
   const type = operatorTypes[operatorType];
 
-  if (arity !== NODE_OPERATOR_UNARY) return createBilinearTag(type, lhs, rhs);
+  if (arity === 2) return createBilinearNode(type, lhs, rhs);
 
   const bindingDirection = unaryBindingDirections[operatorType];
   let leftSide = !isEmpty(lhs) ? lhs : null;
@@ -87,50 +86,51 @@ const createTag = (operatorType, lhs, rhs) => {
   } else if (bindingDirection === FORWARD) {
     argument = rightSide;
     rightSide = null;
-  } else if (leftSide && leftSide.type === NODE_MISC_GROUP) {
+  } else if (bindingDirection === BACKWARD && leftSide && leftSide.type === NODE_MISC_GROUP) {
     argument = last(leftSide.value);
     leftSide = compactMiscGroup({ type: NODE_MISC_GROUP, value: leftSide.value.slice(1) });
-  } else {
+  } else if (bindingDirection === BACKWARD) {
     argument = leftSide;
     leftSide = null;
   }
 
-  const tag = createUnaryTag(type, argument);
-  const group = compact([leftSide, tag, rightSide]);
+  const node = createUnaryNode(type, argument);
+  const group = compact([leftSide, node, rightSide]);
 
   return compactMiscGroup({ type: NODE_MISC_GROUP, value: group });
 };
 
-export default (operators: TokenType[], direction: Direction): Transformer => ({
-  pattern: new Pattern([
+const createPattern = (operators: TokenType[]) => (
+  new Pattern([
     new CaptureOptions(operators).negate().lazy().any(),
     new Pattern([
       new CaptureOptions(operators),
       new CaptureOptions(operators).negate().lazy().any(),
     ]).oneOrMore(),
-  ]),
+  ])
+);
+
+export const createForwardOperatorTransform = (operators: TokenType[]): Transformer => ({
+  pattern: createPattern(operators),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
-    /*
-    FIXME: Don't ignore lhs on unary. I think it's inevitable that we'll just have to pass in at
-    arbitrary transform function for this.
-    */
-
     const operatorTypes = getOperatorTypes(captureGroups);
-
-    if (direction === BACKWARD) {
-      const initialSegment = last(segments);
-      const remainingSegments = dropRight(1, segments);
-
-      return reduceRight(propagateNull((lhs, [operator, rhs]) => (
-        createTag(operator, rhs, lhs)
-      )), initialSegment, zip(operatorTypes, remainingSegments));
-    }
-
-
     const [initialSegment, ...remainingSegments] = segments;
 
     return reduce(propagateNull((lhs, [operator, rhs]) => (
-      createTag(operator, lhs, rhs)
+      createNode(operator, lhs, rhs)
+    )), initialSegment, zip(operatorTypes, remainingSegments));
+  }),
+});
+
+export const createBackwardOperatorTransform = (operators: TokenType[]): Transformer => ({
+  pattern: createPattern(operators),
+  transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
+    const operatorTypes = getOperatorTypes(captureGroups);
+    const initialSegment = last(segments);
+    const remainingSegments = dropRight(1, segments);
+
+    return reduceRight(propagateNull((lhs, [operator, rhs]) => (
+      createNode(operator, rhs, lhs)
     )), initialSegment, zip(operatorTypes, remainingSegments));
   }),
 });

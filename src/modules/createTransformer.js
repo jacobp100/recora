@@ -1,4 +1,3 @@
-// @flow
 import type { Token } from '../types';
 import { Pattern, CaptureWildcard, CaptureElement, CaptureOptions } from './patternMatcher';
 
@@ -8,7 +7,7 @@ export type TransformTokenFunction =
   (captureGroupsToTransform: TransformResult[], transform: TransformFunction) => void;
 export type Transformer = {
   pattern: Pattern | CaptureWildcard | CaptureElement | CaptureOptions,
-  transform: (captureGroups: Token, transform: TransformTokenFunction) => void
+  transform: (captureGroups: Token[], transform: TransformTokenFunction) => void
 };
 
 export default (transforms: Transformer[]) => {

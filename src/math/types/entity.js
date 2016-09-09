@@ -1,38 +1,44 @@
-// @flow
 import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, values, every,
 } from 'lodash/fp';
 import unitDefinitions from '../data/units';
+import type { UnitDescriptor } from '../data/units'; // eslint-disable-line
 
 type UnitName = string;
 type UnitValue = number;
 type Units = { [key: UnitName]: UnitValue };
-type Entity = { value: number, units: Units };
+export type Entity = { value: number, units: Units };
 
-export const combineUnits = flow(
+export const combineUnits: (units1: Units, units2: Units) => Units = flow(
   mergeWith((lhsUnitValue, rhsUnitValue) => ((lhsUnitValue || 0) + (rhsUnitValue || 0))),
   omitBy(eq(0))
 );
 
-type ConvertSiDirection = number;
-const calculateSiValueNumerator = 1;
-const calculateSiValueDenominator = -1;
-
-const getSiUnitDescriptor = unitName => {
+const getSiUnitDescriptor = (unitName: UnitName): UnitDescriptor => {
   const siUnitDescriptor = unitDefinitions[unitName];
   if (!siUnitDescriptor) throw new Error(`${unitName} is not defined`);
   return siUnitDescriptor;
 };
 
-const siUnits = (units: Units) => reduce((accum, [unitName, unitValue]) => {
+export const siUnits = (units: Units): Units => reduce((accum, [unitName, unitValue]) => {
   const siUnitDimensions = getSiUnitDescriptor(unitName)[1];
   const scaledSiUnitDimensions = mapValues(multiply(unitValue), siUnitDimensions);
   return combineUnits(scaledSiUnitDimensions, accum);
 }, {}, toPairs(units));
 
-export const isCompatable = (units1, units2) => isEqual(siUnits(units1), siUnits(units2));
-export const unitIsLinear = unitName => typeof getSiUnitDescriptor(unitName)[0] === 'number';
-export const isLinear = units => flow(values, every(isLinear))(units);
+export const isCompatable = (units1: Units, units2: Units): boolean =>
+  isEqual(siUnits(units1), siUnits(units2));
+
+export const unitIsLinear = (unitName: UnitName): boolean =>
+  typeof getSiUnitDescriptor(unitName)[0] === 'number';
+
+export const isLinear = (units: Units): boolean =>
+  flow(values, every(isLinear))(units);
+
+
+type ConvertSiDirection = number;
+const calculateSiValueNumerator = 1;
+const calculateSiValueDenominator = -1;
 
 const calculateSiValue = (
   direction: ConvertSiDirection,
@@ -56,5 +62,3 @@ export const convertTo = (units: Units, entity: Entity): ?Entity => {
   value = calculateSiValue(calculateSiValueDenominator, value, units);
   return { value, units };
 };
-
-export default convertTo;

@@ -1,4 +1,3 @@
-// @flow
 import {
   first, last, reduce, map, reduceRight, update, add, concat, set, isEqual, castArray,
 } from 'lodash/fp';

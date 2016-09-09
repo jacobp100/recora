@@ -1,5 +1,3 @@
-// @flow
-
 export type TokenType = string;
 export type Token = { type: TokenType, value?: any, start?: number, end?: number };
 
@@ -22,7 +20,6 @@ export const TOKEN_VECTOR_SEPARATOR: TokenType = 'TOKEN_VECTOR_SEPARATOR';
 export const TOKEN_VECTOR_END: TokenType = 'TOKEN_VECTOR_END';
 
 export const NODE_BRACKETS: TokenType = 'NODE_BRACKETS';
-export const NODE_OPERATOR_UNARY: TokenType = 'NODE_OPERATOR_UNARY';
-export const NODE_OPERATOR_BILINEAR: TokenType = 'NODE_OPERATOR_BILINEAR';
+export const NODE_FUNCTION: TokenType = 'NODE_FUNCTION';
 export const NODE_ENTITY: TokenType = 'NODE_ENTITY';
 export const NODE_MISC_GROUP: TokenType = 'NODE_MISC_GROUP';

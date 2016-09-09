@@ -1,4 +1,3 @@
-// @flow
 import tokenizer from './tokenizer';
 import transformer from './transformer';
 

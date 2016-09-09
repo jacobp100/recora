@@ -1,4 +1,3 @@
-// @flow
 import {
   __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy,
 } from 'lodash/fp';

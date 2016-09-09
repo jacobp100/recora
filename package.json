@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "ava",
-    "flow": "flow; test $? -eq 0 -o $? -eq 2"
+    "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "lint": "eslint --config .eslintrc.js src"
   },
   "keywords": [],
   "author": "",

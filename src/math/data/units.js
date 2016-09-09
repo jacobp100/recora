@@ -1,5 +1,3 @@
-// @flow
-
 export type DimensionTransformer = {
   convertToBase: (value: number) => number,
   convertFromBase: (value: number) => number,
