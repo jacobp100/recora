@@ -72,7 +72,7 @@ const getEntities = segment => {
     } else if (tag.type === TOKEN_NUMBER && last(accum).quantity === undefined) {
       return set([accum.length - 1, 'quantity'], tag.value, accum);
     } else if (tag.type === TOKEN_NUMBER) {
-      const newEntityValue = set(['value', 'quantity'], tag.value, baseEntityValue);
+      const newEntityValue = set('quantity', tag.value, baseEntityValue);
       return concat(accum, newEntityValue);
     }
     return accum;

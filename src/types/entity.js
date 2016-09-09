@@ -71,3 +71,8 @@ export const convertTo = (context: ResolverContext, units: Units, entity: Entity
   )(entity.quantity);
   return { quantity, units };
 };
+
+export const convertToFundamentalUnits = (
+  context: ResolverContext,
+  entity: Entity,
+): ?Entity => convertTo(context, toFundamentalUnits(entity.units), entity);

@@ -1,5 +1,5 @@
 // @flow
-import { set, get, flow, map } from 'lodash/fp';
+import { set, get, flow, map, every } from 'lodash/fp';
 import {
   FUNCTION_ADD,
   FUNCTION_SUBTRACT,
@@ -7,7 +7,7 @@ import {
   FUNCTION_DIVIDE,
   FUNCTION_EXPONENT,
 } from './functions';
-import { NODE_FUNCTION, NODE_ENTITY } from './tokenNodeTypes';
+import { NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY } from './tokenNodeTypes';
 import type { TokenNode } from './tokenNodeTypes'; // eslint-disable-line
 import {
   add as addEntityToEntity,
@@ -16,6 +16,7 @@ import {
   divide as divideEntityByEntity,
   exponent as exponentEntityByEntity,
 } from './math/entity';
+import { resolveMiscGroup } from './types/miscGroup';
 import { mapUnlessNull } from './util';
 
 const resolver = {
@@ -33,8 +34,28 @@ const resolver = {
   },
   resolve(value: TokenNode): ?TokenNode {
     switch (value.type) {
+      case NODE_BRACKETS:
+        return this.resolve(value.value);
       case NODE_FUNCTION:
         return this.executeFunction(value.value);
+      case NODE_MISC_GROUP: {
+        /*
+        Should this be implemented a function or something?
+
+        We don't have arbitrarily variadic functions---do we want them?
+
+        A lot of places create misc groups and then compact them---making it a function could add a
+        lot of overhead
+
+        Also, what about when this needs to take more than entities: dates were handled in the
+        previous version. Should nodes really be the type themselves?
+        */
+        const values = mapUnlessNull(value => this.resolve(value), value.value);
+        if (!values) return null;
+        if (!every({ type: NODE_ENTITY }, values)) return null;
+        const entities = map('value', values);
+        return resolveMiscGroup(this.context, entities);
+      }
       case NODE_ENTITY:
         return value;
       default:
