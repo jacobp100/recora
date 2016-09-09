@@ -8,7 +8,9 @@ import {
   FUNCTION_EXPONENT,
 } from './functions';
 import { NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY } from './tokenNodeTypes';
-import type { TokenNode } from './tokenNodeTypes'; // eslint-disable-line
+import type { // eslint-disable-line
+  TokenNode, NodeBrackets, NodeFunction, NodeMiscGroup,
+} from './tokenNodeTypes';
 import {
   add as addEntityToEntity,
   subtract as subtractEntityFromEntity,
@@ -34,10 +36,14 @@ const resolver = {
   },
   resolve(value: TokenNode): ?TokenNode {
     switch (value.type) {
-      case NODE_BRACKETS:
-        return this.resolve(value.value);
-      case NODE_FUNCTION:
-        return this.executeFunction(value.value);
+      case NODE_BRACKETS: {
+        const bracketsNode: NodeBrackets = value;
+        return this.resolve(bracketsNode);
+      }
+      case NODE_FUNCTION: {
+        const functionNode: NodeFunction = value;
+        return this.executeFunction(functionNode);
+      }
       case NODE_MISC_GROUP: {
         /*
         Should this be implemented a function or something?
@@ -50,7 +56,8 @@ const resolver = {
         Also, what about when this needs to take more than entities: dates were handled in the
         previous version. Should nodes really be the type themselves?
         */
-        const values = mapUnlessNull(value => this.resolve(value), value.value);
+        const miscGroupNode: NodeMiscGroup = value;
+        const values = mapUnlessNull(value => this.resolve(value), miscGroupNode.value);
         if (!values) return null;
         if (!every({ type: NODE_ENTITY }, values)) return null;
         const entities = map('value', values);

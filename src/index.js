@@ -40,7 +40,6 @@ class Recora {
         const tokens = cleanTokens(tokenOption);
         return { result, tokens };
       }
-      return;
     }
 
     return null;
