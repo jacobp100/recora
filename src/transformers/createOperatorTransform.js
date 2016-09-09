@@ -1,3 +1,4 @@
+// @flow
 import {
   first, last, reduce, zip, flow, map, isEmpty, dropRight, reduceRight, compact,
 } from 'lodash/fp';
@@ -21,7 +22,7 @@ import {
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
 } from '../math/functions';
-import type { TokenType } from '../types'; // eslint-disable-line
+import type { Token, TokenType } from '../types'; // eslint-disable-line
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
@@ -82,13 +83,15 @@ const createNode = (operatorType, lhs, rhs) => {
 
   if (bindingDirection === FORWARD && rightSide && rightSide.type === NODE_MISC_GROUP) {
     argument = first(rightSide.value);
-    rightSide = compactMiscGroup({ type: NODE_MISC_GROUP, value: rightSide.value.slice(1) });
+    const miscGroup: Token = { type: NODE_MISC_GROUP, value: rightSide.value.slice(1) };
+    rightSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === FORWARD) {
     argument = rightSide;
     rightSide = null;
   } else if (bindingDirection === BACKWARD && leftSide && leftSide.type === NODE_MISC_GROUP) {
     argument = last(leftSide.value);
-    leftSide = compactMiscGroup({ type: NODE_MISC_GROUP, value: leftSide.value.slice(1) });
+    const miscGroup: Token = { type: NODE_MISC_GROUP, value: leftSide.value.slice(1) };
+    leftSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === BACKWARD) {
     argument = leftSide;
     leftSide = null;
@@ -96,8 +99,10 @@ const createNode = (operatorType, lhs, rhs) => {
 
   const node = createUnaryNode(type, argument);
   const group = compact([leftSide, node, rightSide]);
+  const miscGroup: Token = { type: NODE_MISC_GROUP, value: group };
+  const value = compactMiscGroup(miscGroup);
 
-  return compactMiscGroup({ type: NODE_MISC_GROUP, value: group });
+  return value;
 };
 
 const createPattern = (operators: TokenType[]) => (

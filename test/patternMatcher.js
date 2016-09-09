@@ -5,10 +5,9 @@ import {
 } from '../src/modules/patternMatcher';
 /* eslint-disable no-unused-vars */
 import {
-  OPERATOR_EXPONENT, OPERATOR_MULTIPLY, OPERATOR_DIVIDE, OPERATOR_ADD, OPERATOR_SUBTRACT,
-  OPERATOR_NEGATE, TOKEN_OPERATOR, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX,
-  TOKEN_UNIT_SUFFIX, TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE, TOKEN_COLOR, TOKEN_NOOP,
-  TOKEN_VECTOR_START, TOKEN_VECTOR_SEPARATOR, TOKEN_VECTOR_END,
+  TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, TOKEN_BRACKET_OPEN,
+  TOKEN_BRACKET_CLOSE, TOKEN_COLOR, TOKEN_NOOP, TOKEN_VECTOR_START, TOKEN_VECTOR_SEPARATOR,
+  TOKEN_VECTOR_END,
 } from '../src/types';
 /* eslint-enable */
 
@@ -189,7 +188,7 @@ test(
   "CaptureElement options does not match a single item if it's type is not in the capture's",
   captureShouldNotMatch,
   new CaptureOptions([TOKEN_COLOR, TOKEN_NUMBER]),
-  [{ type: TOKEN_OPERATOR }],
+  [{ type: TOKEN_BRACKET_CLOSE }],
 );
 
 test(

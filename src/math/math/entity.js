@@ -1,22 +1,23 @@
+// @flow
 import { matchesProperty, mapValues, update, multiply, isEmpty } from 'lodash/fp';
 import { convertTo, combineUnits, siUnits, isLinear } from '../types/entity';
 import type { Entity } from '../types/entity'; // eslint-disable-line
 
-const isZero = matchesProperty('value', 0);
-const zeroEntity = { value: 0, units: {} };
+const isZero = matchesProperty('quantity', 0);
+const zeroEntity = { quantity: 0, units: {} };
 const hasUnits = entity => !isEmpty(entity.units);
 
 const addSubtractFactory = direction => (left: Entity, right: Entity) => {
-  if (!isLinear(left) || !isLinear(right)) return null;
+  if (!isLinear(left.units) || !isLinear(right.units)) return null;
   if (isZero(right)) return left;
-  if (isZero(left)) return update('value', multiply(direction), right);
+  if (isZero(left)) return update('quantity', multiply(direction), right);
 
   const rightWithLhsUnits = convertTo(left.units, right);
   if (!rightWithLhsUnits) return null;
 
-  const value = left.value + (rightWithLhsUnits.value * direction);
+  const quantity = left.quantity + (rightWithLhsUnits.quantity * direction);
   const units = left.units;
-  return { value, units };
+  return { quantity, units };
 };
 
 const multiplyDivideFactory = direction => (left: Entity, right: Entity) => {
@@ -30,18 +31,18 @@ const multiplyDivideFactory = direction => (left: Entity, right: Entity) => {
   // FIXME: reduce units:
   // if you have lhs = x meter^-1 and rhs = y yard, don't give xy meter^1 yard
 
-  const value = left.value * Math.pow(right.value, direction);
+  const quantity = left.quantity * Math.pow(right.quantity, direction);
   const units = combineUnits(left.units, rightEffectiveUnits);
-  return { units, value };
+  return { units, quantity };
 };
 
 const exponentMath = (left: Entity, right: Entity) => {
   // Note: done for minor perf
   if (hasUnits(right) && hasUnits(siUnits(right))) return null;
 
-  const value = Math.pow(left.value, right.value);
-  const units = mapValues(multiply(right.value), left.units);
-  return { value, units };
+  const quantity = Math.pow(left.quantity, right.quantity);
+  const units = mapValues(multiply(right.quantity), left.units);
+  return { quantity, units };
 };
 
 const addMath = addSubtractFactory(1);

@@ -1,3 +1,4 @@
+// @flow
 import { __, map, flow, has, curry, join, range } from 'lodash/fp';
 import {
   TOKEN_OPERATOR_EXPONENT,

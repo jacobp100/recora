@@ -1,8 +1,11 @@
+// @flow
 import {
   first, last, reduce, map, reduceRight, update, add, concat, set, isEqual, castArray,
 } from 'lodash/fp';
+import { combineUnits } from '../math/types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TransformResult } from '../modules/createTransformer';
+import type { Units } from '../math/data/units';
 import {
   TOKEN_NUMBER,
   TOKEN_UNIT_NAME,
@@ -58,11 +61,11 @@ const getEntities = segment => {
   unit1 number1 unit2 number2 unit3
     => [Entity(number1 unit1 unit2), Entity(number2 unit3)]
   */
-  const baseEntityValue = { quantity: undefined, units: [] };
+  const baseEntityValue = { quantity: undefined, units: {} };
   const entityValues = reduce((accum, tag) => {
     if (tag.type === INTERMEDIATE_UNIT) {
-      const unit = { name: tag.name, power: tag.power };
-      return update([accum.length - 1, 'units'], concat([unit]), accum);
+      const unit: Units = { [tag.name]: tag.power };
+      return update([accum.length - 1, 'units'], combineUnits(unit), accum);
     } else if (tag.type === TOKEN_NUMBER && last(accum).quantity === undefined) {
       return set([accum.length - 1, 'quantity'], tag.value, accum);
     } else if (tag.type === TOKEN_NUMBER) {

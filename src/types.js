@@ -1,3 +1,4 @@
+// @flow
 export type TokenType = string;
 export type Token = { type: TokenType, value?: any, start?: number, end?: number };
 

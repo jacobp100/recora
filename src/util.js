@@ -1,3 +1,4 @@
+// @flow
 type EveryOtherForm<T> = (startIndex: number) => (array: T[]) => T[];
 type PropagateNull<S, T> = (cb: (accum: T, value: S) => ?(T)) => (accum: T, value: S) => ?(T);
 type MapUnlessNull<T> = (cb: (value: any) => ?T, array: any[]) => ?(T[]);

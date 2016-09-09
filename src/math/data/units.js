@@ -1,10 +1,12 @@
+// @flow
 export type DimensionTransformer = {
   convertToBase: (value: number) => number,
   convertFromBase: (value: number) => number,
 };
-export type DimensionDescriptor = { [key: string]: number };
-export type UnitDescriptor = [number | DimensionTransformer, DimensionDescriptor];
 export type UnitName = string;
+export type UnitValue = number;
+export type Units = { [key: UnitName]: UnitValue };
+export type ConversionDescriptor = [number | DimensionTransformer, Units];
 
 const BASE_TIME = 'second';
 const BASE_LENGTH = 'meter';
@@ -28,7 +30,7 @@ const noDimensions = {};
 // TODO: Copy from https://github.com/gentooboontoo/js-quantities/blob/master/src/quantities.js
 
 /* eslint-disable quote-props, no-multi-spaces, indent, max-len */
-const unitDescriptors: { [key: UnitName]: UnitDescriptor } = {
+const conversionDescriptors: { [key: UnitName]: ConversionDescriptor } = {
                'second': [1,                             timeDimensions],
                'minute': [60,                            timeDimensions],
                  'hour': [3600,                          timeDimensions],
@@ -220,4 +222,4 @@ const unitDescriptors: { [key: UnitName]: UnitDescriptor } = {
 };
 /* eslint-enable */
 
-export default unitDescriptors;
+export default conversionDescriptors;

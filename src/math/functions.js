@@ -1,3 +1,4 @@
+// @flow
 export const FUNCTION_ADD = 'add';
 export const FUNCTION_SUBTRACT = 'subtract';
 export const FUNCTION_MULTIPLY = 'multiply';

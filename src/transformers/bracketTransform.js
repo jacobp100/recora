@@ -1,3 +1,4 @@
+// @flow
 import {
   first, last,
 } from 'lodash/fp';

@@ -1,3 +1,4 @@
+// @flow
 import type { Token } from '../types';
 import { Pattern, CaptureWildcard, CaptureElement, CaptureOptions } from './patternMatcher';
 

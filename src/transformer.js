@@ -1,3 +1,4 @@
+// @flow
 import {
   TOKEN_OPERATOR_EXPONENT,
   TOKEN_OPERATOR_MULTIPLY,
