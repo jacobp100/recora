@@ -31,6 +31,7 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
 //   t.is(actual, null);
 // };
 
+/* eslint-disable max-len */
 test('basic maths', entityResult, '5', 5);
 test('basic maths', entityResult, '100', 100);
 test('basic maths', entityResult, '-3', -3);
@@ -238,3 +239,4 @@ test('conversion', entityResult, '1kg - 1 ounce', 0.97, { kilogram: 1 });
 // test('test', entityResult, '#800 / #880', #ff0000);
 // test('test', entityResult, 'red', #ff0000);
 // test('test', entityResult, 'red + lime', #ffff0);
+/* eslint-enable */
