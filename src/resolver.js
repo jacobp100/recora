@@ -72,8 +72,10 @@ const resolver = {
 
         return convert(context, value.units, resolvedValue);
       }
-      default:
+      case NODE_ENTITY:
         return value;
+      default:
+        return null;
     }
   },
   executeFunction(fn) {

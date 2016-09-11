@@ -6,7 +6,7 @@ import createTokenizerWithLocale from './tokenizer';
 import enTokenizerLocale from './tokenizerLocales/en';
 import transformer from './transformer';
 import resolver from './resolver';
-import { defaultContext, setUnits } from './resolverContext';
+import defaultContext from './resolverContext';
 import units from './data/units';
 
 const cleanTokens = flow(
@@ -22,7 +22,7 @@ export default class Recora {
     const tokenizer = createTokenizerWithLocale(enTokenizerLocale);
     this.tokenizer = tokenizer;
 
-    const resolverContext = setUnits(defaultContext, units);
+    const resolverContext = defaultContext.setUnits(units);
     this.resolver = resolver.setContext(resolverContext);
   }
 

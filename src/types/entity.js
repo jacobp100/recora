@@ -41,10 +41,10 @@ export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> 
     isEqual(toFundamentalUnits(context, units1), toFundamentalUnits(context, units2))
   ));
 
+
 type ConversionDirection = number;
 const conversionValueNumerator = 1;
 const conversionValueDenominator = -1;
-
 
 const calculateConversionValue = (
   context: ResolverContext,

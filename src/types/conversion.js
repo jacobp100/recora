@@ -15,7 +15,7 @@ export const convert = ( // eslint-disable-line
 
   const [firstUnit, ...remainingUnits] = units;
   const allUnitsCompatable =
-  !isEmpty(remainingUnits) && every(unitsAreCompatable(context, firstUnit), remainingUnits);
+    !isEmpty(remainingUnits) && every(unitsAreCompatable(context, firstUnit), remainingUnits);
 
   if (allUnitsCompatable) return null; // SPLIT UNITS
 

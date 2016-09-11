@@ -1,16 +1,10 @@
 // @flow
-import {
-  first, last,
-} from 'lodash/fp';
+import { first, last, concat } from 'lodash/fp';
 import {
   Pattern, CaptureWildcard, CaptureElement, CaptureOptions,
 } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/createTransformer';
-import {
-  TOKEN_BRACKET_OPEN,
-  TOKEN_BRACKET_CLOSE,
-  NODE_BRACKETS,
-} from '../tokenNodeTypes';
+import { TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE, NODE_BRACKETS } from '../tokenNodeTypes';
 
 const bracketTransform: Transformer = {
   pattern: new Pattern([
@@ -21,7 +15,7 @@ const bracketTransform: Transformer = {
     new CaptureWildcard().any().lazy(),
   ]),
   transform: (captureGroups, transform) => transform([captureGroups[2]], ([bracketGroup]) => (
-    [...first(captureGroups), { type: NODE_BRACKETS, value: bracketGroup }, ...last(captureGroups)]
+    concat(first(captureGroups), { type: NODE_BRACKETS, value: bracketGroup }, last(captureGroups))
   )),
 };
 export default bracketTransform;
