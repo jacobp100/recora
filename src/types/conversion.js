@@ -8,7 +8,7 @@ import { combineUnits, unitsAreCompatable, convertTo } from '../types/entity';
 
 export const convert = ( // eslint-disable-line
   context: ResolverContext,
-  units: Units,
+  units: Units[],
   value: TokenNode
 ): ?TokenNode => {
   if (value.type !== NODE_ENTITY) return null;

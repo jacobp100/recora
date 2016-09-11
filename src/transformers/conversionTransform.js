@@ -3,6 +3,7 @@ import {
   __, flow, take, takeRight, takeWhile, takeRightWhile, drop, dropRight, dropWhile, dropRightWhile,
   isEmpty, map, includes, last, filter,
 } from 'lodash/fp';
+import type { Transformer } from '../modules/createTransformer';
 import {
   TOKEN_NOOP, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, TOKEN_NUMBER, NODE_CONVERSION,
 } from '../tokenNodeTypes';
@@ -56,7 +57,7 @@ const findRightConversion = tags => {
 const findConversion = tags => findLeftConversion(tags) || findRightConversion(tags);
 
 
-const conversionsTransform = {
+const conversionsTransform: Transformer = {
   pattern: { match: findConversion },
   transform: (captureGroups, transform) => transform([captureGroups[0]], ([value]) => {
     const conversionSegment = captureGroups[1];

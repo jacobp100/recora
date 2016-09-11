@@ -27,7 +27,7 @@ const enLocale: TokenizerSpec = {
   number: [
     {
       match: /\d[\d,]*(?:\.\d+)?/,
-      token: token => ({ type: TOKEN_NUMBER, value: Number(token.replace(',')) }),
+      token: token => ({ type: TOKEN_NUMBER, value: Number(token.replace(/,/g, '')) }),
       penalty: -1000,
     },
   ],
