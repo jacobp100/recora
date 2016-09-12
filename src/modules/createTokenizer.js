@@ -67,19 +67,20 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokeni
     /* eslint-disable no-continue */
     for (const option of options) {
       const { match: matchSpec } = option;
-      let matchedText: ?string = null;
+      let matches: ?(string[]) = null;
 
       if (typeof matchSpec === 'string') {
-        matchedText = startsWith(matchSpec, remainingText) ? matchSpec : null;
+        matches = startsWith(matchSpec, remainingText) ? [matchSpec] : null;
       } else if (matchSpec instanceof RegExp) {
         const regexMatch = remainingText.search(matchSpec) === 0 && remainingText.match(matchSpec);
-        matchedText = regexMatch ? regexMatch[0] : null;
+        matches = regexMatch;
       }
 
-      if (!matchedText) continue;
+      if (!matches) continue;
 
+      const matchedText: ?string = matches && matches[0];
       const token = typeof option.token === 'function'
-        ? option.token(matchedText, state.userState)
+        ? option.token(matchedText, matches, state.userState)
         : option.token;
 
       /*

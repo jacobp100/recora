@@ -46,3 +46,16 @@ export type EntityNode = TokenNode &
 export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = TokenNode &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };
+
+type DateTime = {
+  year: ?number,
+  month: ?number,
+  date: ?number,
+  hour: ?number,
+  minute: ?number,
+  second: ?number,
+  tz: ?number,
+};
+export const NODE_DATETIME = 'NODE_DATETIME';
+export type DateTimeNode = TokenNode &
+  { type: 'NODE_DATETIME', value: DateTime };

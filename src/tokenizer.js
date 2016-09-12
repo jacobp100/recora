@@ -35,16 +35,25 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
   color: [
     { match: /#[0-9a-f]{3,8}/i, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -1000 },
   ],
+  date: [
+    {
+      // ISO 8601 RegExp
+      // http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
+      match: /([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?/,
+      token: () => null,
+      penalty: -50000, // Has to beat multiple numbers
+    },
+  ],
   brackets: [
     {
       match: '(',
-      token: (token, state) => ({ type: TOKEN_BRACKET_OPEN, value: state.bracketLevel }),
+      token: (token, matches, state) => ({ type: TOKEN_BRACKET_OPEN, value: state.bracketLevel }),
       penalty: -1000,
       updateState: state => ({ bracketLevel: state.bracketLevel + 1 }),
     },
     {
       match: ')',
-      token: (token, state) => ({ type: TOKEN_BRACKET_CLOSE, value: state.bracketLevel - 1 }),
+      token: (token, matches, state) => ({ type: TOKEN_BRACKET_CLOSE, value: state.bracketLevel - 1 }),
       penalty: -1000,
       updateState: state => ({ bracketLevel: state.bracketLevel - 1 }),
     },
@@ -65,6 +74,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { ref: 'number' },
     { ref: 'unit' },
     { ref: 'color' },
+    { ref: 'date' },
     { ref: 'brackets' },
     { ref: 'vector' },
     { ref: 'noop' },
