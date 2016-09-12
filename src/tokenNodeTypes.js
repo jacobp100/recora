@@ -18,10 +18,8 @@ export const TOKEN_UNIT_SUFFIX = 'TOKEN_UNIT_SUFFIX';
 export const TOKEN_BRACKET_OPEN = 'TOKEN_BRACKET_OPEN';
 export const TOKEN_BRACKET_CLOSE = 'TOKEN_BRACKET_CLOSE';
 export const TOKEN_COLOR = 'TOKEN_COLOR';
+export const TOKEN_DATETIME = 'TOKEN_DATETIME';
 export const TOKEN_NOOP = 'TOKEN_NOOP';
-export const TOKEN_VECTOR_START = 'TOKEN_VECTOR_START';
-export const TOKEN_VECTOR_SEPARATOR = 'TOKEN_VECTOR_SEPARATOR';
-export const TOKEN_VECTOR_END = 'TOKEN_VECTOR_END';
 
 export const NODE_BRACKETS = 'NODE_BRACKETS';
 export type BracketsNode = TokenNode &
@@ -47,7 +45,7 @@ export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = TokenNode &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };
 
-type DateTime = {
+export type DateTime = {
   year: ?number,
   month: ?number,
   date: ?number,

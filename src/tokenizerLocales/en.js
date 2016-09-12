@@ -6,9 +6,9 @@ import {
   TOKEN_UNIT_NAME,
   TOKEN_UNIT_PREFIX,
   TOKEN_UNIT_SUFFIX,
-  NODE_DATETIME,
+  TOKEN_DATETIME,
 } from '../tokenNodeTypes';
-import type { DateTimeNode } from '../tokenNodeTypes'; // eslint-disable-line
+import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
 import oneWordUnits from '../data/en/1-word-units';
 import twoWordUnits from '../data/en/2-word-units';
 import threeWordUnits from '../data/en/3-word-units';
@@ -47,7 +47,7 @@ const time = [
 const date = {
   key: 'date',
   match: '([1-9]|[0-3][0-9])(?:\\s*(?:st|nd|rd|th))?',
-  value: Number,
+  transform: Number,
 };
 
 const monthPrefixes =
@@ -55,21 +55,21 @@ const monthPrefixes =
 
 const monthName = {
   key: 'month',
-  match: `(?:${[
-    '(jan)(?:uary)?',
-    '(feb)(?:ruary)?',
-    '(mar)(?:ch)?',
-    '(apr)(?:il)?',
-    '(may)',
-    '(jun)e?',
-    '(jul)y?',
-    '(aug)(?:ust)?',
-    '(sep)(?:t(?:ember)?)?',
-    '(oct)(?:ober)?',
-    '(nov)(?:ember)?',
-    '(dec)(?:ember)?',
+  match: `(${[
+    'jan(?:uary)?',
+    'feb(?:ruary)?',
+    'mar(?:ch)?',
+    'apr(?:il)?',
+    'may',
+    'june?',
+    'july?',
+    'aug(?:ust)?',
+    'sep(?:t(?:ember)?)?',
+    'oct(?:ober)?',
+    'nov(?:ember)?',
+    'dec(?:ember)?',
   ].join('|')})`,
-  transform: match => monthPrefixes.indexOf(match.toLowerCase()),
+  transform: match => monthPrefixes.indexOf(match.substring(0, 3).toLowerCase()),
 };
 
 const year = {
@@ -78,12 +78,6 @@ const year = {
   transform: Number,
 };
 
-
-const createRegExp = flow(
-  map('match'),
-  join('\\s*'),
-  string => new RegExp(string, 'i'),
-);
 
 const defaultValue = {
   year: null,
@@ -95,24 +89,30 @@ const defaultValue = {
   tz: null,
 };
 
-const createTransformer = transformers => (match, matches): DateTimeNode => {
-  const value = reduce((accum, transformer) => {
+const createRegExp = flow(
+  map('match'),
+  join('\\s*'),
+  string => new RegExp(string, 'i'),
+);
+
+const createTransformer = transformers => (match, matches): TokenNode => {
+  const { value } = reduce((accum, transformer) => {
     const arity = transformer.matchCount || 1;
     const args = accum.remainingMatches.slice(0, arity);
     const remainingMatches = accum.remainingMatches.slice(arity);
-    const value = set(transformer.key, transformer.transform(args), accum.value);
+    const value = set(transformer.key, transformer.transform(...args), accum.value);
     return { value, remainingMatches };
   }, {
     value: defaultValue,
     remainingMatches: drop(1, matches),
   }, transformers);
 
-  return { NODE_DATETIME, value };
+  return { type: TOKEN_DATETIME, value };
 };
 
 const createDateMatcher = (transformers, penalty) => ({
   match: createRegExp(transformers),
-  transform: createTransformer(transformers),
+  token: createTransformer(transformers),
   penalty,
 });
 
@@ -134,15 +134,15 @@ const enLocale: TokenizerSpec = {
     wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
   ],
   date: [
-    createDateMatcher([date, monthName, year]),
-    createDateMatcher([monthName, date, year]),
-    createDateMatcher([date, monthName]),
-    createDateMatcher([monthName, date]),
-    createDateMatcher([...time, date, monthName, year]),
-    createDateMatcher([...time, monthName, date, year]),
-    createDateMatcher([...time, date, monthName]),
-    createDateMatcher([...time, monthName, date]),
-    createDateMatcher([...time]),
+    createDateMatcher([date, monthName, year], -50000),
+    createDateMatcher([monthName, date, year], -50000),
+    createDateMatcher([date, monthName], -50000),
+    createDateMatcher([monthName, date], -50000),
+    createDateMatcher([...time, date, monthName, year], -50000),
+    createDateMatcher([...time, monthName, date, year], -50000),
+    createDateMatcher([...time, date, monthName], -50000),
+    createDateMatcher([...time, monthName, date], -50000),
+    createDateMatcher([...time], -50000),
   ],
 };
 /* eslint-enable */

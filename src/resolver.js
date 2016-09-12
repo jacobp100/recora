@@ -10,6 +10,7 @@ import {
 } from './functions';
 import {
   NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
+  NODE_DATETIME,
 } from './tokenNodeTypes';
 import type { // eslint-disable-line
   TokenNode, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
@@ -68,6 +69,7 @@ const resolver = {
       }
       case NODE_ENTITY:
       case NODE_COLOR:
+      case NODE_DATETIME:
         return value;
       default:
         return null;
