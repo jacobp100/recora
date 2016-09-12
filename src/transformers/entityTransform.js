@@ -47,7 +47,7 @@ const getEntities = segment => {
 
   if (some(entity => entity.quantity === undefined, maybeEntities)) return null;
 
-  const entities: EntityNode = maybeEntities;
+  const entities: EntityNode[] = maybeEntities;
   return entities;
 };
 

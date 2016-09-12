@@ -30,6 +30,7 @@
     "pluralize": "^3.0.0"
   },
   "dependencies": {
+    "color-forge": "^1.0.18",
     "lodash": "^4.15.0"
   },
   "ava": {

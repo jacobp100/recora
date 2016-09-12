@@ -1,6 +1,7 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 import test from 'ava';
 import { get } from 'lodash/fp';
+import Color from 'color-forge';
 import Recora from '../src';
 
 const recora = new Recora();
@@ -22,6 +23,25 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
     expectedUnits,
     units,
     `Expected ${JSON.stringify(units)} to equal ${JSON.stringify(expectedUnits)} for "${input}"`
+  );
+};
+
+const colorResult = (t, input, expectedHex) => {
+  t.plan(2);
+
+  const actual = recora.parse(input);
+  const { values: actualValues, alpha: actualAlpha, space } = (actual && actual.result) || {};
+  const { values: expectedValues, alpha: expectedAlpha } = Color.hex(expectedHex).convert(space);
+
+  t.deepEqual(
+    actualValues.map(value => value.toFixed(0)),
+    expectedValues.map(value => value.toFixed(0)),
+    `Expected values ${actualValues} to equal ${expectedValues} for "${input}"`
+  );
+  t.is(
+    actualAlpha,
+    expectedAlpha,
+    `Expected alpha ${actualAlpha} to equal ${expectedAlpha} for "${input}"`
   );
 };
 
@@ -198,45 +218,45 @@ test('conversion', entityResult, '1kg - 1 ounce', 0.97, { kilogram: 1 });
 // test('should not crash with', entityResult, 'sin(', );
 // test('should not crash with', entityResult, 'sin(2 * )', );
 // test('should not crash with', entityResult, '1 *', );
-// test('test', entityResult, '#f00', #ff0000);
-// test('test', entityResult, 'rgb(128, 0, 0)', #800000);
-// test('test', entityResult, 'hsl(0, 100%, 1)', #ffffff);
-// test('test', entityResult, 'hsl(0, 100%, 0.5)', #ff0000);
-// test('test', entityResult, 'hsl(0, 1, 0)', #000000);
-// test('test', entityResult, 'hsl(180 degrees, 1, 0.5)', #00ffff);
-// test('test', entityResult, 'hsl(50%, 1, 0.5)', #00ffff);
-// test('test', entityResult, 'hsl(0, 0, 0.5)', #808080);
-// test('test', entityResult, 'hsl(210 degrees, 65%, 20%)', #123354);
-// test('test', entityResult, '#800000 to hsl', hsl(0°, 100%, 25%));
-// test('test', entityResult, '#123456 to hsl', hsl(210°, 65%, 20%));
-// test('test', entityResult, 'hsl(210 degrees, 65%, 20%) to rgb', rgb(18, 51, 84));
-// test('test', entityResult, 'rgb(18, 51, 84) to hsl', hsl(210°, 65%, 20%));
-// test('test', entityResult, 'hsl(0, 100%, 0.5) to hsl', hsl(0°, 100%, 50%));
-// test('test', entityResult, '#f00 + #0f0', #ffff00);
-// test('test', entityResult, '#f00 + #f00', #ff0000);
-// test('test', entityResult, '#f00 - #800', #770000);
-// test('test', entityResult, '#700 + #800', #ff0000);
-// test('test', entityResult, '#888 * #888', #494949);
-// test('test', entityResult, '#888 / #888', #ffffff);
-// test('test', entityResult, '#888 / #fff', #888888);
-// test('test', entityResult, '#888 ** 2', #494949);
-// test('test', entityResult, 'darken(#FF0000, 25%)', #800000);
-// test('test', entityResult, 'lighten(#800000, 50%)', #ff8080);
-// test('test', entityResult, 'darken(rgb(255, 0, 0), 50%)', #000000);
-// test('test', entityResult, 'darken(hsl(0, 100%, 1), 50%)', #ff0000);
-// test('test', entityResult, 'darken(hsl(0, 100%, 0.5), 50%)', #000000);
-// test('test', entityResult, 'mix(#800000, #ff0000)', #c00000);
-// test('test', entityResult, 'mix(#800000, #ff0000, 30%)', #a60000);
-// test('test', entityResult, 'screen(#123456, #345678)', #4278a6);
-// test('test', entityResult, 'overlay(#123456, #345678)', #072351);
-// test('test', entityResult, 'dodge(#123456, #345678)', #386cb5);
-// test('test', entityResult, 'burn(#ccc, #ccc)', #bfbfbf);
-// test('test', entityResult, '#800 * 2', #ff0000);
-// test('test', entityResult, '#f00 / 2', #800000);
-// test('test', entityResult, '#800 + 20%', #ee0000);
-// test('test', entityResult, '#800 - 20%', #220000);
-// test('test', entityResult, '#800 * #880', #490000);
-// test('test', entityResult, '#800 / #880', #ff0000);
-// test('test', entityResult, 'red', #ff0000);
-// test('test', entityResult, 'red + lime', #ffff0);
+test('parse colours', colorResult, '#f00', '#ff0000');
+// test('test', colorResult, 'rgb(128, 0, 0)', #800000);
+// test('test', colorResult, 'hsl(0, 100%, 1)', #ffffff);
+// test('test', colorResult, 'hsl(0, 100%, 0.5)', #ff0000);
+// test('test', colorResult, 'hsl(0, 1, 0)', #000000);
+// test('test', colorResult, 'hsl(180 degrees, 1, 0.5)', #00ffff);
+// test('test', colorResult, 'hsl(50%, 1, 0.5)', #00ffff);
+// test('test', colorResult, 'hsl(0, 0, 0.5)', #808080);
+// test('test', colorResult, 'hsl(210 degrees, 65%, 20%)', #123354);
+// test('test', colorResult, '#800000 to hsl', hsl(0°, 100%, 25%));
+// test('test', colorResult, '#123456 to hsl', hsl(210°, 65%, 20%));
+// test('test', colorResult, 'hsl(210 degrees, 65%, 20%) to rgb', rgb(18, 51, 84));
+// test('test', colorResult, 'rgb(18, 51, 84) to hsl', hsl(210°, 65%, 20%));
+// test('test', colorResult, 'hsl(0, 100%, 0.5) to hsl', hsl(0°, 100%, 50%));
+test('operators on colors', colorResult, '#f00 + #0f0', '#ffff00');
+test('operators on colors', colorResult, '#f00 + #f00', '#ff0000');
+test('operators on colors', colorResult, '#f00 - #800', '#770000');
+test('operators on colors', colorResult, '#700 + #800', '#ff0000');
+test('operators on colors', colorResult, '#888 * #888', '#494949');
+test('operators on colors', colorResult, '#888 / #888', '#ffffff');
+test('operators on colors', colorResult, '#888 / #fff', '#888888');
+// test('test', colorResult, '#888 ** 2', #494949);
+// test('test', colorResult, 'darken(#FF0000, 25%)', #800000);
+// test('test', colorResult, 'lighten(#800000, 50%)', #ff8080);
+// test('test', colorResult, 'darken(rgb(255, 0, 0), 50%)', #000000);
+// test('test', colorResult, 'darken(hsl(0, 100%, 1), 50%)', #ff0000);
+// test('test', colorResult, 'darken(hsl(0, 100%, 0.5), 50%)', #000000);
+// test('test', colorResult, 'mix(#800000, #ff0000)', #c00000);
+// test('test', colorResult, 'mix(#800000, #ff0000, 30%)', #a60000);
+// test('test', colorResult, 'screen(#123456, #345678)', #4278a6);
+// test('test', colorResult, 'overlay(#123456, #345678)', #072351);
+// test('test', colorResult, 'dodge(#123456, #345678)', #386cb5);
+// test('test', colorResult, 'burn(#ccc, #ccc)', #bfbfbf);
+// test('test', colorResult, '#800 * 2', #ff0000);
+// test('test', colorResult, '#f00 / 2', #800000);
+// test('test', colorResult, '#800 + 20%', #ee0000);
+// test('test', colorResult, '#800 - 20%', #220000);
+// test('test', colorResult, '#800 * #880', #490000);
+// test('test', colorResult, '#800 / #880', #ff0000);
+// test('test', colorResult, 'red', #ff0000);
+// test('test', colorResult, 'red + lime', #ffff0);
 /* eslint-enable */

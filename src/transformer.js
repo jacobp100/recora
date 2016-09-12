@@ -14,6 +14,7 @@ import {
 } from './transformers/createOperatorTransform';
 import conversionTransform from './transformers/conversionTransform';
 import entityTransform from './transformers/entityTransform';
+import colorTransform from './transformers/colorTransform';
 
 export default createTransformer([
   conversionTransform,
@@ -22,4 +23,5 @@ export default createTransformer([
   createForwardOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
   createBackwardOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE]),
   entityTransform,
+  colorTransform,
 ]);

@@ -1,13 +1,15 @@
 // @flow
-import { matchesProperty, mapValues, update, multiply, isEmpty } from 'lodash/fp';
-import { convertTo, combineUnits, toFundamentalUnits, unitsAreLinear } from '../types/entity';
+import { matchesProperty, mapValues, update, multiply } from 'lodash/fp';
+import {
+  convertTo, combineUnits, toFundamentalUnits, unitsAreLinear, isUnitless,
+} from '../types/entity';
 import { NODE_ENTITY } from '../tokenNodeTypes';
 import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
 import type { ResolverContext } from '../resolverContext';
 
 const isZero = matchesProperty('quantity', 0);
 const zeroEntity = { type: NODE_ENTITY, quantity: 0, units: {} };
-const hasUnits = entity => !isEmpty(entity.units);
+
 
 const addSubtractFactory = direction => (
   context: ResolverContext,
@@ -52,7 +54,7 @@ const exponentMath = (
   right: EntityNode
 ): ?EntityNode => {
   // Note: done for minor perf
-  if (hasUnits(right) && hasUnits(toFundamentalUnits(context, right))) return null;
+  if (!isUnitless(right) && !isUnitless(toFundamentalUnits(context, right))) return null;
 
   const quantity = Math.pow(left.quantity, right.quantity);
   const units = mapValues(multiply(right.quantity), left.units);

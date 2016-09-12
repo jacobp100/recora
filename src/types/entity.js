@@ -1,6 +1,7 @@
 // @flow
 import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, every, curry,
+  isEmpty,
 } from 'lodash/fp';
 import type { ConversionDescriptor, UnitName, Units } from '../data/units';
 import { NODE_ENTITY } from '../tokenNodeTypes';
@@ -17,6 +18,8 @@ const getConversionDescriptor = (
   return siUnitDescriptor;
 };
 
+
+// Unit utils
 const addUnitValues = (lhsUnitValue, rhsUnitValue) => ((lhsUnitValue || 0) + (rhsUnitValue || 0));
 
 const unitIsLinear: Curry2<ResolverContext, UnitName, boolean> =
@@ -41,6 +44,9 @@ export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> 
     isEqual(toFundamentalUnits(context, units1), toFundamentalUnits(context, units2))
   ));
 
+
+// Entity utils
+export const isUnitless = (entity: EntityNode): bool => isEmpty(entity.units);
 
 type ConversionDirection = number;
 const conversionValueNumerator = 1;

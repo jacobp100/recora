@@ -15,6 +15,7 @@ const conversionTokens = [
   TOKEN_UNIT_PREFIX,
   TOKEN_UNIT_SUFFIX,
 ];
+const isNoop = type => type === TOKEN_NOOP;
 const notNoop = type => type !== TOKEN_NOOP;
 const isConversionToken = includes(__, conversionTokens);
 
@@ -23,7 +24,8 @@ const findLeftConversion = tags => {
 
   const conversionTagTypes = flow(
     takeWhile(isConversionToken),
-    dropRightWhile(notNoop)
+    dropRightWhile(notNoop),
+    dropWhile(isNoop)
   )(tagTypes);
 
   if (isEmpty(conversionTagTypes) || last(conversionTagTypes) !== TOKEN_NOOP) return null;

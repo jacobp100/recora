@@ -9,19 +9,13 @@ import {
   FUNCTION_NEGATE,
 } from './functions';
 import {
-  NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_ENTITY, NODE_CONVERSION,
+  NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
 } from './tokenNodeTypes';
 import type { // eslint-disable-line
   TokenNode, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
 } from './tokenNodeTypes';
-import {
-  add as addEntityToEntity,
-  subtract as subtractEntityFromEntity,
-  multiply as multiplyEntityByEntity,
-  divide as divideEntityByEntity,
-  exponent as exponentEntityByEntity,
-  negate as negateEntity,
-} from './math/entity';
+import * as entityMath from './math/entity';
+import * as colorMath from './math/color';
 import { resolve as resolveMiscGroup } from './types/miscGroup';
 import { convert } from './types/conversion';
 import { mapUnlessNull } from './util';
@@ -73,6 +67,7 @@ const resolver = {
         return convert(context, value.units, resolvedValue);
       }
       case NODE_ENTITY:
+      case NODE_COLOR:
         return value;
       default:
         return null;
@@ -94,10 +89,15 @@ const resolver = {
 
 /* eslint-disable max-len */
 export default resolver
-  .extendFunction(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, addEntityToEntity)
-  .extendFunction(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, subtractEntityFromEntity)
-  .extendFunction(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, multiplyEntityByEntity)
-  .extendFunction(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, divideEntityByEntity)
-  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, exponentEntityByEntity)
-  .extendFunction(FUNCTION_NEGATE, [NODE_ENTITY], NODE_ENTITY, negateEntity);
+  .extendFunction(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.add)
+  .extendFunction(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.subtract)
+  .extendFunction(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.multiply)
+  .extendFunction(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.divide)
+  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.exponent)
+  .extendFunction(FUNCTION_NEGATE, [NODE_ENTITY], NODE_ENTITY, entityMath.negate)
+  .extendFunction(FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.add)
+  .extendFunction(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.subtract)
+  .extendFunction(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.multiply)
+  .extendFunction(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.divide)
+  ;
 /* eslint-enable */

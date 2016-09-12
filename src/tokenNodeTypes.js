@@ -24,21 +24,25 @@ export const TOKEN_VECTOR_SEPARATOR = 'TOKEN_VECTOR_SEPARATOR';
 export const TOKEN_VECTOR_END = 'TOKEN_VECTOR_END';
 
 export const NODE_BRACKETS = 'NODE_BRACKETS';
-export type BracketsNode =
-  TokenNode & { type: 'NODE_BRACKETS', value: TokenNode };
+export type BracketsNode = TokenNode &
+  { type: 'NODE_BRACKETS', value: TokenNode };
 
 export const NODE_FUNCTION = 'NODE_FUNCTION';
-export type FunctionNode =
-  TokenNode & { type: 'NODE_FUNCTION', name: string, args: TokenNode[] };
+export type FunctionNode = TokenNode &
+  { type: 'NODE_FUNCTION', name: string, args: TokenNode[] };
 
 export const NODE_MISC_GROUP = 'NODE_MISC_GROUP';
-export type MiscGroupNode =
-  TokenNode & { type: 'NODE_MISC_GROUP', value: TokenNode[] };
-
-export const NODE_ENTITY = 'NODE_ENTITY';
-export type EntityNode =
-  TokenNode & { type: 'NODE_ENTITY', quantity: number, units: Units };
+export type MiscGroupNode = TokenNode &
+  { type: 'NODE_MISC_GROUP', value: TokenNode[] };
 
 export const NODE_CONVERSION = 'NODE_CONVERSION';
-export type ConversionNode =
-  TokenNode & { type: 'NODE_CONVERSION', value: TokenNode, units: Units[] };
+export type ConversionNode = TokenNode &
+  { type: 'NODE_CONVERSION', value: TokenNode, units: Units[] };
+
+export const NODE_ENTITY = 'NODE_ENTITY';
+export type EntityNode = TokenNode &
+  { type: 'NODE_ENTITY', quantity: number, units: Units };
+
+export const NODE_COLOR = 'NODE_COLOR';
+export type ColorNode = TokenNode &
+  { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };

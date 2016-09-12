@@ -33,7 +33,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },
   ],
   color: [
-    { match: /#[0-9a-f]{3,8}/, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -500 },
+    { match: /#[0-9a-f]{3,8}/i, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -1000 },
   ],
   brackets: [
     {
