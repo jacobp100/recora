@@ -1,7 +1,12 @@
 // @flow
+import { curry, flatten, isArray } from 'lodash/fp';
+import type { Curry2 } from './utilTypes';
+
 type EveryOtherForm<T> = (startIndex: number) => (array: T[]) => T[];
 type PropagateNull<S, T> = (cb: (accum: T, value: S) => ?(T)) => (accum: T, value: S) => ?(T);
 type MapUnlessNull<T> = (cb: (value: any) => ?T, array: any[]) => ?(T[]);
+type FlatZip<T> = Curry2<T[], T[], T[]>;
+type UncastArray<T> = (value: T | T[]) => ?T;
 
 const everyOtherFrom: EveryOtherForm<any> = startIndex => array => {
   const accum = [];
@@ -24,4 +29,30 @@ export const mapUnlessNull: MapUnlessNull<any> = (cb, array) => {
     accum[i] = value;
   }
   return accum;
+};
+
+export const flatZip: FlatZip<any> = curry((array1, array2) => {
+  let accum = [];
+  const to = Math.min(array1.length, array2.length);
+
+  for (let i = 0; i < to; i += 1) {
+    accum = accum.concat(array1[i], array2[i]);
+  }
+
+  if (to < array1.length) {
+    accum = accum.concat(flatten(array1.slice(to)));
+  } else if (to < array2.length) {
+    accum = accum.concat(flatten(array2.slice(to)));
+  }
+
+  return accum;
+});
+
+export const uncastArray: UncastArray<any> = value => {
+  if (!isArray(value) || value.length > 1) {
+    return value;
+  } else if (value.length === 1) {
+    return value[0];
+  }
+  return null;
 };

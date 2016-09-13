@@ -1,5 +1,5 @@
 // @flow
-import { castArray, keys } from 'lodash/fp';
+import { keys } from 'lodash/fp';
 import Color from 'color-forge';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/createTransformer';
@@ -7,7 +7,7 @@ import { NODE_COLOR, NODE_DATETIME } from '../modules/math/types';
 import type { ColorNode, DateTimeNode, DateTime } from '../modules/math/types'; // eslint-disable-line
 import type { Token, TokenNode } from '../modules/types';
 import { TOKEN_COLOR, TOKEN_DATETIME } from '../tokenTypes';
-import { evenIndexElements, oddIndexElements } from '../util';
+import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip, uncastArray } from '../util';
 
 const transforms = {
   [TOKEN_COLOR]: (token: Token): ColorNode => {
@@ -31,17 +31,15 @@ const remainingTokensTransform: Transformer = {
     ]).oneOrMore(),
   ]),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
-    const remainingTokenSegments = oddIndexElements(captureGroups);
+    const remainingTokenSegments = mapUnlessNull(element => {
+      const token: Token = element[0];
+      return transforms[token.type](token);
+    }, oddIndexElements(captureGroups));
 
-    let zippedSegments: TokenNode[] = castArray(segments[0]);
-    for (let i = 0; i < remainingTokenSegments.length; i += 1) {
-      const token: Token = remainingTokenSegments[i][0];
-      const node = transforms[token.type](token);
-      if (node === null) return null;
-      zippedSegments = zippedSegments.concat(node, segments[i + 1]);
-    }
+    if (!remainingTokenSegments) return null;
 
-    return zippedSegments.length > 1 ? zippedSegments : zippedSegments[0];
+    const remainingTokens: TokenNode[] = flatZip(segments, remainingTokenSegments);
+    return uncastArray(remainingTokens);
   }),
 };
 export default remainingTokensTransform;

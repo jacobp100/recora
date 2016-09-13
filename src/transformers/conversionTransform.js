@@ -65,7 +65,7 @@ const conversionsTransform: Transformer = {
   transform: (captureGroups, transform) => transform([captureGroups[0]], ([value]) => {
     const conversionSegment = captureGroups[1];
     const segmentWithIntermediateUnits = combineUnitNamesPrefixesSuffixes(conversionSegment);
-    if (segmentWithIntermediateUnits === null) return null;
+    if (!segmentWithIntermediateUnits) return null;
 
     const units = flow(
       filter({ type: INTERMEDIATE_UNIT }),

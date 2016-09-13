@@ -95,6 +95,7 @@ const defaultValue = {
 
 const createRegExp = flow(
   map('match'),
+  map(match => `\\b${match}\\b`),
   join('\\s*'),
   string => new RegExp(string, 'i'),
 );
@@ -143,10 +144,10 @@ const enLocale: TokenizerSpec = {
   date: [
     createDateMatcher([date, monthName, year], -50000),
     createDateMatcher([monthName, date, year], -50000),
-    createDateMatcher([date, monthName], -50000),
-    createDateMatcher([monthName, date], -50000),
-    createDateMatcher([time, date, monthName, year], -50000),
-    createDateMatcher([time, monthName, date, year], -50000),
+    createDateMatcher([date, monthName], -30000),
+    createDateMatcher([monthName, date], -30000),
+    createDateMatcher([time, date, monthName, year], -70000),
+    createDateMatcher([time, monthName, date, year], -70000),
     createDateMatcher([time, date, monthName], -50000),
     createDateMatcher([time, monthName, date], -50000),
     // TODO: Allow stuff like 6
