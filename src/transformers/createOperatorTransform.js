@@ -13,7 +13,7 @@ import {
   TOKEN_OPERATOR_NEGATE,
 } from '../tokenTypes';
 import { NODE_FUNCTION, NODE_MISC_GROUP } from '../modules/math/types';
-import type { FunctionNode } from '../modules/math/types'; // eslint-disable-line
+import type { Node, FunctionNode } from '../modules/math/types'; // eslint-disable-line
 import {
   FUNCTION_ADD,
   FUNCTION_SUBTRACT,
@@ -22,7 +22,6 @@ import {
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
 } from '../modules/math/functions';
-import type { TokenNode } from '../modules/types';
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
@@ -84,14 +83,14 @@ const createNode = (operatorType, lhs, rhs) => {
 
   if (bindingDirection === FORWARD && rightSide && rightSide.type === NODE_MISC_GROUP) {
     argument = first(rightSide.value);
-    const miscGroup: TokenNode = { type: NODE_MISC_GROUP, value: rightSide.value.slice(1) };
+    const miscGroup: Node = { type: NODE_MISC_GROUP, value: rightSide.value.slice(1) };
     rightSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === FORWARD) {
     argument = rightSide;
     rightSide = null;
   } else if (bindingDirection === BACKWARD && leftSide && leftSide.type === NODE_MISC_GROUP) {
     argument = last(leftSide.value);
-    const miscGroup: TokenNode = { type: NODE_MISC_GROUP, value: leftSide.value.slice(1) };
+    const miscGroup: Node = { type: NODE_MISC_GROUP, value: leftSide.value.slice(1) };
     leftSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === BACKWARD) {
     argument = leftSide;
@@ -102,7 +101,7 @@ const createNode = (operatorType, lhs, rhs) => {
 
   const node = createUnaryNode(type, argument);
   const group = compact([leftSide, node, rightSide]);
-  const miscGroup: TokenNode = { type: NODE_MISC_GROUP, value: group };
+  const miscGroup: Node = { type: NODE_MISC_GROUP, value: group };
   const value = compactMiscGroup(miscGroup);
 
   return value;

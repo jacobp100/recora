@@ -2,12 +2,13 @@
 import { last, reduce, update, concat, set, some, castArray, reject } from 'lodash/fp';
 import { combineUnits } from '../modules/math/types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
-import type { Transformer, TransformResult } from '../modules/createTransformer';
+import type { Transformer } from '../modules/createTransformer';
 import {
   TOKEN_NOOP, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX,
 } from '../tokenTypes';
 import { NODE_MISC_GROUP, NODE_ENTITY } from '../modules/math/types';
 import type { Units, EntityNode } from '../modules/math/types'; // eslint-disable-line
+import type { TokenNode } from '../modules/types';
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
 import { evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
@@ -63,7 +64,7 @@ const entityTransform: Transformer = {
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => {
     const unitSegments = oddIndexElements(captureGroups);
 
-    let zippedSegments: TransformResult[] = castArray(segments[0]);
+    let zippedSegments: TokenNode[] = castArray(segments[0]);
     for (let i = 0; i < unitSegments.length; i += 1) {
       const entitiesOfSegment = getEntities(unitSegments[i]);
       if (entitiesOfSegment === null) return null;

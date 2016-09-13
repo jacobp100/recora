@@ -3,13 +3,14 @@ import type { TokenNode } from './types';
 import { mapUnlessNull } from '../util';
 
 export type TransformResult = TokenNode[] | TokenNode;
-export type TransformFunction = (captureGroups: TransformResult[]) => ?TransformResult;
+export type CaptureGroup = TokenNode[];
+export type TransformFunction = (captureGroups: CaptureGroup[]) => ?TransformResult;
 export type TransformTokenFunction =
-  (captureGroupsToTransform: TransformResult[], transform: TransformFunction) => void;
-export type CaptureGroupFunction = (tokens: TokenNode[]) => ?((TokenNode[])[]);
+  (captureGroupsToTransform: CaptureGroup[], transform: TransformFunction) => void;
+export type CaptureGroupFunction = (tokens: TokenNode[]) => ?(CaptureGroup[]);
 export type Transformer = {
   pattern: { match: CaptureGroupFunction },
-  transform: (captureGroups: (TokenNode[])[], transform: TransformTokenFunction) => void,
+  transform: (captureGroups: CaptureGroup[], transform: TransformTokenFunction) => void,
 };
 
 export default (transforms: Transformer[]) => {
