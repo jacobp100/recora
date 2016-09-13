@@ -1,5 +1,5 @@
 // @flow
-import { flow, drop, map, reduce, set, join } from 'lodash/fp';
+import { flow, drop, map, reduce, assign, join } from 'lodash/fp';
 import type { TokenizerSpec } from '../modules/createTokenizer';
 import {
   TOKEN_NUMBER,
@@ -25,29 +25,29 @@ const unitSuffixes = {
   cubed: 3,
 };
 
-const time = [
-  {
-    key: 'hour',
-    match: '([0-2]\\d)(\\s+am|\\s+pm)?',
-    transform: Number, // FIXME: AM/PM
-    matchCount: 2,
-  },
-  {
-    key: 'minute',
-    match: ':([0-5]\\d)',
-    transform: match => Number(match.substring(1)),
-  },
-  {
-    key: 'second',
-    match: ':([0-5]\\d)',
-    transform: match => Number(match.substring(1)),
-  },
-];
+const numberUnlessEmptyString = value => (value === '' ? null : Number(value));
+
+const time = {
+  key: 'hour',
+  match: '([0-2]?\\d)(:[0-5]\\d|)(:[0-5]\\d|)(\\s*am|\\s*pm|)',
+  matchCount: 4,
+  transform: (hour, minute, second, amPm) => (
+    (minute === '' && amPm === '')
+      ? null
+      : {
+        hour: Number(hour) + (amPm.toLowerCase() === 'pm' ? 12 : 0),
+        minute: numberUnlessEmptyString(minute.substring(1)),
+        second: numberUnlessEmptyString(second.substring(1)),
+      }
+  ),
+};
 
 const date = {
   key: 'date',
   match: '([1-9]|[0-3][0-9])(?:\\s*(?:st|nd|rd|th))?',
-  transform: Number,
+  transform: value => ({
+    date: Number(value),
+  }),
 };
 
 const monthPrefixes =
@@ -69,13 +69,17 @@ const monthName = {
     'nov(?:ember)?',
     'dec(?:ember)?',
   ].join('|')})`,
-  transform: match => monthPrefixes.indexOf(match.substring(0, 3).toLowerCase()),
+  transform: match => ({
+    month: monthPrefixes.indexOf(match.substring(0, 3).toLowerCase()),
+  }),
 };
 
 const year = {
   key: 'year',
-  match: '\\d{2}(?:\\d{2})?',
-  transform: Number,
+  match: '([1-9]\\d{1,3})',
+  transform: year => ({
+    year: Number(year),
+  }),
 };
 
 
@@ -100,7 +104,10 @@ const createTransformer = transformers => (match, matches): TokenNode => {
     const arity = transformer.matchCount || 1;
     const args = accum.remainingMatches.slice(0, arity);
     const remainingMatches = accum.remainingMatches.slice(arity);
-    const value = set(transformer.key, transformer.transform(...args), accum.value);
+
+    const newValue = transformer.transform(...args, accum.value);
+    const value = assign(accum.value, newValue);
+
     return { value, remainingMatches };
   }, {
     value: defaultValue,
@@ -138,11 +145,11 @@ const enLocale: TokenizerSpec = {
     createDateMatcher([monthName, date, year], -50000),
     createDateMatcher([date, monthName], -50000),
     createDateMatcher([monthName, date], -50000),
-    createDateMatcher([...time, date, monthName, year], -50000),
-    createDateMatcher([...time, monthName, date, year], -50000),
-    createDateMatcher([...time, date, monthName], -50000),
-    createDateMatcher([...time, monthName, date], -50000),
-    createDateMatcher([...time], -50000),
+    createDateMatcher([time, date, monthName, year], -50000),
+    createDateMatcher([time, monthName, date, year], -50000),
+    createDateMatcher([time, date, monthName], -50000),
+    createDateMatcher([time, monthName, date], -50000),
+    // TODO: Allow stuff like 6
   ],
 };
 /* eslint-enable */

@@ -1,6 +1,6 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 import test from 'ava';
-import { get } from 'lodash/fp';
+import { get, forEach, getOr } from 'lodash/fp';
 import Color from 'color-forge';
 import Recora from '../src';
 
@@ -27,10 +27,12 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
 };
 
 const colorResult = (t, input, expectedHex) => {
-  t.plan(2);
+  t.plan(3);
 
   const actual = recora.parse(input);
-  const { values: actualValues, alpha: actualAlpha, space } = (actual && actual.result) || {};
+  t.truthy(actual, `Expected to get a result for "${input}"`);
+
+  const { values: actualValues, alpha: actualAlpha, space } = actual.result;
   const { values: expectedValues, alpha: expectedAlpha } = Color.hex(expectedHex).convert(space);
 
   t.deepEqual(
@@ -43,6 +45,27 @@ const colorResult = (t, input, expectedHex) => {
     expectedAlpha,
     `Expected alpha ${actualAlpha} to equal ${expectedAlpha} for "${input}"`
   );
+};
+
+const dateResult = (t, input, expectedValues) => {
+  const dateKeys = ['second', 'minute', 'hour', 'date', 'month', 'year'];
+  t.plan(1 + dateKeys.length);
+
+  const actual = recora.parse(input);
+  t.truthy(actual, `Expected to get a result for "${input}"`);
+
+  const actualValues = actual.result.value;
+
+  forEach(dateKey => {
+    const actualValue = actualValues[dateKey];
+    const expectedValue = getOr(null, dateKey, expectedValues);
+
+    t.is(
+      actualValue,
+      expectedValue,
+      `Expected ${dateKey} of ${actualValue} to equal ${expectedValue} for "${input}"`
+    );
+  }, dateKeys);
 };
 
 // const noResult = (t, input) => {
@@ -204,11 +227,11 @@ test('conversion', entityResult, '1kg - 1 ounce', 0.97, { kilogram: 1 });
 // { 'input': '2 weeks ago', Thursday, 18th December 1969);
 // { 'input': '2 weeks ago until next week in days', 21 days);
 // { 'input': '13 hours from now', 1:00PM, Thursday, 1st January 1970);
-// test('test', entityResult, '5th jan 2015', Mon Jan 05 2015 00:00:00 GMT+0000);
-// test('test', entityResult, '5 jan 2015', Mon Jan 05 2015 00:00:00 GMT+0000);
-// test('test', entityResult, '6pm 5th jan 2015', Mon Jan 05 2015 18:00:00 GMT+0000);
-// test('test', entityResult, '6:53am 5th jan 2015', Mon Jan 05 2015 18:53:00 GMT+0000);
-// test('test', entityResult, '6:07am 5th jan 2015', Mon Jan 05 2015 18:07:00 GMT+0000);
+test('date parsing', dateResult, '5th jan 2015', { date: 5, month: 0, year: 2015 });
+test('date parsing', dateResult, '5 jan 2015', { date: 5, month: 0, year: 2015 });
+test('date parsing', dateResult, '6pm 5th jan 2015', { hour: 18, date: 5, month: 0, year: 2015 });
+test('date parsing', dateResult, '6:53am 5th jan 2015', { minute: 53, hour: 6, date: 5, month: 0, year: 2015 });
+test('date parsing', dateResult, '6:07am 5th jan 2015', { minute: 7, hour: 6, date: 5, month: 0, year: 2015 });
 // test('test', entityResult, 'jan 5th 2015', Mon Jan 05 2015 00:00:00 GMT+0000);
 // test('test', entityResult, 'mortgage is -£10 per month', £-10.00 per month);
 // test('test', entityResult, 'Convert 1 meter to yards please', 1.09 yards);
