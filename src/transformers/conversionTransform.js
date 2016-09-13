@@ -3,7 +3,7 @@ import {
   __, flow, take, takeRight, takeWhile, takeRightWhile, drop, dropRight, dropWhile, dropRightWhile,
   isEmpty, map, includes, last, filter,
 } from 'lodash/fp';
-import type { Transformer } from '../modules/createTransformer';
+import type { Transformer } from '../modules/transformer/types';
 import {
   TOKEN_NOOP, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, TOKEN_NUMBER,
 } from '../tokenTypes';

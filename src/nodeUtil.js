@@ -1,7 +1,7 @@
 // @flow
 import { NODE_MISC_GROUP } from './modules/math/types';
 import type { Node, MiscGroupNode } from './modules/math/types'; // eslint-disable-line
-import type { TokenNode } from './modules/types';
+import type { TokenNode } from './modules/transformer/types';
 
 /* eslint-disable import/prefer-default-export */
 export const compactMiscGroup = (node: TokenNode): ?Node => {

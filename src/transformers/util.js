@@ -1,8 +1,8 @@
 // @flow
 import { first, last, reduce, map, reduceRight, update, multiply, get } from 'lodash/fp';
-import { TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX } from '../tokenTypes';
 import type { EntityNode } from '../modules/math/types';
-import type { TokenNode } from '../modules/types';
+import type { TokenNode } from '../modules/transformer/types';
+import { TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX } from '../tokenTypes';
 import { propagateNull } from '../util';
 
 export const INTERMEDIATE_UNIT = 'INTERMEDIATE_UNIT';

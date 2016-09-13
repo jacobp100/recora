@@ -1,17 +1,7 @@
 // @flow
-import type { TokenNode } from './types';
-import { mapUnlessNull } from '../util';
+import type { TokenNode, Transformer, TransformResult } from './types';
+import { mapUnlessNull } from '../../util';
 
-export type TransformResult = TokenNode[] | TokenNode;
-export type CaptureGroup = TokenNode[];
-export type TransformFunction = (captureGroups: CaptureGroup[]) => ?TransformResult;
-export type TransformTokenFunction =
-  (captureGroupsToTransform: CaptureGroup[], transform: TransformFunction) => void;
-export type CaptureGroupFunction = (tokens: TokenNode[]) => ?(CaptureGroup[]);
-export type Transformer = {
-  pattern: { match: CaptureGroupFunction },
-  transform: (captureGroups: CaptureGroup[], transform: TransformTokenFunction) => void,
-};
 
 export default (transforms: Transformer[]) => {
   const iter = (tokens: TransformResult, location = 0): ?TransformResult => {

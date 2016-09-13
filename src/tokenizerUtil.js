@@ -1,6 +1,6 @@
 // @flow
 import { map, flow, has, join, range } from 'lodash/fp';
-import type { TokenizerSpecEntry } from './modules/createTokenizer';
+import type { TokenizerSpecEntry } from './modules/tokenizer/types';
 
 const wordRegexpCreator = flow(
   range(0),

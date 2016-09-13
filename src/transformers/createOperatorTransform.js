@@ -3,7 +3,7 @@ import {
   first, last, reduce, zip, flow, map, isEmpty, dropRight, reduceRight, compact,
 } from 'lodash/fp';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
-import type { Transformer } from '../modules/createTransformer';
+import type { Transformer } from '../modules/transformer/types';
 import {
   TOKEN_OPERATOR_EXPONENT,
   TOKEN_OPERATOR_MULTIPLY,

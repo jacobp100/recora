@@ -1,11 +1,11 @@
 // @flow
 import { keys } from 'lodash/fp';
 import Color from 'color-forge';
+import type { Token } from '../modules/tokenizer/types';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
-import type { Transformer } from '../modules/createTransformer';
+import type { Transformer, TokenNode } from '../modules/transformer/types';
 import { NODE_COLOR, NODE_DATETIME } from '../modules/math/types';
 import type { ColorNode, DateTimeNode, DateTime } from '../modules/math/types'; // eslint-disable-line
-import type { Token, TokenNode } from '../modules/types';
 import { TOKEN_COLOR, TOKEN_DATETIME } from '../tokenTypes';
 import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip, uncastArray } from '../util';
 

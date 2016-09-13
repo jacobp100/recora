@@ -106,6 +106,8 @@ test('exponentiation with negation', entityResult, '-4 ** 3 ** 2', -262144);
 test('brackets', entityResult, '(1 + 1) * 2', 4);
 test('brackets', entityResult, '1 + (2 * 2)', 5);
 test('brackets', entityResult, '(1 + 1)', 2);
+test('brackets', entityResult, '(6 - (2 + 2)) * 2', 4);
+test('brackets', entityResult, '(6 - (2 + 2)) * (6 - (2 + 2))', 4);
 test('conversion', entityResult, '1 meter to yards', 1.09, { yard: 1 });
 test('conversion', entityResult, '1 minute to seconds', 60, { second: 1 });
 test('conversion', entityResult, '3 feet 4 inches to cm', 101.6, { centimeter: 1 });

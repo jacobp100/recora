@@ -13,8 +13,8 @@ import {
   TOKEN_COLOR,
   TOKEN_NOOP,
 } from './tokenTypes';
-import createTokenizer from './modules/createTokenizer';
-import type { TokenizerSpec } from './modules/createTokenizer'; // eslint-disable-line
+import createTokenizer from './modules/tokenizer';
+import type { TokenizerSpec } from './modules/tokenizer/types';
 
 const concatCompact = flow(concat, compact);
 

@@ -1,6 +1,6 @@
 // @flow
 import { flow, reject, map, pick } from 'lodash/fp';
-import type { Tokenizer } from './modules/createTokenizer';
+import type { Tokenizer } from './modules/tokenizer/types';
 import { TOKEN_NOOP } from './tokenTypes';
 import createTokenizerWithLocale from './tokenizer';
 import enTokenizerLocale from './tokenizerLocales/en';

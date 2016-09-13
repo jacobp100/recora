@@ -3,7 +3,7 @@ import { first, last } from 'lodash/fp';
 import {
   Pattern, CaptureWildcard, CaptureElement, CaptureOptions,
 } from '../modules/patternMatcher';
-import type { Transformer } from '../modules/createTransformer';
+import type { Transformer } from '../modules/transformer/types';
 import { TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE } from '../tokenTypes';
 import { NODE_BRACKETS } from '../modules/math/types';
 import { uncastArray } from '../util';

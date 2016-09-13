@@ -1,6 +1,6 @@
 // @flow
 import { flow, drop, map, reduce, assign, join } from 'lodash/fp';
-import type { TokenizerSpec } from '../modules/createTokenizer';
+import type { TokenBase, TokenizerSpec } from '../modules/tokenizer/types';
 import {
   TOKEN_NUMBER,
   TOKEN_UNIT_NAME,
@@ -8,7 +8,6 @@ import {
   TOKEN_UNIT_SUFFIX,
   TOKEN_DATETIME,
 } from '../tokenTypes';
-import type { TokenNode } from '../modules/types';
 import oneWordUnits from '../data/en/1-word-units';
 import twoWordUnits from '../data/en/2-word-units';
 import threeWordUnits from '../data/en/3-word-units';
@@ -100,7 +99,7 @@ const createRegExp = flow(
   string => new RegExp(string, 'i'),
 );
 
-const createTransformer = transformers => (match, matches): TokenNode => {
+const createTransformer = transformers => (match, matches): TokenBase => {
   const { value } = reduce((accum, transformer) => {
     const arity = transformer.matchCount || 1;
     const args = accum.remainingMatches.slice(0, arity);

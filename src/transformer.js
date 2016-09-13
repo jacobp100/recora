@@ -7,7 +7,7 @@ import {
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_OPERATOR_NEGATE,
 } from './tokenTypes';
-import createTransformer from './modules/createTransformer';
+import createTransformer from './modules/transformer';
 import bracketTransform from './transformers/bracketTransform';
 import {
   createForwardOperatorTransform, createBackwardOperatorTransform,
