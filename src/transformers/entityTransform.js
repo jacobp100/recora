@@ -14,7 +14,7 @@ import { evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
 
-const getEntities = segment => {
+const getEntities = (segment: TokenNode[]): ?(EntityNode[]) => {
   const segmentWithIntermediateUnits = combineUnitNamesPrefixesSuffixes(segment);
   if (segmentWithIntermediateUnits === null) return null;
 
@@ -67,7 +67,7 @@ const entityTransform: Transformer = {
     let zippedSegments: TokenNode[] = castArray(segments[0]);
     for (let i = 0; i < unitSegments.length; i += 1) {
       const entitiesOfSegment = getEntities(unitSegments[i]);
-      if (entitiesOfSegment === null) return null;
+      if (!entitiesOfSegment) return null;
       zippedSegments = zippedSegments.concat(entitiesOfSegment, segments[i + 1]);
     }
 
