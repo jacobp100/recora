@@ -4,7 +4,8 @@ import {
   Pattern, CaptureWildcard, CaptureElement, CaptureOptions,
 } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/createTransformer';
-import { TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE, NODE_BRACKETS } from '../tokenNodeTypes';
+import { TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE } from '../tokenTypes';
+import { NODE_BRACKETS } from '../modules/math/types';
 
 const bracketTransform: Transformer = {
   pattern: new Pattern([

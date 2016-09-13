@@ -3,8 +3,10 @@ import { castArray, keys } from 'lodash/fp';
 import Color from 'color-forge';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TransformResult } from '../modules/createTransformer';
-import { TOKEN_COLOR, NODE_COLOR, TOKEN_DATETIME, NODE_DATETIME } from '../tokenNodeTypes';
-import type { TokenNode, ColorNode, DateTimeNode } from '../tokenNodeTypes'; // eslint-disable-line
+import { TOKEN_COLOR, TOKEN_DATETIME } from '../tokenTypes';
+import { NODE_COLOR, NODE_DATETIME } from '../modules/math/types';
+import type { ColorNode, DateTimeNode } from '../modules/math/types'; // eslint-disable-line
+import type { TokenNode } from '../modules/types';
 import { evenIndexElements, oddIndexElements } from '../util';
 
 const transforms = {

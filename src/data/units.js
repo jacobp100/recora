@@ -1,13 +1,5 @@
 // @flow
-export type DimensionTransformer = {
-  convertToBase: (value: number) => number,
-  convertFromBase: (value: number) => number,
-};
-export type UnitName = string;
-export type UnitValue = number;
-export type Units = { [key: UnitName]: UnitValue };
-export type ConversionDescriptor = [number | DimensionTransformer, Units];
-export type ConversionDescriptors = { [key: UnitName]: ConversionDescriptor };
+import type { ConversionDescriptors } from '../modules/math/types';
 
 const BASE_TIME = 'second';
 const BASE_LENGTH = 'meter';

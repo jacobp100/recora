@@ -3,10 +3,9 @@ import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, every, curry,
   isEmpty,
 } from 'lodash/fp';
-import type { ConversionDescriptor, UnitName, Units } from '../data/units';
-import { NODE_ENTITY } from '../tokenNodeTypes';
-import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
-import type { Curry2, Curry3 } from '../utilTypes';
+import { NODE_ENTITY } from '.';
+import type { ConversionDescriptor, UnitName, Units, EntityNode } from '.'; // eslint-disable-line
+import type { Curry2, Curry3 } from '../../../utilTypes';
 import type { ResolverContext } from '../resolverContext';
 
 const getConversionDescriptor = (
@@ -28,20 +27,19 @@ const unitIsLinear: Curry2<ResolverContext, UnitName, boolean> =
 export const combineUnits: Curry2<Units, Units, Units> =
   curry((units1, units2) => flow(mergeWith(addUnitValues), omitBy(eq(0)))(units1, units2));
 
-export const toFundamentalUnits: Curry2<ResolverContext, Units, Units> = curry((context, units) => (
-  reduce((accum, [unitName, unitValue]) => {
+export const getFundamentalUnits: Curry2<ResolverContext, Units, Units> =
+  curry((context, units) => reduce((accum, [unitName, unitValue]) => {
     const siUnitDimensions = getConversionDescriptor(context, unitName)[1];
     const scaledSiUnitDimensions = mapValues(multiply(unitValue), siUnitDimensions);
     return combineUnits(scaledSiUnitDimensions, accum);
-  }, {}, toPairs(units))
-));
+  }, {}, toPairs(units)));
 
 export const unitsAreLinear: Curry2<ResolverContext, Units, boolean> =
   curry((context, units) => flow(keys, every(unitIsLinear(context)))(units));
 
 export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> =
   curry((context, units1, units2) => (
-    isEqual(toFundamentalUnits(context, units1), toFundamentalUnits(context, units2))
+    isEqual(getFundamentalUnits(context, units1), getFundamentalUnits(context, units2))
   ));
 
 
@@ -80,3 +78,10 @@ export const convertTo = (
   )(entity.quantity);
   return { type: NODE_ENTITY, quantity, units };
 };
+
+export const convertToFundamentalUnits = (
+  context: ResolverContext,
+  entity: EntityNode
+): ?EntityNode => (
+  convertTo(context, getFundamentalUnits(context, entity.units), entity)
+);

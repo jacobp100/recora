@@ -1,16 +1,15 @@
 // @flow
 import { every, reduce, isEmpty } from 'lodash/fp';
 import type { ResolverContext } from '../resolverContext';
-import { NODE_ENTITY } from '../tokenNodeTypes';
-import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
-import type { Units } from '../data/units';
+import { NODE_ENTITY } from '.';
+import type { Units, Node } from '.'; // eslint-disable-line
 import { combineUnits, unitsAreCompatable, convertTo } from '../types/entity';
 
 export const convert = ( // eslint-disable-line
   context: ResolverContext,
   units: Units[],
-  value: TokenNode
-): ?TokenNode => {
+  value: Node
+): ?Node => {
   if (value.type !== NODE_ENTITY) return null;
 
   const [firstUnit, ...remainingUnits] = units;

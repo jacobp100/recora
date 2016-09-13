@@ -1,7 +1,7 @@
 // @flow
 import Color from 'color-forge';
-import { NODE_COLOR } from '../tokenNodeTypes';
-import type { ColorNode } from '../tokenNodeTypes'; // eslint-disable-line
+import { NODE_COLOR } from '../types';
+import type { ColorNode } from '../types'; // eslint-disable-line
 import type { ResolverContext } from '../resolverContext';
 
 const operationFactory = operation => (

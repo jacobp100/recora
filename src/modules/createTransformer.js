@@ -1,5 +1,5 @@
 // @flow
-import type { TokenNode } from '../tokenNodeTypes';
+import type { TokenNode } from './types';
 import { mapUnlessNull } from '../util';
 
 export type TransformResult = TokenNode[] | TokenNode;

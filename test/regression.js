@@ -232,7 +232,6 @@ test('date parsing', dateResult, '5 jan 2015', { date: 5, month: 0, year: 2015 }
 test('date parsing', dateResult, '6pm 5th jan 2015', { hour: 18, date: 5, month: 0, year: 2015 });
 test('date parsing', dateResult, '6:53am 5th jan 2015', { minute: 53, hour: 6, date: 5, month: 0, year: 2015 });
 test('date parsing', dateResult, '6:07am 5th jan 2015', { minute: 7, hour: 6, date: 5, month: 0, year: 2015 });
-// test('test', entityResult, 'jan 5th 2015', Mon Jan 05 2015 00:00:00 GMT+0000);
 // test('test', entityResult, 'mortgage is -£10 per month', £-10.00 per month);
 // test('test', entityResult, 'Convert 1 meter to yards please', 1.09 yards);
 // test('test', entityResult, 'How many yards are there in 100 meters?', 109 yards);

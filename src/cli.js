@@ -11,7 +11,7 @@ const rl = readline.createInterface({
 });
 
 const processInput = input => {
-  console.log(recora.parse(input));
+  console.log(recora.parse(input)); // eslint-disable-line
   getInput(); // eslint-disable-line
 };
 

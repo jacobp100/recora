@@ -7,8 +7,8 @@ import {
   TOKEN_UNIT_PREFIX,
   TOKEN_UNIT_SUFFIX,
   TOKEN_DATETIME,
-} from '../tokenNodeTypes';
-import type { TokenNode } from '../tokenNodeTypes'; // eslint-disable-line
+} from '../tokenTypes';
+import type { TokenNode } from '../modules/types';
 import oneWordUnits from '../data/en/1-word-units';
 import twoWordUnits from '../data/en/2-word-units';
 import threeWordUnits from '../data/en/3-word-units';

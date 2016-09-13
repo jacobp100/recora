@@ -1,9 +1,9 @@
 // @flow
-import { NODE_MISC_GROUP } from './tokenNodeTypes';
-import type { TokenNode, MiscGroupNode } from './tokenNodeTypes'; // eslint-disable-line
+import { NODE_MISC_GROUP } from './modules/math/types';
+import type { Node, MiscGroupNode } from './modules/math/types'; // eslint-disable-line
 
 /* eslint-disable import/prefer-default-export */
-export const compactMiscGroup = (node: MiscGroupNode): ?TokenNode => {
+export const compactMiscGroup = (node: MiscGroupNode): ?Node => {
   if (node.type !== NODE_MISC_GROUP || !node.value) return node;
 
   const value: MiscGroupNode[] = node.value;

@@ -11,9 +11,9 @@ import {
   TOKEN_OPERATOR_ADD,
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_OPERATOR_NEGATE,
-  NODE_FUNCTION,
-  NODE_MISC_GROUP,
-} from '../tokenNodeTypes';
+} from '../tokenTypes';
+import { NODE_FUNCTION, NODE_MISC_GROUP } from '../modules/math/types';
+import type { FunctionNode } from '../modules/math/types'; // eslint-disable-line
 import {
   FUNCTION_ADD,
   FUNCTION_SUBTRACT,
@@ -21,8 +21,8 @@ import {
   FUNCTION_DIVIDE,
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
-} from '../functions';
-import type { TokenNode, FunctionNode } from '../tokenNodeTypes'; // eslint-disable-line
+} from '../modules/math/functions';
+import type { TokenNode } from '../modules/types';
 import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 

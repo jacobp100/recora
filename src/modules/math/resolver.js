@@ -11,15 +11,15 @@ import {
 import {
   NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
   NODE_DATETIME,
-} from './tokenNodeTypes';
+} from './types';
 import type { // eslint-disable-line
-  TokenNode, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
-} from './tokenNodeTypes';
-import * as entityMath from './math/entity';
-import * as colorMath from './math/color';
+  Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
+} from './types';
+import * as entityOps from './operations/entity';
+import * as colorOps from './operations/color';
 import { resolve as resolveMiscGroup } from './types/miscGroup';
 import { convert } from './types/conversion';
-import { mapUnlessNull } from './util';
+import { mapUnlessNull } from '../../util';
 
 const resolver = {
   functionTrie: {},
@@ -34,7 +34,7 @@ const resolver = {
       set([...path, '_type'], type)
     )(this);
   },
-  resolve(value: TokenNode): ?TokenNode {
+  resolve(value: Node): ?Node {
     switch (value.type) {
       case NODE_BRACKETS: {
         const bracketsNode: BracketsNode = value;
@@ -91,15 +91,15 @@ const resolver = {
 
 /* eslint-disable max-len */
 export default resolver
-  .extendFunction(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.add)
-  .extendFunction(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.subtract)
-  .extendFunction(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.multiply)
-  .extendFunction(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.divide)
-  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityMath.exponent)
-  .extendFunction(FUNCTION_NEGATE, [NODE_ENTITY], NODE_ENTITY, entityMath.negate)
-  .extendFunction(FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.add)
-  .extendFunction(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.subtract)
-  .extendFunction(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.multiply)
-  .extendFunction(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorMath.divide)
+  .extendFunction(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.add)
+  .extendFunction(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.subtract)
+  .extendFunction(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.multiply)
+  .extendFunction(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.divide)
+  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.exponent)
+  .extendFunction(FUNCTION_NEGATE, [NODE_ENTITY], NODE_ENTITY, entityOps.negate)
+  .extendFunction(FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.add)
+  .extendFunction(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.subtract)
+  .extendFunction(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.multiply)
+  .extendFunction(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.divide)
   ;
 /* eslint-enable */

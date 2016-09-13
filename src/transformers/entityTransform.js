@@ -1,14 +1,13 @@
 // @flow
 import { last, reduce, update, concat, set, some, castArray, reject } from 'lodash/fp';
-import { combineUnits } from '../types/entity';
+import { combineUnits } from '../modules/math/types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TransformResult } from '../modules/createTransformer';
-import type { Units } from '../data/units';
 import {
-  TOKEN_NOOP, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, NODE_MISC_GROUP,
-  NODE_ENTITY,
-} from '../tokenNodeTypes';
-import type { EntityNode } from '../tokenNodeTypes'; // eslint-disable-line
+  TOKEN_NOOP, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX,
+} from '../tokenTypes';
+import { NODE_MISC_GROUP, NODE_ENTITY } from '../modules/math/types';
+import type { Units, EntityNode } from '../modules/math/types'; // eslint-disable-line
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
 import { evenIndexElements, oddIndexElements } from '../util';
 import { compactMiscGroup } from '../nodeUtil';

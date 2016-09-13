@@ -12,7 +12,7 @@ import {
   TOKEN_BRACKET_CLOSE,
   TOKEN_COLOR,
   TOKEN_NOOP,
-} from './tokenNodeTypes';
+} from './tokenTypes';
 import createTokenizer from './modules/createTokenizer';
 import type { TokenizerSpec } from './modules/createTokenizer'; // eslint-disable-line
 

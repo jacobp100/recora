@@ -5,8 +5,9 @@ import {
 } from 'lodash/fp';
 import type { Transformer } from '../modules/createTransformer';
 import {
-  TOKEN_NOOP, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, TOKEN_NUMBER, NODE_CONVERSION,
-} from '../tokenNodeTypes';
+  TOKEN_NOOP, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, TOKEN_NUMBER,
+} from '../tokenTypes';
+import { NODE_CONVERSION } from '../modules/math/types';
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
 
 const conversionTokens = [

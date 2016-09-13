@@ -2,7 +2,7 @@
 import {
   __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy,
 } from 'lodash/fp';
-import type { TokenBase } from '../tokenNodeTypes'; // eslint-disable-line
+import type { TokenBase } from './types'; // eslint-disable-line
 
 export type TokenTransform = (token: string, state: Object) => ?TokenBase;
 export type TokenizerSpecEntry = {
@@ -73,12 +73,12 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokeni
         matches = startsWith(matchSpec, remainingText) ? [matchSpec] : null;
       } else if (matchSpec instanceof RegExp) {
         const regexMatch = remainingText.search(matchSpec) === 0 && remainingText.match(matchSpec);
-        matches = regexMatch;
+        matches = regexMatch || null;
       }
 
       if (!matches) continue;
 
-      const matchedText: ?string = matches && matches[0];
+      const matchedText: string = matches[0];
       const token = typeof option.token === 'function'
         ? option.token(matchedText, matches, state.userState)
         : option.token;
