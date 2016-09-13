@@ -8,9 +8,9 @@ export type TransformResult = TokenNode[] | TokenNode;
 export type CaptureGroup = TokenNode[];
 export type TransformFunction = (captureGroups: CaptureGroup[]) => ?TransformResult;
 export type TransformTokenFunction =
-  (captureGroupsToTransform: CaptureGroup[], transform: TransformFunction) => void;
+  (captureGroupsToTransform: CaptureGroup[], transform: TransformFunction) => ?TransformResult;
 export type CaptureGroupFunction = (tokens: TokenNode[]) => ?(CaptureGroup[]);
 export type Transformer = {
   pattern: { match: CaptureGroupFunction },
-  transform: (captureGroups: CaptureGroup[], transform: TransformTokenFunction) => void,
+  transform: (captureGroups: CaptureGroup[], transform: TransformTokenFunction) => ?TransformResult,
 };
