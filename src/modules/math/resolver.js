@@ -38,7 +38,7 @@ const resolver = {
     switch (value.type) {
       case NODE_BRACKETS: {
         const bracketsNode: BracketsNode = value;
-        return this.resolve(bracketsNode);
+        return this.resolve(bracketsNode.value);
       }
       case NODE_FUNCTION: {
         const functionNode: FunctionNode = value;

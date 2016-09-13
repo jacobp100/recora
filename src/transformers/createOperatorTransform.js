@@ -22,7 +22,7 @@ import {
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
 } from '../modules/math/functions';
-import { propagateNull, evenIndexElements, oddIndexElements } from '../util';
+import { propagateNull, evenIndexElements, oddIndexElements, singleArrayValue } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
 
 type Direction = number;
@@ -58,27 +58,18 @@ const getOperatorTypes = flow(
   map('type'),
 );
 
-const createBilinearNode = (name, lhs, rhs): ?FunctionNode => (
-  (isEmpty(lhs) || isEmpty(rhs))
-    ? null
-    : { type: NODE_FUNCTION, name, args: [lhs, rhs] }
-);
+const createBilinearNode = (name, leftSegment, rightSegment): ?FunctionNode => {
+  const lhs = singleArrayValue(leftSegment);
+  const rhs = singleArrayValue(rightSegment);
 
-const createUnaryNode = (name, argument): ?FunctionNode => ({
-  type: NODE_FUNCTION,
-  name,
-  args: [argument],
-});
+  return (lhs && rhs)
+    ? { type: NODE_FUNCTION, name, args: [lhs, rhs] }
+    : null;
+};
 
-const createNode = (operatorType, lhs, rhs) => {
-  const arity = operatorArity[operatorType];
-  const type = operatorTypes[operatorType];
-
-  if (arity === 2) return createBilinearNode(type, lhs, rhs);
-
-  const bindingDirection = unaryBindingDirections[operatorType];
-  let leftSide = !isEmpty(lhs) ? lhs : null;
-  let rightSide = !isEmpty(rhs) ? rhs : null;
+const createUnaryNode = (bindingDirection, name, leftSegment, rightSegment): ?FunctionNode => {
+  let leftSide = !isEmpty(leftSegment) ? leftSegment : null;
+  let rightSide = !isEmpty(rightSegment) ? rightSegment : null;
   let argument;
 
   if (bindingDirection === FORWARD && rightSide && rightSide.type === NODE_MISC_GROUP) {
@@ -99,12 +90,27 @@ const createNode = (operatorType, lhs, rhs) => {
 
   if (!argument) return null;
 
-  const node = createUnaryNode(type, argument);
+  const node = {
+    type: NODE_FUNCTION,
+    name,
+    args: [argument],
+  };
   const group = compact([leftSide, node, rightSide]);
   const miscGroup: Node = { type: NODE_MISC_GROUP, value: group };
   const value = compactMiscGroup(miscGroup);
 
   return value;
+};
+
+const createNode = (operatorType, leftSegment, rightSegment) => {
+  const arity = operatorArity[operatorType];
+  const name = operatorTypes[operatorType];
+
+  if (arity === 2) {
+    return createBilinearNode(name, leftSegment, rightSegment);
+  }
+  const bindingDirection = unaryBindingDirections[operatorType];
+  return createUnaryNode(bindingDirection, name, leftSegment, rightSegment);
 };
 
 const createPattern = (operators: string[]) => (

@@ -56,3 +56,12 @@ export const uncastArray: UncastArray<any> = value => {
   }
   return null;
 };
+
+export const singleArrayValue: UncastArray<any> = value => {
+  if (!isArray(value)) {
+    return value;
+  } else if (value.length === 1) {
+    return value[0];
+  }
+  return null;
+};
