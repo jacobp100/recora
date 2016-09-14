@@ -104,7 +104,17 @@ gulp.task('en-math-formatting-data', ['clean-en-math-formatting-data'], () => {
     omitBy(isNil),
   )(en);
 
-  return file([{ name: 'en-formatting.json', source: JSON.stringify(formatting) }])
+  const plurals = flow(
+    keys,
+    without(keys(formatting)),
+    map(unit => [unit, pluralizeLastWord(unit)]),
+    fromPairs
+  )(units);
+
+  return file([
+    { name: 'en-unit-formatting.json', source: JSON.stringify(formatting) },
+    { name: 'en-unit-plurals.json', source: JSON.stringify(plurals) },
+  ])
     .pipe(gulp.dest(enMathFormattingDataDir));
 });
 

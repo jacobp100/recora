@@ -3,7 +3,8 @@ import { isEqual, toPairs, reduce, stubTrue, cond, getOr } from 'lodash/fp';
 import type { EntityNode, ResolverContext } from '../../math/types';
 import { convertToFundamentalUnits } from '../../math/types/entity';
 import type { FormattingHints } from '../types';
-import unitFormatting from '../data/en-formatting';
+import unitFormatting from '../data/en-unit-formatting';
+import unitPlurals from '../data/en-unit-plurals';
 import { formatPower, orderOfMagnitude } from '../util';
 
 
@@ -16,23 +17,30 @@ const baseNames = {
 };
 /* eslint-enable */
 
-const formatUnits = (value, units) => reduce((value, [unit, power]) => {
-  if (unit.power > 1) {
-    return `${value} ${unit}^${formatPower(power)}`;
-  } else if (unit.power < -1) {
-    return `${value} per ${unit}^${formatPower(power)}`;
-  } else if (unit.power === -1) {
-    return `${value} per ${unit}`;
-  }
-  // power is 1
-  if (unit in unitFormatting) {
-    const [title, position] = unitFormatting[unit];
-    return position === 'suffix'
-      ? `${value}${title}`
-      : `${title}${value}`;
-  }
-  return `${value} ${unit}`;
-}, value, toPairs(units));
+const formatUnits = (value, entity) => {
+  const isPlural = entity.quantity !== 1;
+  const formatPlural = isPlural
+    ? unit => getOr(unit, unit, unitPlurals)
+    : unit => unit;
+
+  return reduce((value, [unit, power]) => {
+    if (unit.power > 1) {
+      return `${value} ${formatPlural(unit)}^${formatPower(power)}`;
+    } else if (unit.power < -1) {
+      return `${value} per ${unit}^${formatPower(power)}`;
+    } else if (unit.power === -1) {
+      return `${value} per ${unit}`;
+    }
+    // power is 1
+    if (unit in unitFormatting) {
+      const [title, position] = unitFormatting[unit];
+      return position === 'suffix'
+        ? `${value}${title}`
+        : `${title}${value}`;
+    }
+    return `${value} ${formatPlural(unit)}`;
+  }, value, toPairs(entity.units));
+};
 
 const isCurrency = (context, formattingHints, entity) =>
   !formattingHints.base &&
@@ -41,7 +49,7 @@ const isCurrency = (context, formattingHints, entity) =>
   isEqual(convertToFundamentalUnits(context, entity), { EUR: 1 });
 
 const formatCurrency = (context, formattingHints, entity) =>
-  formatUnits(entity.quantity.toFixed(2), entity.units);
+  formatUnits(entity.quantity.toFixed(2), entity);
 
 const baseNumberFormatter = (formattingHints, entity) => {
   const { base, decimalPlaces, significantFigures } = formattingHints;
@@ -80,7 +88,7 @@ const baseNumberFormatter = (formattingHints, entity) => {
 };
 
 const baseFormatter = (context, formattingHints, entity) =>
-  formatUnits(baseNumberFormatter(formattingHints, entity), entity.units);
+  formatUnits(baseNumberFormatter(formattingHints, entity), entity);
 
 const entityFormatter: (
   context: ResolverContext,
