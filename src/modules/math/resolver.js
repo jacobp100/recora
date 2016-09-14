@@ -1,5 +1,5 @@
 // @flow
-import { set, get, flow, map } from 'lodash/fp';
+import { set, get, map } from 'lodash/fp';
 import { set as setMut } from 'lodash';
 import {
   FUNCTION_ADD,
@@ -15,7 +15,7 @@ import {
   NODE_DATETIME,
 } from './types';
 import type { // eslint-disable-line
-  Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
+  ResolverContext, Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
 } from './types';
 import * as entityOps from './operations/entity';
 import * as colorOps from './operations/color';
@@ -27,13 +27,13 @@ import { mapUnlessNull } from '../../util';
 const resolver = {
   functionTrie: {},
   context: {},
-  setContext(context) {
+  setContext(context: ResolverContext) {
     return set('context', context, this);
   },
-  extendFunction(functionName, types, type, fn) {
+  extendFunction(functionName: string, types: string[], fn: Function) {
     return set(['functionTrie', functionName, ...types, '_fn'], fn, this);
   },
-  extendFunctionMut(functionName, types, fn) {
+  extendFunctionMut(functionName: string, types: string[], fn: Function) {
     setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
     return this;
   },
@@ -78,7 +78,7 @@ const resolver = {
         return null;
     }
   },
-  executeFunction(fn) {
+  executeFunction(fn: Function) {
     const { name, args: unresolvedArgs } = fn;
 
     const args = mapUnlessNull(arg => this.resolve(arg), unresolvedArgs);

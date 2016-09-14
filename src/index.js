@@ -20,7 +20,7 @@ const cleanTokens = flow(
 export default class Recora {
   tokenizer: Tokenizer
   resolverContext: ResolverContext
-  resolver: resolver
+  resolver: typeof resolver
   formatter: Formatter
 
   constructor() {

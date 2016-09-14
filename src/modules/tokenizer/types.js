@@ -2,11 +2,12 @@
 export type TokenBase = Object & { type: string, value?: any };
 export type Token = TokenBase & { start: number, end: number };
 
-export type TokenTransform = (token: string, state: Object) => ?TokenBase;
+export type TokenResult = ?TokenBase | (?TokenBase)[];
+export type TokenTransform = (token: string, tokens: string[], state: Object) => TokenResult;
 export type TokenizerSpecEntry = {
   match: RegExp | string,
   penalty: number,
-  token?: TokenTransform | ?TokenBase,
+  token?: TokenTransform | TokenResult,
   push?: string[],
   pop?: boolean | number,
   updateState?: (state: Object) => Object
@@ -15,7 +16,7 @@ export type TokenizerSpecEntryRef = {
   ref: string,
   match?: RegExp | string,
   penalty?: number,
-  token?: TokenTransform | ?TokenBase,
+  token?: TokenTransform | TokenResult,
   push?: string[],
   pop?: boolean | number,
   updateState?: (state: Object) => Object

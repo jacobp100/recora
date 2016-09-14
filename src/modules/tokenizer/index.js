@@ -75,8 +75,10 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokeni
 
           const tokenStart = start + index;
           const tokenEnd = tokenStart + match.length;
-          accum.tokens.push({ ...token, start: tokenStart, end: tokenEnd });
+
+          if (token) accum.tokens.push({ ...token, start: tokenStart, end: tokenEnd });
           accum.index = index; // eslint-disable-line
+
           return accum;
         }, {
           index: 0,

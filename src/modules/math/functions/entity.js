@@ -13,7 +13,7 @@ export const negate = (context: ResolverContext, entity: EntityNode): EntityNode
 
 export const factorial = (context: ResolverContext, entity: EntityNode): ?EntityNode => {
   const fundamental = convertToFundamentalUnits(context, entity);
-  return isUnitless(fundamental)
+  return fundamental && isUnitless(fundamental)
     ? update('quantity', flow(add(1), gamma), fundamental)
     : null;
 };

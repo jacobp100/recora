@@ -1,8 +1,8 @@
 // @flow
 import { map, flow, has, join, range } from 'lodash/fp';
-import type { TokenizerSpecEntry } from './modules/tokenizer/types';
+import type { TokenizerSpecEntry, TokenResult } from './modules/tokenizer/types';
 
-const wordRegexpCreator = flow(
+const wordRegexpCreator: (words: number) => RegExp = flow(
   range(0),
   map(() => '[a-z]+'),
   join('\\s+'),
@@ -10,10 +10,13 @@ const wordRegexpCreator = flow(
 );
 
 type WordMatcher = {
-  words: number,
   type: string,
   dictionary: Object,
   penalty: number,
+  words?: number,
+  match?: RegExp,
+  matchIndex?: number,
+  transform?: (matchedWord: string, match: string, matches: string[]) => TokenResult,
 };
 export const wordMatcher = ({ // eslint-disable-line
   type,
