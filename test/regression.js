@@ -120,7 +120,8 @@ test('conversion', entityResult, 'kilometers in 1 mile', 1.61, { kilometer: 1 })
 test('conversion', entityResult, 'ounces in 1kg', 35.27, { ounce: 1 });
 test('conversion', entityResult, '1 meter + 1 yard', 1.91, { meter: 1 });
 test('conversion', entityResult, '1kg - 1 ounce', 0.97, { kilogram: 1 });
-test('conversion', entityResult, '180 degrees + 3.14 radians', 6.28);
+test('conversion', entityResult, '180 degrees + 3.14 radians', 359.91, { degree: 1 });
+test('conversion', entityResult, '3.14 radians + 180 degrees', 6.28, { radian: 1 });
 test('conversion', entityResult, '1 gallon to meters^3', 0.00455, { meter: 3 });
 test('conversion', entityResult, '1 gigajoules to kilowatt hours', 277.78, { kilowatt: 1, hour: 1 });
 test('conversion', entityResult, '1 joule per second to watts', 1, { Watt: 1 });
