@@ -7,6 +7,9 @@ import enTokenizerLocale from './tokenizerLocales/en';
 import transformer from './transformer';
 import resolver from './modules/math/resolver';
 import defaultContext from './modules/math/resolverContext';
+import defaultFormatter from './modules/math-formatter';
+import type { ResolverContext } from './modules/math/types';
+import type { Formatter } from './modules/math-formatter/types';
 import units from './data/units';
 
 const cleanTokens = flow(
@@ -16,32 +19,47 @@ const cleanTokens = flow(
 
 export default class Recora {
   tokenizer: Tokenizer
+  resolverContext: ResolverContext
   resolver: resolver
+  formatter: Formatter
 
   constructor() {
     const tokenizer = createTokenizerWithLocale(enTokenizerLocale);
     this.tokenizer = tokenizer;
 
     const resolverContext = defaultContext.setUnits(units);
+    this.resolverContext = resolverContext;
     this.resolver = resolver.setContext(resolverContext);
+
+    this.formatter = defaultFormatter.setLocale('en');
   }
 
-  parse(text: string) {
+  getResult(text: string) {
     const { tokenizer, resolver } = this;
 
     const tokenOptions = tokenizer(text);
     let result;
 
-    for (const tokenOption of tokenOptions) {
-      const ast = transformer(tokenOption);
+    for (const tokens of tokenOptions) {
+      const ast = transformer(tokens);
       result = ast ? resolver.resolve(ast) : null;
-
-      if (result) {
-        const tokens = cleanTokens(tokenOption);
-        return { result, tokens };
-      }
+      if (result) return { result, tokens };
     }
 
     return null;
+  }
+
+  parse(text: string) {
+    const value = this.getResult(text);
+    if (!value) return null;
+
+    const { resolverContext, formatter } = this;
+    const { result, tokens } = value;
+
+    return {
+      result,
+      pretty: formatter.format(resolverContext, formatter, result),
+      tokens: cleanTokens(tokens),
+    };
   }
 }

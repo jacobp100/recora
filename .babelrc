@@ -1,8 +1,9 @@
 {
-  "presets": ["babel-preset-node6"],
+  "presets": ["node6"],
   "plugins": [
-    "babel-plugin-transform-flow-strip-types",
-    "babel-plugin-transform-object-rest-spread",
-    "transform-class-properties"
+    "transform-flow-strip-types",
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    "transform-exponentiation-operator"
   ]
 }

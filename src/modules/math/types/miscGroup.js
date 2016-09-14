@@ -1,8 +1,7 @@
 // @flow
 import { first, drop, reduce, isEmpty, isEqual, intersection, keys, pick, size } from 'lodash/fp';
 import { NODE_ENTITY } from '.';
-import type { Node, EntityNode } from '.'; // eslint-disable-line
-import type { ResolverContext } from '../resolverContext';
+import type { ResolverContext, Node, EntityNode } from '.'; // eslint-disable-line
 import { getFundamentalUnits } from './entity';
 import * as entityOps from '../operations/entity';
 import { propagateNull } from '../../../util';

@@ -1,8 +1,7 @@
 // @flow
 import { every, reduce, isEmpty } from 'lodash/fp';
-import type { ResolverContext } from '../resolverContext';
 import { NODE_ENTITY } from '.';
-import type { Units, Node } from '.'; // eslint-disable-line
+import type { ResolverContext, Units, Node } from '.'; // eslint-disable-line
 import { combineUnits, unitsAreCompatable, convertTo } from '../types/entity';
 
 export const convert = ( // eslint-disable-line

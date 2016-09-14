@@ -1,11 +1,6 @@
 // @flow
 import { set } from 'lodash/fp';
-import type { ConversionDescriptors } from './types';
-
-export type ResolverContext = {
-  conversionDescriptors: ConversionDescriptors,
-  setUnits: (conversionDescriptors: ConversionDescriptors) => ResolverContext,
-};
+import type { ConversionDescriptors, ResolverContext } from './types';
 
 const defaultContext: ResolverContext = {
   conversionDescriptors: {},

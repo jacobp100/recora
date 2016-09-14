@@ -1,0 +1,14 @@
+{
+  "Kelvin"     : [" Kelvin",   "suffix"],
+  "Celsius"    : ["℃",         "suffix"],
+  "Fahrenheit" : ["℉",         "suffix"],
+  "gas mark"   : ["Gas mark ", "prefix"],
+  "angstrom"   : [" Å",        "suffix"],
+  "GBP"        : ["£",         "prefix"],
+  "USD"        : ["$",         "prefix"],
+  "EUR"        : ["€",         "suffix"],
+  "percent"    : ["%",         "suffix"],
+  "degree"     : ["°",         "suffix"],
+  "arcsecond"  : ["″",         "suffix"],
+  "arcminute"  : ["′",         "suffix"]
+}

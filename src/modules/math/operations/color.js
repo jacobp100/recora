@@ -1,8 +1,7 @@
 // @flow
 import Color from 'color-forge';
 import { NODE_COLOR } from '../types';
-import type { ColorNode } from '../types'; // eslint-disable-line
-import type { ResolverContext } from '../resolverContext';
+import type { ResolverContext, ColorNode } from '../types'; // eslint-disable-line
 
 const operationFactory = operation => (
   context: ResolverContext,

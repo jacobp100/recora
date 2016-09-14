@@ -20,6 +20,11 @@ export type Units = { [key: UnitName]: UnitValue };
 export type ConversionDescriptor = [number | DimensionTransformer, Units];
 export type ConversionDescriptors = { [key: UnitName]: ConversionDescriptor };
 
+export type ResolverContext = {
+  conversionDescriptors: ConversionDescriptors,
+  setUnits: (conversionDescriptors: ConversionDescriptors) => ResolverContext,
+};
+
 
 export const NODE_BRACKETS = 'NODE_BRACKETS';
 export type BracketsNode = Node &

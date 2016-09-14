@@ -1,0 +1,281 @@
+{
+  "millisecond": {
+    "abbreviations": ["ms"]
+  },
+  "second": {
+    "abbreviations": ["s", "sec"]
+  },
+  "minute": {
+    "abbreviations": ["min"]
+  },
+  "hour": {
+    "abbreviations": ["h", "hr"]
+  },
+  "day": {
+    "abbreviations": ["d", "dy"]
+  },
+  "week": {
+    "abbreviations": ["wk"]
+  },
+  "year": {
+    "abbreviations": ["yr"]
+  },
+
+  "milligram": {
+    "abbreviations": ["mg"]
+  },
+  "gram": {
+    "abbreviations": ["g"]
+  },
+  "kilogram": {
+    "abbreviations": ["kg", "kilo"]
+  },
+  "ounce": {
+    "abbreviations": ["oz"]
+  },
+  "pound": {
+    "abbreviations": ["lb"]
+  },
+
+  "meter": {
+    "alternates": ["metre"],
+    "abbreviations": ["m"]
+  },
+  "femtometer": {
+    "alternates": ["femtometre", "fermi"]
+  },
+  "picometer": {
+    "alternates": ["picometre"]
+  },
+  "nanometer": {
+    "alternates": ["nanometre"]
+  },
+  "micrometer": {
+    "alternates": ["micrometre"]
+  },
+  "millimeter": {
+    "alternates": ["millimetre"],
+    "abbreviations": ["mm"]
+  },
+  "centimeter": {
+    "alternates": ["centimetre"],
+    "abbreviations": ["cm"]
+  },
+  "kilometer": {
+    "alternates": ["kilometre"],
+    "abbreviations": ["km"]
+  },
+  "megameter": {
+    "alternates": ["megametre"]
+  },
+  "gigameter": {
+    "alternates": ["gigametre"]
+  },
+  "terameter": {
+    "alternates": ["terametre"]
+  },
+  "petameter": {
+    "alternates": ["petametre"]
+  },
+  "foot": {
+    "alternates": ["feet"]
+  },
+  "angstrom": {
+    "format": [" Å", "suffix"]
+  },
+
+
+  "liter": {
+    "alternates": ["litre"],
+    "abbreviations": ["l"]
+  },
+  "milliliter": {
+    "alternates": ["millilitre"],
+    "abbreviations": ["ml"]
+  },
+  "centiliter": {
+    "alternates": ["centilitre"]
+  },
+
+  "teaspoon": {
+    "abbreviations": ["tsp"]
+  },
+  "tablespoon": {
+    "abbreviations": ["tbsp"]
+  },
+  "fluid ounce": {
+    "abbreviations": ["floz"]
+  },
+
+  "Celsius": {
+    "alternates": ["centigrade", "degree celsius", "degree centigrade", "degrees celsius", "degrees centigrade"],
+    "format": ["℃", "suffix"]
+  },
+  "Fahrenheit": {
+    "alternates": ["degree fahrenheit", "degrees fahrenheit"],
+    "format": ["℉", "suffix"]
+  },
+  "Kelvin": {
+    "alternates": ["degree kelvin", "degrees kelvin"],
+    "format": [" Kelvin", "suffix"]
+  },
+  "gas mark": {
+    "format": ["Gas mark ", "prefix"]
+  },
+
+  "AUD": {
+    "alternates": ["aus dollar", "australian dollar"]
+  },
+  "BGN": {
+    "alternates": ["lev", "bulgarian lev"]
+  },
+  "BRL": {
+    "alternates": ["brazilian real"]
+  },
+  "CAD": {
+    "alternates": ["canadian dollar"]
+  },
+  "CHF": {
+    "alternates": ["swiss franc"]
+  },
+  "CNY": {
+    "alternates": ["yuan", "chinese yuan"]
+  },
+  "CZK": {
+    "alternates": ["koruna", "czech koruna"]
+  },
+  "DKK": {
+    "alternates": ["danish krone"]
+  },
+  "EUR": {
+    "alternates": ["euro"],
+    "abbreviations": ["€"],
+    "format": ["€", "prefix"]
+  },
+  "GBP": {
+    "alternates": ["quid", "sterling", "british pound", "pound sterling"],
+    "abbreviations": ["£"],
+    "format": ["£", "prefix"]
+  },
+  "HKD": {
+    "alternates": ["hong kong dollar"]
+  },
+  "HRK": {
+    "alternates": ["kuna", "croatian kuna"]
+  },
+  "HUF": {
+    "alternates": ["forint", "hungarian forint"]
+  },
+  "IDR": {
+    "alternates": ["rupiah", "undonesian rupiah"]
+  },
+  "ILS": {
+    "alternates": ["shekel", "sheqel", "israeli shekel", "israeli sheqel", "israeli new shekel", "israeli new sheqel"]
+  },
+  "INR": {
+    "alternates": ["rupee", "indian rupee"]
+  },
+  "JPY": {
+    "alternates": ["yen", "japanese yen"]
+  },
+  "KRW": {
+    "alternates": ["won", "korean won"]
+  },
+  "MXN": {
+    "alternates": ["mexican peso"]
+  },
+  "MYR": {
+    "alternates": ["ringgit", "malaysian ringgit"]
+  },
+  "NKK": {
+    "alternates": ["norwegian krone"]
+  },
+  "NZD": {
+    "alternates": ["new zealand dollar"]
+  },
+  "PHP": {
+    "alternates": ["philippine peso"]
+  },
+  "PLN": {
+    "alternates": ["zloty", "polish zloty"]
+  },
+  "RON": {
+    "alternates": ["leu", "romanian leu"]
+  },
+  "RUB": {
+    "alternates": ["ruble", "russian ruble"]
+  },
+  "SEK": {
+    "alternates": ["swedish krona"]
+  },
+  "SGD": {
+    "alternates": ["singapore dollar"]
+  },
+  "THB": {
+    "alternates": ["baht", "thai baht"]
+  },
+  "TRY": {
+    "alternates": ["lira", "turkish lira"]
+  },
+  "USD": {
+    "alternates": ["dollan", "us dollar", "american dollar"],
+    "abbreviations": ["$"],
+    "format": ["$", "prefix"]
+  },
+  "ZAR": {
+    "alternates": ["rand", "african rand", "south african rand"]
+  },
+
+  "kilobyte": {
+    "abbreviations": ["kb"]
+  },
+  "megabyte": {
+    "abbreviations": ["mb"]
+  },
+  "gigabyte": {
+    "abbreviations": ["gb"]
+  },
+  "terabyte": {
+    "abbreviations": ["tb"]
+  },
+  "kibibyte": {
+    "abbreviations": ["kib"]
+  },
+  "mebibyte": {
+    "abbreviations": ["mib"]
+  },
+  "gibibyte": {
+    "abbreviations": ["gib"]
+  },
+  "tebibyte": {
+    "abbreviations": ["tib"]
+  },
+
+  "Joule": {
+    "abbreviations": ["j"]
+  },
+  "Calorie": {
+    "abbreviations": ["cal"]
+  },
+  "electron volt": {
+    "abbreviations": ["ev"]
+  },
+
+  "degree": {
+    "abbreviations": ["deg"],
+    "format": ["°", "suffix"]
+  },
+  "radian": {
+    "abbreviations": ["rad"]
+  },
+  "percent": {
+    "abbreviations": ["%"],
+    "format": ["%", "suffix"]
+  },
+  "arcsecond": {
+    "format": ["″", "suffix"]
+  },
+  "arcminute": {
+    "format": ["′", "suffix"]
+  }
+}

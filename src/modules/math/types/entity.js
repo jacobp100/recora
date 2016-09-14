@@ -4,9 +4,8 @@ import {
   isEmpty,
 } from 'lodash/fp';
 import { NODE_ENTITY } from '.';
-import type { ConversionDescriptor, UnitName, Units, EntityNode } from '.'; // eslint-disable-line
+import type { ResolverContext, ConversionDescriptor, UnitName, Units, EntityNode } from '.'; // eslint-disable-line
 import type { Curry2, Curry3 } from '../../../utilTypes';
-import type { ResolverContext } from '../resolverContext';
 
 const getConversionDescriptor = (
   context: ResolverContext,

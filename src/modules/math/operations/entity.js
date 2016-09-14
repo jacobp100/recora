@@ -4,8 +4,7 @@ import {
   convertTo, combineUnits, convertToFundamentalUnits, unitsAreLinear, isUnitless,
 } from '../types/entity';
 import { NODE_ENTITY } from '../types';
-import type { EntityNode } from '../types'; // eslint-disable-line
-import type { ResolverContext } from '../resolverContext';
+import type { ResolverContext, EntityNode } from '../types'; // eslint-disable-line
 
 const isZero = matchesProperty('quantity', 0);
 const zeroEntity = { type: NODE_ENTITY, quantity: 0, units: {} };
