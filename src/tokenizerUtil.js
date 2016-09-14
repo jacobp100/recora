@@ -27,9 +27,10 @@ export const wordMatcher = ({ // eslint-disable-line
   matchIndex = 0,
   transform = (value) => ({ type, value }),
 }: WordMatcher): TokenizerSpecEntry => ({
+  // FIXME: Refactor
   token: (token, tokens) => (
-    has(tokens[matchIndex], dictionary)
-      ? transform(dictionary[tokens[matchIndex]], token, tokens)
+    has(tokens[matchIndex].toLowerCase(), dictionary)
+      ? transform(dictionary[tokens[matchIndex].toLowerCase()], token, tokens)
       : null
     ),
   match,

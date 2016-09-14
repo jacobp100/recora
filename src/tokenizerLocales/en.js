@@ -136,19 +136,36 @@ const enLocale: TokenizerSpec = {
     wordMatcher({ words: 3, type: TOKEN_UNIT_NAME, dictionary: threeWordUnits, penalty: -600 }),
     wordMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: oneWordUnits, penalty: -400 }),
-    wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: abbreviations, penalty: -200 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
     wordMatcher({
       type: TOKEN_UNIT_NAME,
+      dictionary: abbreviations,
+      matchIndex: 1,
+      match: /([a-z]+|[£$€]|)/i,
+      penalty: -200,
+    }),
+    wordMatcher({
+      type: TOKEN_UNIT_NAME,
       dictionary: oneWordUnits,
       matchIndex: 1,
-      match: new RegExp('([a-z]+)\\^(\\d+)', 'i'),
+      match: /([a-z]+)\^(-?\d+(?:\.\d+)?)/i,
       transform: (value, token, tokens) => ([
         { type: TOKEN_UNIT_NAME, value },
         { type: TOKEN_UNIT_SUFFIX, value: Number(tokens[2]) },
       ]),
       penalty: -5000,
+    }),
+    wordMatcher({
+      type: TOKEN_UNIT_NAME,
+      dictionary: abbreviations,
+      matchIndex: 1,
+      match: /([a-z]+)\^(-?\d+(?:\.\d+)?)/i,
+      transform: (value, token, tokens) => ([
+        { type: TOKEN_UNIT_NAME, value },
+        { type: TOKEN_UNIT_SUFFIX, value: Number(tokens[2]) },
+      ]),
+      penalty: -3000,
     }),
   ],
   date: [

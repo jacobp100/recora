@@ -4,7 +4,7 @@ import type { ConversionDescriptors } from '../modules/math/types';
 const BASE_TIME = 'second';
 const BASE_LENGTH = 'meter';
 const BASE_WEIGHT = 'kilogram';
-const BASE_CURRENCY = 'euro';
+const BASE_CURRENCY = 'EUR';
 const BASE_MEMORY = 'bit';
 const BASE_ABSOLUTE_TEMPERATURE = 'Kelvin';
 
