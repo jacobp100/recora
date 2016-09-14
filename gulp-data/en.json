@@ -226,28 +226,44 @@
   },
 
   "kilobyte": {
-    "abbreviations": ["kb"]
+    "abbreviations": ["kb"],
+    "format": ["KB", "suffix"]
   },
   "megabyte": {
-    "abbreviations": ["mb"]
+    "abbreviations": ["mb"],
+    "format": ["MB", "suffix"]
   },
   "gigabyte": {
-    "abbreviations": ["gb"]
+    "abbreviations": ["gb"],
+    "format": ["GB", "suffix"]
   },
   "terabyte": {
-    "abbreviations": ["tb"]
+    "abbreviations": ["tb"],
+    "format": ["TB", "suffix"]
+  },
+  "petabyte": {
+    "abbreviations": ["pb"],
+    "format": ["PB", "suffix"]
   },
   "kibibyte": {
-    "abbreviations": ["kib"]
+    "abbreviations": ["kib"],
+    "format": ["KiB", "suffix"]
   },
   "mebibyte": {
-    "abbreviations": ["mib"]
+    "abbreviations": ["mib"],
+    "format": ["MiB", "suffix"]
   },
   "gibibyte": {
-    "abbreviations": ["gib"]
+    "abbreviations": ["gib"],
+    "format": ["GiB", "suffix"]
   },
   "tebibyte": {
-    "abbreviations": ["tib"]
+    "abbreviations": ["tib"],
+    "format": ["TiB", "suffix"]
+  },
+  "pebibyte": {
+    "abbreviations": ["pib"],
+    "format": ["PiB", "suffix"]
   },
 
   "Joule": {
