@@ -84,7 +84,6 @@
     "format": [" Å", "suffix"]
   },
 
-
   "liter": {
     "alternates": ["litre"],
     "abbreviations": ["l"]
@@ -218,7 +217,7 @@
     "alternates": ["lira", "turkish lira"]
   },
   "USD": {
-    "alternates": ["dollan", "us dollar", "american dollar"],
+    "alternates": ["dollar", "us dollar", "american dollar"],
     "abbreviations": ["$"],
     "format": ["$", "prefix"]
   },

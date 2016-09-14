@@ -3,7 +3,7 @@ import { isEqual, toPairs, reduce, stubTrue, cond, getOr } from 'lodash/fp';
 import type { EntityNode, ResolverContext } from '../../math/types';
 import { convertToFundamentalUnits } from '../../math/types/entity';
 import type { FormattingHints } from '../types';
-import unitFormatting from './unitFormatting';
+import unitFormatting from '../data/en-formatting';
 import { formatPower, orderOfMagnitude } from '../util';
 
 
