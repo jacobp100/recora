@@ -11,6 +11,7 @@ import {
   TOKEN_OPERATOR_ADD,
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_OPERATOR_NEGATE,
+  TOKEN_OPERATOR_FACTORIAL,
 } from '../tokenTypes';
 import { NODE_FUNCTION, NODE_MISC_GROUP } from '../modules/math/types';
 import type { Node, FunctionNode } from '../modules/math/types'; // eslint-disable-line
@@ -21,6 +22,7 @@ import {
   FUNCTION_DIVIDE,
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
+  FUNCTION_FACTORIAL,
 } from '../modules/math/functions';
 import { propagateNull, evenIndexElements, oddIndexElements, singleArrayValue } from '../util';
 import { compactMiscGroup } from '../nodeUtil';
@@ -29,15 +31,6 @@ type Direction = number;
 const FORWARD: Direction = 0;
 const BACKWARD: Direction = 1;
 
-const operatorArity = {
-  [TOKEN_OPERATOR_EXPONENT]: 2,
-  [TOKEN_OPERATOR_MULTIPLY]: 2,
-  [TOKEN_OPERATOR_DIVIDE]: 2,
-  [TOKEN_OPERATOR_ADD]: 2,
-  [TOKEN_OPERATOR_SUBTRACT]: 2,
-  [TOKEN_OPERATOR_NEGATE]: 1,
-};
-
 const operatorTypes = {
   [TOKEN_OPERATOR_ADD]: FUNCTION_ADD,
   [TOKEN_OPERATOR_SUBTRACT]: FUNCTION_SUBTRACT,
@@ -45,12 +38,24 @@ const operatorTypes = {
   [TOKEN_OPERATOR_DIVIDE]: FUNCTION_DIVIDE,
   [TOKEN_OPERATOR_EXPONENT]: FUNCTION_EXPONENT,
   [TOKEN_OPERATOR_NEGATE]: FUNCTION_NEGATE,
+  [TOKEN_OPERATOR_FACTORIAL]: FUNCTION_FACTORIAL,
+};
+
+const operatorArity = {
+  [FUNCTION_ADD]: 2,
+  [FUNCTION_SUBTRACT]: 2,
+  [FUNCTION_MULTIPLY]: 2,
+  [FUNCTION_DIVIDE]: 2,
+  [FUNCTION_EXPONENT]: 2,
+  [FUNCTION_NEGATE]: 1,
+  [FUNCTION_FACTORIAL]: 1,
 };
 
 const unaryBindingDirections = {
-  // Factorial is backwards
-  [TOKEN_OPERATOR_NEGATE]: FORWARD,
+  [FUNCTION_NEGATE]: FORWARD,
+  [FUNCTION_FACTORIAL]: BACKWARD,
 };
+
 
 const getOperatorTypes = flow(
   oddIndexElements,
@@ -103,13 +108,13 @@ const createUnaryNode = (bindingDirection, name, leftSegment, rightSegment): ?Fu
 };
 
 const createNode = (operatorType, leftSegment, rightSegment) => {
-  const arity = operatorArity[operatorType];
   const name = operatorTypes[operatorType];
+  const arity = operatorArity[name];
 
   if (arity === 2) {
     return createBilinearNode(name, leftSegment, rightSegment);
   }
-  const bindingDirection = unaryBindingDirections[operatorType];
+  const bindingDirection = unaryBindingDirections[name];
   return createUnaryNode(bindingDirection, name, leftSegment, rightSegment);
 };
 

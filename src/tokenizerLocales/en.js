@@ -139,6 +139,17 @@ const enLocale: TokenizerSpec = {
     wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: abbreviations, penalty: -200 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
     wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
+    wordMatcher({
+      type: TOKEN_UNIT_NAME,
+      dictionary: oneWordUnits,
+      matchIndex: 1,
+      match: new RegExp('([a-z]+)\\^(\\d+)', 'i'),
+      transform: (value, token, tokens) => ([
+        { type: TOKEN_UNIT_NAME, value },
+        { type: TOKEN_UNIT_SUFFIX, value: Number(tokens[2]) },
+      ]),
+      penalty: -5000,
+    }),
   ],
   date: [
     createDateMatcher([date, monthName, year], -50000),

@@ -6,6 +6,7 @@ import {
   TOKEN_OPERATOR_ADD,
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_OPERATOR_NEGATE,
+  TOKEN_OPERATOR_FACTORIAL,
 } from './tokenTypes';
 import createTransformer from './modules/transformer';
 import bracketTransform from './transformers/bracketTransform';
@@ -22,6 +23,7 @@ export default createTransformer([
   createForwardOperatorTransform([TOKEN_OPERATOR_ADD, TOKEN_OPERATOR_SUBTRACT]),
   createForwardOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
   createBackwardOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE]),
+  createForwardOperatorTransform([TOKEN_OPERATOR_FACTORIAL]),
   remainingTokensTransform,
   entityTransform,
 ]);

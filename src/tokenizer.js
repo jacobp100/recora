@@ -7,6 +7,7 @@ import {
   TOKEN_OPERATOR_ADD,
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_OPERATOR_NEGATE,
+  TOKEN_OPERATOR_FACTORIAL,
   TOKEN_UNIT_PREFIX,
   TOKEN_BRACKET_OPEN,
   TOKEN_BRACKET_CLOSE,
@@ -28,6 +29,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { match: '+', token: { type: TOKEN_OPERATOR_ADD }, penalty: -1000 },
     { match: '-', token: { type: TOKEN_OPERATOR_SUBTRACT }, penalty: -1000 },
     { match: '-', token: { type: TOKEN_OPERATOR_NEGATE }, penalty: -500 },
+    { match: '!', token: { type: TOKEN_OPERATOR_FACTORIAL }, penalty: -500 },
   ],
   unit: [
     { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },
@@ -65,9 +67,9 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { match: /\s+/, penalty: 0 },
   ],
   otherCharacter: [
-    // No numbers, whitespace, operators, or brackets
+    // No numbers, whitespace, operators (except - and !), or brackets
     // the less this catches, the better the perf
-    { match: /[^\w\s*^/+\-%()\[\]]/, penalty: 1000 },
+    { match: /[^\w\s*^/+%()\[\]]/, penalty: 1000 },
   ],
   default: [
     { ref: 'operator' },

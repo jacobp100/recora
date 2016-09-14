@@ -16,12 +16,19 @@ type WordMatcher = {
   penalty: number,
 };
 export const wordMatcher = ({ // eslint-disable-line
-  words,
   type,
   dictionary,
   penalty,
+  words = 1,
+  match = wordRegexpCreator(words),
+  matchIndex = 0,
+  transform = (value) => ({ type, value }),
 }: WordMatcher): TokenizerSpecEntry => ({
-  token: token => (has(token, dictionary) ? ({ type, value: dictionary[token] }) : null),
-  match: wordRegexpCreator(words),
+  token: (token, tokens) => (
+    has(tokens[matchIndex], dictionary)
+      ? transform(dictionary[tokens[matchIndex]], token, tokens)
+      : null
+    ),
+  match,
   penalty,
 });

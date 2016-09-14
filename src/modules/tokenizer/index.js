@@ -1,6 +1,6 @@
 // @flow
 import {
-  __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy,
+  __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy, zip, reduce, drop,
 } from 'lodash/fp';
 import type { Tokenizer, TokenizerSpec, TokenizerState } from './types';
 
@@ -61,10 +61,32 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokeni
       */
       if (token === null) continue;
 
+      const start = state.character;
       const end = state.character + matchedText.length;
-      const tokens = token
-        ? [...state.tokens, { ...token, start: state.character, end }]
-        : state.tokens;
+      let tokens;
+
+      if (!token) {
+        tokens = state.tokens;
+      } else if (Array.isArray(token)) {
+        const { tokens: mappedTokens } = reduce((accum, [match, token]) => {
+          let index = matchedText.indexOf(match, accum.index);
+
+          if (index === -1) index = accum.index;
+
+          const tokenStart = start + index;
+          const tokenEnd = tokenStart + match.length;
+          accum.tokens.push({ ...token, start: tokenStart, end: tokenEnd });
+          accum.index = index; // eslint-disable-line
+          return accum;
+        }, {
+          index: 0,
+          tokens: [],
+        }, zip(drop(1, matches), token));
+
+        tokens = state.tokens.concat(mappedTokens);
+      } else {
+        tokens = state.tokens.concat({ ...token, start, end });
+      }
 
       let { stack, userState } = state;
 

@@ -1,5 +1,6 @@
 // @flow
 import { set, get, flow, map } from 'lodash/fp';
+import { set as setMut } from 'lodash';
 import {
   FUNCTION_ADD,
   FUNCTION_SUBTRACT,
@@ -7,6 +8,7 @@ import {
   FUNCTION_DIVIDE,
   FUNCTION_EXPONENT,
   FUNCTION_NEGATE,
+  FUNCTION_FACTORIAL,
 } from './functions';
 import {
   NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
@@ -17,6 +19,7 @@ import type { // eslint-disable-line
 } from './types';
 import * as entityOps from './operations/entity';
 import * as colorOps from './operations/color';
+import * as entityFns from './functions/entity';
 import { resolve as resolveMiscGroup } from './types/miscGroup';
 import { convert } from './types/conversion';
 import { mapUnlessNull } from '../../util';
@@ -28,11 +31,11 @@ const resolver = {
     return set('context', context, this);
   },
   extendFunction(functionName, types, type, fn) {
-    const path = ['functionTrie', functionName, ...types];
-    return flow(
-      set([...path, '_fn'], fn),
-      set([...path, '_type'], type)
-    )(this);
+    return set(['functionTrie', functionName, ...types, '_fn'], fn, this);
+  },
+  extendFunctionMut(functionName, types, fn) {
+    setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
+    return this;
   },
   resolve(value: Node): ?Node {
     switch (value.type) {
@@ -91,15 +94,16 @@ const resolver = {
 
 /* eslint-disable max-len */
 export default resolver
-  .extendFunction(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.add)
-  .extendFunction(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.subtract)
-  .extendFunction(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.multiply)
-  .extendFunction(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.divide)
-  .extendFunction(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], NODE_ENTITY, entityOps.exponent)
-  .extendFunction(FUNCTION_NEGATE, [NODE_ENTITY], NODE_ENTITY, entityOps.negate)
-  .extendFunction(FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.add)
-  .extendFunction(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.subtract)
-  .extendFunction(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.multiply)
-  .extendFunction(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], NODE_COLOR, colorOps.divide)
+  .extendFunctionMut(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], entityOps.add)
+  .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], entityOps.subtract)
+  .extendFunctionMut(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], entityOps.multiply)
+  .extendFunctionMut(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], entityOps.divide)
+  .extendFunctionMut(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], entityOps.exponent)
+  .extendFunctionMut(FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], colorOps.add)
+  .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], colorOps.subtract)
+  .extendFunctionMut(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], colorOps.multiply)
+  .extendFunctionMut(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], colorOps.divide)
+  .extendFunctionMut(FUNCTION_NEGATE, [NODE_ENTITY], entityFns.negate)
+  .extendFunctionMut(FUNCTION_FACTORIAL, [NODE_ENTITY], entityFns.factorial)
   ;
 /* eslint-enable */

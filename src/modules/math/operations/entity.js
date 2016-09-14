@@ -66,12 +66,6 @@ const exponentMath = (
   return { type: NODE_ENTITY, quantity, units };
 };
 
-const negateMath = (context: ResolverContext, value: EntityNode): ?EntityNode => ({
-  type: NODE_ENTITY,
-  quantity: -value.quantity,
-  units: value.units,
-});
-
 const addMath = addSubtractFactory(1);
 const subtractMath = addSubtractFactory(-1);
 const multiplyMath = multiplyDivideFactory(1);
@@ -83,5 +77,4 @@ export {
   multiplyMath as multiply,
   divideMath as divide,
   exponentMath as exponent,
-  negateMath as negate,
 };
