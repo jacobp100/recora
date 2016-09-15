@@ -4,9 +4,9 @@ import Color from 'color-forge';
 import type { Token } from '../modules/tokenizer/types';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TokenNode } from '../modules/transformer/types';
-import { NODE_COLOR, NODE_DATETIME } from '../modules/math/types';
+import { NODE_COLOR, NODE_DATE_TIME } from '../modules/math/types';
 import type { ColorNode, DateTimeNode, DateTime } from '../modules/math/types'; // eslint-disable-line
-import { TOKEN_COLOR, TOKEN_DATETIME } from '../tokenTypes';
+import { TOKEN_COLOR, TOKEN_DATE_TIME } from '../tokenTypes';
 import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip, uncastArray } from '../util';
 
 const transforms = {
@@ -14,10 +14,10 @@ const transforms = {
     const { values, alpha, space } = Color.hex(token.value);
     return { type: NODE_COLOR, values, alpha, space };
   },
-  [TOKEN_DATETIME]: (token: Token): ?DateTimeNode => {
+  [TOKEN_DATE_TIME]: (token: Token): ?DateTimeNode => {
     const value: ?DateTime = token.value;
     if (!value) return null;
-    return { type: NODE_DATETIME, value };
+    return { type: NODE_DATE_TIME, value };
   },
 };
 const transformTokens = keys(transforms);

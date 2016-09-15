@@ -12,16 +12,18 @@ import {
 } from './functions';
 import {
   NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
-  NODE_DATETIME,
+  NODE_DATE_TIME,
 } from './types';
 import type { // eslint-disable-line
   ResolverContext, Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
 } from './types';
 import * as entityOps from './operations/entity';
 import * as colorOps from './operations/color';
+import * as dateTimeEntityOps from './operations/dateTimeEntity';
 import * as entityFns from './functions/entity';
-import { resolve as resolveMiscGroup } from './types/miscGroup';
-import { convert } from './types/conversion';
+import { resolve as miscGroupResolve } from './types/miscGroup';
+import { convert as conversionConvert } from './types/conversion';
+import { resolveDefaults as dateTimeResolveDefaults } from './types/dateTime';
 import { mapUnlessNull } from '../../util';
 
 const resolver = {
@@ -48,18 +50,10 @@ const resolver = {
         return this.executeFunction(functionNode);
       }
       case NODE_MISC_GROUP: {
-        /*
-        Should this be implemented a function or something?
-
-        We don't have arbitrarily variadic functions---do we want them?
-
-        A lot of places create misc groups and then compact them---making it a function could add a
-        lot of overhead
-        */
         const miscGroupNode: MiscGroupNode = value;
         const values = mapUnlessNull(value => this.resolve(value), miscGroupNode.value);
         if (!values) return null;
-        return resolveMiscGroup(this.context, values);
+        return miscGroupResolve(this.context, values);
       }
       case NODE_CONVERSION: {
         const { context } = this;
@@ -68,11 +62,12 @@ const resolver = {
         const resolvedValue = this.resolve(conversionNode.value);
         if (!resolvedValue) return null;
 
-        return convert(context, value.units, resolvedValue);
+        return conversionConvert(context, value.units, resolvedValue);
       }
+      case NODE_DATE_TIME:
+        return dateTimeResolveDefaults(this.context, value);
       case NODE_ENTITY:
       case NODE_COLOR:
-      case NODE_DATETIME:
         return value;
       default:
         return null;
@@ -103,6 +98,8 @@ export default resolver
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], colorOps.subtract)
   .extendFunctionMut(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], colorOps.multiply)
   .extendFunctionMut(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], colorOps.divide)
+  .extendFunctionMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.add)
+  .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.subtract)
   .extendFunctionMut(FUNCTION_NEGATE, [NODE_ENTITY], entityFns.negate)
   .extendFunctionMut(FUNCTION_FACTORIAL, [NODE_ENTITY], entityFns.factorial)
   ;

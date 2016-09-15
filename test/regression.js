@@ -1,15 +1,18 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 import test from 'ava';
-import { get, forEach, getOr } from 'lodash/fp';
+import { get, assignWith } from 'lodash/fp';
 import Color from 'color-forge';
 import Recora from '../src';
 
 const recora = new Recora();
+const defaultDate = recora.resolverContext.date;
+const assignDefaults = assignWith((a, b) => (b === null ? a : b), defaultDate);
 
 const parse = input => {
   try {
     return recora.parse(input);
   } catch (e) {
+    console.log(e);
     throw new Error(`Failed to parse "${input}`);
   }
 };
@@ -56,25 +59,26 @@ const colorResult = (t, input, expectedHex) => {
   );
 };
 
-const dateResult = (t, input, expectedValues) => {
-  const dateKeys = ['second', 'minute', 'hour', 'date', 'month', 'year'];
-  t.plan(1 + dateKeys.length);
+const dateResult = (t, input, expectedValuesWithoutDefaults) => {
+  t.plan(2);
 
   const actual = parse(input);
-  t.truthy(actual, `Expected to get a result for "${input}"`);
+  const actualValuesWithoutDefaults = actual && actual.result.value;
 
-  const actualValues = actual.result.value;
+  t.truthy(actualValuesWithoutDefaults, `Expected to get a result for "${input}"`);
 
-  forEach(dateKey => {
-    const actualValue = actualValues[dateKey];
-    const expectedValue = getOr(null, dateKey, expectedValues);
+  const actualValues = assignDefaults(actualValuesWithoutDefaults);
+  const expectedValues = assignDefaults(expectedValuesWithoutDefaults);
 
-    t.is(
-      actualValue,
-      expectedValue,
-      `Expected ${dateKey} of ${actualValue} to equal ${expectedValue} for "${input}"`
-    );
-  }, dateKeys);
+  t.deepEqual(
+    actualValues,
+    expectedValues,
+    `Expected ${
+      JSON.stringify(actualValues)
+    } to equal ${
+      JSON.stringify(expectedValues)
+    } for "${input}"`
+  );
 };
 
 // const noResult = (t, input) => {
@@ -239,10 +243,6 @@ test('unit operations', entityResult, '3.14 radians + 180 degrees', 6.28, { radi
 // test('test', entityResult, '1 mexican peso to euro', 1.00€);
 // test('test', entityResult, '1000 us cup to fluid ounces', 8,292 fluid ounces);
 // test('test', entityResult, '1992/12/4', Fri Dec 04 1992 00:00:00 GMT+0000);
-// test('test', entityResult, '1992/12/4 + 30 days', Sun Jan 03 1993 00:00:00 GMT+0000);
-// test('test', entityResult, '1992/12/4 + 1 year', Sat Dec 04 1993 00:00:00 GMT+0000);
-// test('test', entityResult, '1992/12/4 - 1 century', Sun Dec 04 1892 00:00:00 GMT+0000);
-// test('test', entityResult, '1992/12/4 until 1993/6/18', 196 days);
 // { 'input': 'next week', Midnight Thursday, 8th January 1970);
 // { 'input': 'last week', Midnight Thursday, 25th December 1969);
 // { 'input': 'next week to days', 7 days);
@@ -252,11 +252,16 @@ test('unit operations', entityResult, '3.14 radians + 180 degrees', 6.28, { radi
 // { 'input': '2 weeks ago', Thursday, 18th December 1969);
 // { 'input': '2 weeks ago until next week in days', 21 days);
 // { 'input': '13 hours from now', 1:00PM, Thursday, 1st January 1970);
-test('date parsing', dateResult, '5th jan 2015', { date: 5, month: 0, year: 2015 });
-test('date parsing', dateResult, '5 jan 2015', { date: 5, month: 0, year: 2015 });
-test('date parsing', dateResult, '6pm 5th jan 2015', { hour: 18, date: 5, month: 0, year: 2015 });
-test('date parsing', dateResult, '6:53am 5th jan 2015', { minute: 53, hour: 6, date: 5, month: 0, year: 2015 });
-test('date parsing', dateResult, '6:07am 5th jan 2015', { minute: 7, hour: 6, date: 5, month: 0, year: 2015 });
+test('date parsing', dateResult, '5th jan 2015', { date: 5, month: 1, year: 2015 });
+test('date parsing', dateResult, '5 jan 2015', { date: 5, month: 1, year: 2015 });
+test('date parsing', dateResult, '6pm 5th jan 2015', { hour: 18, date: 5, month: 1, year: 2015 });
+test('date parsing', dateResult, '6:53am 5th jan 2015', { minute: 53, hour: 6, date: 5, month: 1, year: 2015 });
+test('date parsing', dateResult, '6:07am 5th jan 2015', { minute: 7, hour: 6, date: 5, month: 1, year: 2015 });
+test('date parsing', dateResult, '1992-12-04T10:09:08.7654Z', { date: 4, month: 12, year: 1992, hour: 10, minute: 9, second: 8 });
+test('date entity math', dateResult, '1992-12-04 + 30 days', { date: 3, month: 1, year: 1993 });
+test('date entity math', dateResult, '1992-12-04 + 1 year', { date: 4, month: 12, year: 1993 });
+test('date entity math', dateResult, '1992-12-04 - 1 century', { date: 4, month: 12, year: 1892 });
+// test('date math', dateResult, '1992-12-04 until 1993/6/18', 196 days);
 // test('test', entityResult, 'mortgage is -£10 per month', £-10.00 per month);
 // test('test', entityResult, 'Convert 1 meter to yards please', 1.09 yards);
 // test('test', entityResult, 'How many yards are there in 100 meters?', 109 yards);

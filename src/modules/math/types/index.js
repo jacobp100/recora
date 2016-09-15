@@ -1,6 +1,7 @@
 // @flow
 export type Node = Object;
 
+// NOTE: We're using the timezone library, so months are 1-based (sane)
 export type DateTime = {
   year: ?number,
   month: ?number,
@@ -8,7 +9,7 @@ export type DateTime = {
   hour: ?number,
   minute: ?number,
   second: ?number,
-  tz: ?number,
+  timezone: ?string,
 };
 export type DimensionTransformer = {
   convertToBase: (value: number) => number,
@@ -22,7 +23,9 @@ export type ConversionDescriptors = { [key: UnitName]: ConversionDescriptor };
 
 export type ResolverContext = {
   conversionDescriptors: ConversionDescriptors,
+  date: DateTime,
   setUnits: (conversionDescriptors: ConversionDescriptors) => ResolverContext,
+  setDate: (dateTime: DateTime) => ResolverContext,
 };
 
 
@@ -50,6 +53,6 @@ export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = Node &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };
 
-export const NODE_DATETIME = 'NODE_DATETIME';
+export const NODE_DATE_TIME = 'NODE_DATE_TIME';
 export type DateTimeNode = Node &
-  { type: 'NODE_DATETIME', value: DateTime };
+  { type: 'NODE_DATE_TIME', value: DateTime };

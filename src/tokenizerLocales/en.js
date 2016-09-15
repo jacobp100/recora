@@ -1,12 +1,13 @@
 // @flow
 import { flow, drop, map, reduce, assign, join } from 'lodash/fp';
 import type { TokenBase, TokenizerSpec } from '../modules/tokenizer/types';
+import type { DateTime } from '../modules/math/types';
 import {
   TOKEN_NUMBER,
   TOKEN_UNIT_NAME,
   TOKEN_UNIT_PREFIX,
   TOKEN_UNIT_SUFFIX,
-  TOKEN_DATETIME,
+  TOKEN_DATE_TIME,
 } from '../tokenTypes';
 import oneWordUnits from '../data/en/1-word-units';
 import twoWordUnits from '../data/en/2-word-units';
@@ -67,7 +68,7 @@ const monthName = {
     'dec(?:ember)?',
   ].join('|')})`,
   transform: match => ({
-    month: monthPrefixes.indexOf(match.substring(0, 3).toLowerCase()),
+    month: monthPrefixes.indexOf(match.substring(0, 3).toLowerCase()) + 1,
   }),
 };
 
@@ -79,14 +80,14 @@ const year = {
 };
 
 
-const defaultValue = {
+const defaultValue: DateTime = {
   year: null,
   month: null,
   date: null,
   hour: null,
   minute: null,
   second: null,
-  tz: null,
+  timezone: null,
 };
 
 const createRegExp = flow(
@@ -96,7 +97,7 @@ const createRegExp = flow(
   string => new RegExp(string, 'i'),
 );
 
-const createTransformer = transformers => (match, matches): TokenBase => {
+const createTransformer = transformers => (match, matches): ?TokenBase => {
   const valueMatches = reduce(propagateNull((accum, transformer) => {
     const arity = transformer.matchCount || 1;
     const args = accum.remainingMatches.slice(0, arity);
@@ -115,7 +116,7 @@ const createTransformer = transformers => (match, matches): TokenBase => {
   if (!valueMatches) return null;
   const { value } = valueMatches;
 
-  return { type: TOKEN_DATETIME, value };
+  return { type: TOKEN_DATE_TIME, value };
 };
 
 const createDateMatcher = (transformers, penalty) => ({
@@ -175,6 +176,8 @@ const enLocale: TokenizerSpec = {
     createDateMatcher([time, monthName, date, year], -70000),
     createDateMatcher([time, date, monthName], -50000),
     createDateMatcher([time, monthName, date], -50000),
+    createDateMatcher([time, date], -30000),
+    createDateMatcher([date, time], -30000),
     createDateMatcher([time], -20000),
   ],
 };
