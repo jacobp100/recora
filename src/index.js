@@ -14,6 +14,7 @@ import units from './data/units';
 
 const cleanTokens = flow(
   reject({ type: TOKEN_NOOP }),
+  reject(({ start, end }) => start >= end),
   map(pick(['type', 'start', 'end']))
 );
 

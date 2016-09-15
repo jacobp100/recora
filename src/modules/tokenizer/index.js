@@ -1,6 +1,7 @@
 // @flow
 import {
-  __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy, zip, reduce, drop,
+  __, startsWith, last, get, map, flatMap, mapValues, flow, assign, sortBy, reduce, drop, range,
+  includes,
 } from 'lodash/fp';
 import type { Tokenizer, TokenizerSpec, TokenizerState } from './types';
 
@@ -12,6 +13,43 @@ const defaultTokenizerState = {
   tokens: [],
   userState: {},
 };
+
+const setTokenArrayStartEndValues = (start, defaultTokenIndexes, matchedText, matches, token) => {
+  const tokenIndexes = defaultTokenIndexes || range(1, matches.length);
+
+  const { tokenMatches } = reduce((accum, index) => {
+    accum.tokenMatches.push({
+      token: accum.remainingTokens.shift(),
+      match: includes(index + 1, tokenIndexes) ? accum.remainingMatches.shift() : null,
+    });
+    return accum;
+  }, {
+    tokenMatches: [],
+    remainingTokens: token.slice(),
+    remainingMatches: (matches.length > 1) ? drop(1, matches) : [matchedText],
+  }, range(0, token.length));
+
+  const { tokens: mappedTokens } = reduce((accum, { match, token }) => {
+    let index = -1;
+
+    if (match !== null) index = matchedText.indexOf(match, accum.index);
+    if (index === -1) index = accum.index;
+
+    const tokenStart = start + index;
+    const tokenEnd = tokenStart + (match !== null ? match.length : 0);
+
+    if (token) accum.tokens.push({ ...token, start: tokenStart, end: tokenEnd });
+    accum.index = index; // eslint-disable-line
+
+    return accum;
+  }, {
+    index: 0,
+    tokens: [],
+  }, tokenMatches);
+
+  return mappedTokens;
+};
+
 export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokenizer => {
   const flattenRefs = flatMap(option => (
     !option.ref
@@ -68,23 +106,8 @@ export default (inputSpec: TokenizerSpec, defaultUserState: Object = {}): Tokeni
       if (!token) {
         tokens = state.tokens;
       } else if (Array.isArray(token)) {
-        const { tokens: mappedTokens } = reduce((accum, [match, token]) => {
-          let index = matchedText.indexOf(match, accum.index);
-
-          if (index === -1) index = accum.index;
-
-          const tokenStart = start + index;
-          const tokenEnd = tokenStart + match.length;
-
-          if (token) accum.tokens.push({ ...token, start: tokenStart, end: tokenEnd });
-          accum.index = index; // eslint-disable-line
-
-          return accum;
-        }, {
-          index: 0,
-          tokens: [],
-        }, zip(drop(1, matches), token));
-
+        const mappedTokens =
+          setTokenArrayStartEndValues(start, option.tokenIndexes, matchedText, matches, token);
         tokens = state.tokens.concat(mappedTokens);
       } else {
         tokens = state.tokens.concat({ ...token, start, end });

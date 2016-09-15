@@ -8,6 +8,7 @@ export type TokenizerSpecEntry = {
   match: RegExp | string,
   penalty: number,
   token?: TokenTransform | TokenResult,
+  tokenIndices?: number[],
   push?: string[],
   pop?: boolean | number,
   updateState?: (state: Object) => Object
@@ -17,12 +18,14 @@ export type TokenizerSpecEntryRef = {
   match?: RegExp | string,
   penalty?: number,
   token?: TokenTransform | TokenResult,
+  tokenIndices?: number[],
   push?: string[],
   pop?: boolean | number,
   updateState?: (state: Object) => Object
 }
+export type TokenizerSpecEntries = (TokenizerSpecEntry | TokenizerSpecEntryRef)[];
 
-export type TokenizerSpec = ({ [key:string]: (TokenizerSpecEntry | TokenizerSpecEntryRef)[] });
+export type TokenizerSpec = ({ [key:string]: TokenizerSpecEntries });
 export type TokenizerState = {
   character: number,
   stack: string[],

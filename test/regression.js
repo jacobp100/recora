@@ -243,15 +243,6 @@ test('unit operations', entityResult, '3.14 radians + 180 degrees', 6.28, { radi
 // test('test', entityResult, '1 mexican peso to euro', 1.00€);
 // test('test', entityResult, '1000 us cup to fluid ounces', 8,292 fluid ounces);
 // test('test', entityResult, '1992/12/4', Fri Dec 04 1992 00:00:00 GMT+0000);
-// { 'input': 'next week', Midnight Thursday, 8th January 1970);
-// { 'input': 'last week', Midnight Thursday, 25th December 1969);
-// { 'input': 'next week to days', 7 days);
-// { 'input': 'now', Midnight Thursday, 1st January 1970);
-// { 'input': '2 weeks + now', Thursday, 15th January 1970);
-// { 'input': '2 weeks from now', Thursday, 15th January 1970);
-// { 'input': '2 weeks ago', Thursday, 18th December 1969);
-// { 'input': '2 weeks ago until next week in days', 21 days);
-// { 'input': '13 hours from now', 1:00PM, Thursday, 1st January 1970);
 test('date parsing', dateResult, '5th jan 2015', { date: 5, month: 1, year: 2015 });
 test('date parsing', dateResult, '5 jan 2015', { date: 5, month: 1, year: 2015 });
 test('date parsing', dateResult, '6pm 5th jan 2015', { hour: 18, date: 5, month: 1, year: 2015 });
@@ -262,6 +253,23 @@ test('date entity math', dateResult, '1992-12-04 + 30 days', { date: 3, month: 1
 test('date entity math', dateResult, '1992-12-04 + 1 year', { date: 4, month: 12, year: 1993 });
 test('date entity math', dateResult, '1992-12-04 - 1 century', { date: 4, month: 12, year: 1892 });
 test('date differences', entityResult, '1992-12-04 until 1993-06-18', 196.04, { day: 1 });
+test('relative dates', dateResult, 'now', { date: 1, month: 1, year: 1970 });
+test('relative dates', dateResult, 'tomorrow', { date: 2, month: 1, year: 1970 });
+test('relative dates', dateResult, 'yesterday', { date: 31, month: 12, year: 1969 });
+test('relative dates', dateResult, 'next week', { date: 8, month: 1, year: 1970 });
+test('relative dates', dateResult, 'last week', { date: 25, month: 12, year: 1969 });
+// We may need to special case additions: i.e. (date) + 1 month should increment the month,
+// not add ~30.5 days
+test('relative dates', dateResult, 'next month', { hour: 10, date: 31, month: 1, year: 1970 });
+test('relative dates', dateResult, 'last month', { hour: 14, date: 1, month: 12, year: 1969 });
+test('relative dates', dateResult, 'next year', { date: 1, month: 1, year: 1971 });
+test('relative dates', dateResult, 'last year', { date: 1, month: 1, year: 1969 });
+// test('relative dates', 'next week to days', 7 days);
+// { 'input': '2 weeks + now', Thursday, 15th January 1970);
+// { 'input': '2 weeks from now', Thursday, 15th January 1970);
+// { 'input': '2 weeks ago', Thursday, 18th December 1969);
+// { 'input': '2 weeks ago until next week in days', 21 days);
+// { 'input': '13 hours from now', 1:00PM, Thursday, 1st January 1970);
 // test('test', entityResult, 'mortgage is -£10 per month', £-10.00 per month);
 // test('test', entityResult, 'Convert 1 meter to yards please', 1.09 yards);
 // test('test', entityResult, 'How many yards are there in 100 meters?', 109 yards);
