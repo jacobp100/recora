@@ -1,19 +1,20 @@
 // @flow
 import { assignWith, flow, concat, compact } from 'lodash/fp';
 import {
-  TOKEN_OPERATOR_EXPONENT,
-  TOKEN_OPERATOR_MULTIPLY,
-  TOKEN_OPERATOR_DIVIDE,
-  TOKEN_OPERATOR_ADD,
-  TOKEN_OPERATOR_SUBTRACT,
-  TOKEN_OPERATOR_NEGATE,
-  TOKEN_OPERATOR_FACTORIAL,
-  TOKEN_UNIT_PREFIX,
-  TOKEN_BRACKET_OPEN,
   TOKEN_BRACKET_CLOSE,
+  TOKEN_BRACKET_OPEN,
   TOKEN_COLOR,
   TOKEN_DATE_TIME,
   TOKEN_NOOP,
+  TOKEN_OPERATOR_ADD,
+  TOKEN_OPERATOR_DIVIDE,
+  TOKEN_OPERATOR_EXPONENT,
+  TOKEN_OPERATOR_FACTORIAL,
+  TOKEN_OPERATOR_MULTIPLY,
+  TOKEN_OPERATOR_NEGATE,
+  TOKEN_OPERATOR_SUBTRACT,
+  TOKEN_PERCENTAGE,
+  TOKEN_UNIT_PREFIX,
 } from './tokenTypes';
 import createTokenizer from './modules/tokenizer';
 import type { TokenizerSpec } from './modules/tokenizer/types';
@@ -31,6 +32,9 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { match: '-', token: { type: TOKEN_OPERATOR_SUBTRACT }, penalty: -1000 },
     { match: '-', token: { type: TOKEN_OPERATOR_NEGATE }, penalty: -500 },
     { match: '!', token: { type: TOKEN_OPERATOR_FACTORIAL }, penalty: -500 },
+  ],
+  percent: [
+    { match: '%', token: { type: TOKEN_PERCENTAGE }, penalty: -1000 },
   ],
   unit: [
     { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },
@@ -82,12 +86,13 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { match: /\s+/, penalty: 0 },
   ],
   otherCharacter: [
-    // No numbers, whitespace, operators (except - and !), or brackets
+    // No numbers, letters, whitespace, operators (except - and !), or brackets
     // the less this catches, the better the perf
     { match: /[^\w\s*^/+%()\[\]]/, penalty: 1000 },
   ],
   default: [
     { ref: 'operator' },
+    { ref: 'percent' },
     { ref: 'number' },
     { ref: 'unit' },
     { ref: 'color' },

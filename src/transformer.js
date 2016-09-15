@@ -14,6 +14,7 @@ import {
   createForwardOperatorTransform, createBackwardOperatorTransform,
 } from './transformers/createOperatorTransform';
 import conversionTransform from './transformers/conversionTransform';
+import percentTransform from './transformers/percentTransform';
 import entityTransform from './transformers/entityTransform';
 import remainingTokensTransform from './transformers/remainingTokensTransform';
 import miscGroupTransform from './transformers/miscGroupTransform';
@@ -26,6 +27,7 @@ export default createTransformer([
   createBackwardOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE]),
   createForwardOperatorTransform([TOKEN_OPERATOR_FACTORIAL]),
   remainingTokensTransform,
+  percentTransform,
   entityTransform,
   miscGroupTransform,
 ]);

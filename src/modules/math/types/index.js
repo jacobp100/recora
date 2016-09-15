@@ -49,6 +49,10 @@ export const NODE_ENTITY = 'NODE_ENTITY';
 export type EntityNode = Node &
   { type: 'NODE_ENTITY', quantity: number, units: Units };
 
+export const NODE_PERCENTAGE = 'NODE_PERCENTAGE';
+export type PercentageNode = Node &
+  { type: 'NODE_PERCENTAGE', value: number };
+
 export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = Node &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };

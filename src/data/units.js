@@ -196,7 +196,7 @@ const conversionDescriptors: ConversionDescriptors = {
              'tebibyte': [8796093022208,                 memoryDimensions],
              'pebibyte': [9007199254740992,              memoryDimensions],
 
-              'percent': [0.01,                          noDimensions],
+              // 'percent': [0.01,                          noDimensions],
                'degree': [0.0174532925199432957692369,   noDimensions],
                'radian': [1,                             noDimensions],
             'arcminute': [0.000290888208665721596153948, noDimensions],

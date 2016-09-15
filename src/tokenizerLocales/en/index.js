@@ -1,6 +1,6 @@
 // @flow
 import type { TokenizerSpec } from '../../modules/tokenizer/types';
-import { TOKEN_NUMBER } from '../../tokenTypes';
+import { TOKEN_NUMBER, TOKEN_PERCENTAGE } from '../../tokenTypes';
 import unit from './unit';
 import date from './date';
 
@@ -13,6 +13,9 @@ const enLocale: TokenizerSpec = {
       token: token => ({ type: TOKEN_NUMBER, value: Number(token.replace(/,/g, '')) }),
       penalty: -1000,
     },
+  ],
+  percent: [
+    { match: /per\s*cent/, token: { type: TOKEN_PERCENTAGE }, penalty: -1000 },
   ],
   unit,
   date,

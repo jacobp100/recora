@@ -17,12 +17,12 @@ const bracketTransform: Transformer = {
     new CaptureWildcard().any().lazy(),
   ]),
   transform: (captureGroups, transform) => transform([captureGroups[2]], ([bracketGroup]) => {
-    const zippedSegments = [].concat(
+    const concatSegments = [].concat(
       first(captureGroups),
       { type: NODE_BRACKETS, value: bracketGroup },
       last(captureGroups)
     );
-    return uncastArray(zippedSegments);
+    return uncastArray(concatSegments);
   }),
 };
 export default bracketTransform;
