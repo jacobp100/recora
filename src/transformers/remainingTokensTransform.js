@@ -6,19 +6,22 @@ import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TokenNode } from '../modules/transformer/types';
 import { NODE_COLOR, NODE_DATE_TIME } from '../modules/math/types';
 import type { ColorNode, DateTimeNode, DateTime } from '../modules/math/types'; // eslint-disable-line
-import { TOKEN_COLOR, TOKEN_DATE_TIME } from '../tokenTypes';
+import { TOKEN_COLOR, TOKEN_DATE_TIME, TOKEN_DATE_TIME_BACKWARDS } from '../tokenTypes';
 import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip, uncastArray } from '../util';
+
+const createDateTime = directionHint => (token: Token): ?DateTimeNode => {
+  const value: ?DateTime = token.value;
+  if (!value) return null;
+  return { type: NODE_DATE_TIME, value, directionHint };
+};
 
 const transforms = {
   [TOKEN_COLOR]: (token: Token): ColorNode => {
     const { values, alpha, space } = Color.hex(token.value);
     return { type: NODE_COLOR, values, alpha, space };
   },
-  [TOKEN_DATE_TIME]: (token: Token): ?DateTimeNode => {
-    const value: ?DateTime = token.value;
-    if (!value) return null;
-    return { type: NODE_DATE_TIME, value };
-  },
+  [TOKEN_DATE_TIME]: createDateTime(1),
+  [TOKEN_DATE_TIME_BACKWARDS]: createDateTime(-1),
 };
 const transformTokens = keys(transforms);
 

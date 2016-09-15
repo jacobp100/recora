@@ -103,6 +103,8 @@ export default resolver
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_DATE_TIME], dateTimeOps.subtract)
   .extendFunctionMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.add)
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.subtract)
+  .extendFunctionMut(FUNCTION_ADD, [NODE_ENTITY, NODE_DATE_TIME], (context, left, right) =>
+    dateTimeEntityOps.add(context, right, left))
   .extendFunctionMut(FUNCTION_NEGATE, [NODE_ENTITY], entityFns.negate)
   .extendFunctionMut(FUNCTION_FACTORIAL, [NODE_ENTITY], entityFns.factorial)
   ;

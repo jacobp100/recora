@@ -30,11 +30,15 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
     `Expected ${quantity} to equal ${expectedQuantity} for "${input}"`
   );
 
-  const units = get(['result', 'units'], actual);
+  const actualUnits = get(['result', 'units'], actual);
   t.deepEqual(
+    actualUnits,
     expectedUnits,
-    units,
-    `Expected ${JSON.stringify(units)} to equal ${JSON.stringify(expectedUnits)} for "${input}"`
+    `Expected ${
+      JSON.stringify(actualUnits)
+    } to equal ${
+      JSON.stringify(expectedUnits)
+    } for "${input}"`
   );
 };
 
@@ -252,7 +256,7 @@ test('date parsing', dateResult, '1992-12-04T10:09:08.7654Z', { date: 4, month: 
 test('date entity math', dateResult, '1992-12-04 + 30 days', { date: 3, month: 1, year: 1993 });
 test('date entity math', dateResult, '1992-12-04 + 1 year', { date: 4, month: 12, year: 1993 });
 test('date entity math', dateResult, '1992-12-04 - 1 century', { date: 4, month: 12, year: 1892 });
-test('date differences', entityResult, '1992-12-04 until 1993-06-18', 196.04, { day: 1 });
+test('date math', entityResult, '1992-12-04 until 1993-06-18', 196.04, { day: 1 });
 test('relative dates', dateResult, 'now', { date: 1, month: 1, year: 1970 });
 test('relative dates', dateResult, 'tomorrow', { date: 2, month: 1, year: 1970 });
 test('relative dates', dateResult, 'yesterday', { date: 31, month: 12, year: 1969 });
@@ -264,12 +268,14 @@ test('relative dates', dateResult, 'next month', { hour: 10, date: 31, month: 1,
 test('relative dates', dateResult, 'last month', { hour: 14, date: 1, month: 12, year: 1969 });
 test('relative dates', dateResult, 'next year', { date: 1, month: 1, year: 1971 });
 test('relative dates', dateResult, 'last year', { date: 1, month: 1, year: 1969 });
+test('relative date math', dateResult, '2 weeks + now', { date: 15, month: 1, year: 1970 });
+test('relative date math', dateResult, 'now + 2 weeks', { date: 15, month: 1, year: 1970 });
+test('relative date math', dateResult, 'now - 2 weeks', { date: 18, month: 12, year: 1969 });
+test('relative date math', dateResult, '2 weeks from now', { date: 15, month: 1, year: 1970 });
+test('relative date math', dateResult, '2 weeks ago', { date: 18, month: 12, year: 1969 });
+test('relative date math', dateResult, '13 hours from now', { hour: 13, date: 1, month: 1, year: 1970 });
+// test('relative date math', dateResult, '2 weeks ago until next week in days', 21 days);
 // test('relative dates', 'next week to days', 7 days);
-// { 'input': '2 weeks + now', Thursday, 15th January 1970);
-// { 'input': '2 weeks from now', Thursday, 15th January 1970);
-// { 'input': '2 weeks ago', Thursday, 18th December 1969);
-// { 'input': '2 weeks ago until next week in days', 21 days);
-// { 'input': '13 hours from now', 1:00PM, Thursday, 1st January 1970);
 // test('test', entityResult, 'mortgage is -£10 per month', £-10.00 per month);
 // test('test', entityResult, 'Convert 1 meter to yards please', 1.09 yards);
 // test('test', entityResult, 'How many yards are there in 100 meters?', 109 yards);

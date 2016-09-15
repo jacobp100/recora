@@ -9,6 +9,7 @@ import {
   TOKEN_BRACKET_OPEN,
   TOKEN_BRACKET_CLOSE,
   TOKEN_DATE_TIME,
+  TOKEN_DATE_TIME_BACKWARDS,
 } from '../../tokenTypes';
 import { propagateNull } from '../../util';
 
@@ -150,6 +151,11 @@ const dateSpec: TokenizerSpecEntries = [
     match: 'tomorrow',
     token: () => createRelativeDate(1, 'day'),
     tokenIndices: [2],
+    penalty: -500,
+  },
+  {
+    match: /ago/,
+    token: { type: TOKEN_DATE_TIME_BACKWARDS, value: defaultValue },
     penalty: -500,
   },
   {

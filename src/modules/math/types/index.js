@@ -53,6 +53,7 @@ export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = Node &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };
 
+// directionHint is used for miscGroup to work out whether to add or subtract an entity
 export const NODE_DATE_TIME = 'NODE_DATE_TIME';
 export type DateTimeNode = Node &
-  { type: 'NODE_DATE_TIME', value: DateTime };
+  { type: 'NODE_DATE_TIME', value: DateTime, directionHint: number };

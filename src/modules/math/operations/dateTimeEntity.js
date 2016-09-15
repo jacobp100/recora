@@ -19,7 +19,7 @@ const addSubtractFactory = direction => (
 
   const value = unixTzToDateTime(newUnix, left.value.timezone);
 
-  return { type: NODE_DATE_TIME, value };
+  return { type: NODE_DATE_TIME, value, directionHint: 1 };
 };
 
 const addMath = addSubtractFactory(1);

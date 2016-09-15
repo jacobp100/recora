@@ -1,7 +1,7 @@
 // @flow
 import { first, drop, reduce, isEmpty, isEqual, intersection, keys, pick, size } from 'lodash/fp';
 import { NODE_ENTITY, NODE_DATE_TIME } from '.';
-import type { ResolverContext, Node, EntityNode } from '.'; // eslint-disable-line
+import type { ResolverContext, Node, EntityNode, DateTimeNode } from '.'; // eslint-disable-line
 import { getFundamentalUnits } from './entity';
 import * as entityOps from '../operations/entity';
 import * as dateTimeOps from '../operations/dateTime';
@@ -36,6 +36,16 @@ const combineEntities = (
   return entityOps.multiply(context, left, right);
 };
 
+const combineDateTimeEntity = (
+  context: ResolverContext,
+  left: DateTimeNode,
+  right: EntityNode
+) => (
+  left.directionHint === -1
+    ? dateTimeEntityOps.subtract(context, left, right)
+    : dateTimeEntityOps.add(context, left, right)
+);
+
 const combineValues = (context: ResolverContext) => (
   left: Node,
   right: Node
@@ -45,7 +55,9 @@ const combineValues = (context: ResolverContext) => (
   } else if (left.type === NODE_DATE_TIME && right.type === NODE_DATE_TIME) {
     return dateTimeOps.add(context, left, right);
   } else if (left.type === NODE_DATE_TIME && right.type === NODE_ENTITY) {
-    return dateTimeEntityOps.add(context, left, right);
+    return combineDateTimeEntity(context, left, right);
+  } else if (left.type === NODE_ENTITY && right.type === NODE_DATE_TIME) {
+    return combineDateTimeEntity(context, right, left);
   }
   return null;
 };
