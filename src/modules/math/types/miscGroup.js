@@ -1,9 +1,11 @@
 // @flow
 import { first, drop, reduce, isEmpty, isEqual, intersection, keys, pick, size } from 'lodash/fp';
-import { NODE_ENTITY } from '.';
+import { NODE_ENTITY, NODE_DATE_TIME } from '.';
 import type { ResolverContext, Node, EntityNode } from '.'; // eslint-disable-line
 import { getFundamentalUnits } from './entity';
 import * as entityOps from '../operations/entity';
+import * as dateTimeOps from '../operations/dateTime';
+import * as dateTimeEntityOps from '../operations/dateTimeEntity';
 import { propagateNull } from '../../../util';
 
 const shouldDivide = (leftFundamentalUnits, rightFundamentalUnits) => {
@@ -39,9 +41,11 @@ const combineValues = (context: ResolverContext) => (
   right: Node
 ): ?Node => {
   if (left.type === NODE_ENTITY && right.type === NODE_ENTITY) {
-    const leftEntity: EntityNode = left;
-    const rightEntity: EntityNode = right;
-    return combineEntities(context, leftEntity, rightEntity);
+    return combineEntities(context, left, right);
+  } else if (left.type === NODE_DATE_TIME && right.type === NODE_DATE_TIME) {
+    return dateTimeOps.add(context, left, right);
+  } else if (left.type === NODE_DATE_TIME && right.type === NODE_ENTITY) {
+    return dateTimeEntityOps.add(context, left, right);
   }
   return null;
 };

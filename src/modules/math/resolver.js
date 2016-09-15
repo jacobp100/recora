@@ -19,6 +19,7 @@ import type { // eslint-disable-line
 } from './types';
 import * as entityOps from './operations/entity';
 import * as colorOps from './operations/color';
+import * as dateTimeOps from './operations/dateTime';
 import * as dateTimeEntityOps from './operations/dateTimeEntity';
 import * as entityFns from './functions/entity';
 import { resolve as miscGroupResolve } from './types/miscGroup';
@@ -98,6 +99,8 @@ export default resolver
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], colorOps.subtract)
   .extendFunctionMut(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], colorOps.multiply)
   .extendFunctionMut(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], colorOps.divide)
+  .extendFunctionMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_DATE_TIME], dateTimeOps.add)
+  .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_DATE_TIME], dateTimeOps.subtract)
   .extendFunctionMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.add)
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.subtract)
   .extendFunctionMut(FUNCTION_NEGATE, [NODE_ENTITY], entityFns.negate)

@@ -1,16 +1,15 @@
 // @flow
-import { flow, last, reduce, update, concat, set, some, reject } from 'lodash/fp';
+import { last, reduce, update, concat, set, some } from 'lodash/fp';
 import { combineUnits } from '../modules/math/types/entity';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer, TokenNode } from '../modules/transformer/types';
 import {
-  TOKEN_NOOP, TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX,
+  TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX,
 } from '../tokenTypes';
-import { NODE_MISC_GROUP, NODE_ENTITY } from '../modules/math/types';
+import { NODE_ENTITY } from '../modules/math/types';
 import type { Units, EntityNode } from '../modules/math/types'; // eslint-disable-line
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
-import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip } from '../util';
-import { compactMiscGroup } from '../nodeUtil';
+import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip, uncastArray } from '../util';
 
 
 const getEntities = (segment: TokenNode[]): ?(EntityNode[]) => {
@@ -64,12 +63,8 @@ const entityTransform: Transformer = {
     const unitSegments = mapUnlessNull(getEntities, oddIndexElements(captureGroups));
     if (!unitSegments) return null;
 
-    const zippedSegments = flow(
-      flatZip(segments),
-      reject({ type: TOKEN_NOOP })
-    )(unitSegments);
-
-    return compactMiscGroup({ type: NODE_MISC_GROUP, value: zippedSegments });
+    const zippedSegments = flatZip(segments, unitSegments);
+    return uncastArray(zippedSegments);
   }),
 };
 export default entityTransform;

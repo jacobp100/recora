@@ -16,6 +16,7 @@ import {
 import conversionTransform from './transformers/conversionTransform';
 import entityTransform from './transformers/entityTransform';
 import remainingTokensTransform from './transformers/remainingTokensTransform';
+import miscGroupTransform from './transformers/miscGroupTransform';
 
 export default createTransformer([
   conversionTransform,
@@ -26,4 +27,5 @@ export default createTransformer([
   createForwardOperatorTransform([TOKEN_OPERATOR_FACTORIAL]),
   remainingTokensTransform,
   entityTransform,
+  miscGroupTransform,
 ]);
