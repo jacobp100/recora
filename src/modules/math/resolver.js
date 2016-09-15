@@ -21,11 +21,14 @@ import * as entityOps from './operations/entity';
 import * as colorOps from './operations/color';
 import * as dateTimeOps from './operations/dateTime';
 import * as dateTimeEntityOps from './operations/dateTimeEntity';
+import * as colorEntityOps from './operations/colorEntity';
 import * as entityFns from './functions/entity';
 import { resolve as miscGroupResolve } from './types/miscGroup';
 import { convert as conversionConvert } from './types/conversion';
 import { resolveDefaults as dateTimeResolveDefaults } from './types/dateTime';
 import { mapUnlessNull } from '../../util';
+
+const flip2 = fn => (context, left, right) => fn(context, right, left);
 
 const resolver = {
   functionTrie: {},
@@ -103,8 +106,11 @@ export default resolver
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_DATE_TIME], dateTimeOps.subtract)
   .extendFunctionMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.add)
   .extendFunctionMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.subtract)
-  .extendFunctionMut(FUNCTION_ADD, [NODE_ENTITY, NODE_DATE_TIME], (context, left, right) =>
-    dateTimeEntityOps.add(context, right, left))
+  .extendFunctionMut(FUNCTION_ADD, [NODE_ENTITY, NODE_DATE_TIME], flip2(dateTimeEntityOps.add))
+  .extendFunctionMut(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_ENTITY], colorEntityOps.multiply)
+  .extendFunctionMut(FUNCTION_DIVIDE, [NODE_COLOR, NODE_ENTITY], colorEntityOps.divide)
+  .extendFunctionMut(FUNCTION_EXPONENT, [NODE_COLOR, NODE_ENTITY], colorEntityOps.exponent)
+  .extendFunctionMut(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_COLOR], flip2(colorEntityOps.multiply))
   .extendFunctionMut(FUNCTION_NEGATE, [NODE_ENTITY], entityFns.negate)
   .extendFunctionMut(FUNCTION_FACTORIAL, [NODE_ENTITY], entityFns.factorial)
   ;
