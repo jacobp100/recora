@@ -6,9 +6,18 @@ import Recora from '../src';
 
 const recora = new Recora();
 
+const parse = input => {
+  try {
+    return recora.parse(input);
+  } catch (e) {
+    throw new Error(`Failed to parse "${input}`);
+  }
+};
+
 const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
   t.plan(3);
-  const actual = recora.parse(input);
+
+  const actual = parse(input);
 
   t.truthy(actual, `Expected to get a result for "${input}"`);
 
@@ -29,7 +38,7 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
 const colorResult = (t, input, expectedHex) => {
   t.plan(3);
 
-  const actual = recora.parse(input);
+  const actual = parse(input);
   t.truthy(actual, `Expected to get a result for "${input}"`);
 
   const { values: actualValues, alpha: actualAlpha, space } = actual.result;
@@ -51,7 +60,7 @@ const dateResult = (t, input, expectedValues) => {
   const dateKeys = ['second', 'minute', 'hour', 'date', 'month', 'year'];
   t.plan(1 + dateKeys.length);
 
-  const actual = recora.parse(input);
+  const actual = parse(input);
   t.truthy(actual, `Expected to get a result for "${input}"`);
 
   const actualValues = actual.result.value;
@@ -70,7 +79,7 @@ const dateResult = (t, input, expectedValues) => {
 
 // const noResult = (t, input) => {
 //   t.plan(1);
-//   const actual = recora.parse(input);
+//   const actual = parse(input);
 //   t.is(actual, null);
 // };
 

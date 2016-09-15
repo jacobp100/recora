@@ -9,30 +9,69 @@ const wordRegexpCreator: (words: number) => RegExp = flow(
   str => new RegExp(str, 'i')
 );
 
+type CustomWordMatcher = {
+  dictionary: Object,
+  penalty: number,
+  match: RegExp,
+  matchIndex: number,
+  transform: (matchedWord: string, matches: string[]) => TokenResult,
+};
+
 type WordMatcher = {
   type: string,
   dictionary: Object,
   penalty: number,
-  words?: number,
-  match?: RegExp,
-  matchIndex?: number,
-  transform?: (matchedWord: string, match: string, matches: string[]) => TokenResult,
+  words: number,
 };
-export const wordMatcher = ({ // eslint-disable-line
+
+type WordRegexpMatcher = {
+  type: string,
+  dictionary: Object,
+  penalty: number,
+  match: RegExp,
+  matchIndex: number,
+};
+
+export const customWordMatcher = ({
+  dictionary,
+  penalty,
+  match,
+  matchIndex,
+  transform,
+}: CustomWordMatcher): TokenizerSpecEntry => ({
+  token: (token, tokens) => {
+    const match = tokens[matchIndex].toLowerCase();
+    return has(match, dictionary)
+      ? transform(dictionary[match], tokens)
+      : null;
+  },
+  match,
+  penalty,
+});
+
+export const multipleWordsMatcher = ({
+  type,
+  words,
+  dictionary,
+  penalty,
+}: WordMatcher) => customWordMatcher({
+  dictionary,
+  penalty,
+  match: wordRegexpCreator(words),
+  matchIndex: 0,
+  transform: value => ({ type, value }),
+});
+
+export const wordRegexpMatcher = ({
   type,
   dictionary,
   penalty,
-  words = 1,
-  match = wordRegexpCreator(words),
-  matchIndex = 0,
-  transform = (value) => ({ type, value }),
-}: WordMatcher): TokenizerSpecEntry => ({
-  // FIXME: Refactor
-  token: (token, tokens) => (
-    has(tokens[matchIndex].toLowerCase(), dictionary)
-      ? transform(dictionary[tokens[matchIndex].toLowerCase()], token, tokens)
-      : null
-    ),
   match,
+  matchIndex = 0,
+}: WordRegexpMatcher) => customWordMatcher({
+  dictionary,
   penalty,
+  match,
+  matchIndex,
+  transform: value => ({ type, value }),
 });

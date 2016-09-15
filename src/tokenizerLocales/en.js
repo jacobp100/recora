@@ -12,7 +12,8 @@ import oneWordUnits from '../data/en/1-word-units';
 import twoWordUnits from '../data/en/2-word-units';
 import threeWordUnits from '../data/en/3-word-units';
 import abbreviations from '../data/en/abbreviations';
-import { wordMatcher } from '../tokenizerUtil';
+import { multipleWordsMatcher, wordRegexpMatcher, customWordMatcher } from '../tokenizerUtil';
+import { propagateNull } from '../util';
 
 const unitPrefixes = {
   per: -1,
@@ -27,7 +28,6 @@ const unitSuffixes = {
 const numberUnlessEmptyString = value => (value === '' ? null : Number(value));
 
 const time = {
-  key: 'hour',
   match: '([0-2]?\\d)(:[0-5]\\d|)(:[0-5]\\d|)(\\s*am|\\s*pm|)',
   matchCount: 4,
   transform: (hour, minute, second, amPm) => (
@@ -42,7 +42,6 @@ const time = {
 };
 
 const date = {
-  key: 'date',
   match: '([1-9]|[0-3][0-9])(?:\\s*(?:st|nd|rd|th))?',
   transform: value => ({
     date: Number(value),
@@ -53,7 +52,6 @@ const monthPrefixes =
   ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
 const monthName = {
-  key: 'month',
   match: `(${[
     'jan(?:uary)?',
     'feb(?:ruary)?',
@@ -74,7 +72,6 @@ const monthName = {
 };
 
 const year = {
-  key: 'year',
   match: '([1-9]\\d{1,3})',
   transform: year => ({
     year: Number(year),
@@ -100,19 +97,23 @@ const createRegExp = flow(
 );
 
 const createTransformer = transformers => (match, matches): TokenBase => {
-  const { value } = reduce((accum, transformer) => {
+  const valueMatches = reduce(propagateNull((accum, transformer) => {
     const arity = transformer.matchCount || 1;
     const args = accum.remainingMatches.slice(0, arity);
     const remainingMatches = accum.remainingMatches.slice(arity);
 
     const newValue = transformer.transform(...args, accum.value);
+    if (!newValue) return null;
     const value = assign(accum.value, newValue);
 
     return { value, remainingMatches };
-  }, {
+  }), {
     value: defaultValue,
     remainingMatches: drop(1, matches),
   }, transformers);
+
+  if (!valueMatches) return null;
+  const { value } = valueMatches;
 
   return { type: TOKEN_DATETIME, value };
 };
@@ -122,6 +123,15 @@ const createDateMatcher = (transformers, penalty) => ({
   token: createTransformer(transformers),
   penalty,
 });
+
+const wordWithPowerMatcherBase = {
+  match: /([a-z]+)\^(-?\d+(?:\.\d+)?)/i,
+  matchIndex: 1,
+  transform: (value, tokens) => ([
+    { type: TOKEN_UNIT_NAME, value },
+    { type: TOKEN_UNIT_SUFFIX, value: Number(tokens[2]) },
+  ]),
+};
 
 /* eslint-disable max-len */
 const enLocale: TokenizerSpec = {
@@ -133,38 +143,26 @@ const enLocale: TokenizerSpec = {
     },
   ],
   unit: [
-    wordMatcher({ words: 3, type: TOKEN_UNIT_NAME, dictionary: threeWordUnits, penalty: -600 }),
-    wordMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
-    wordMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: oneWordUnits, penalty: -400 }),
-    wordMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
-    wordMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
-    wordMatcher({
+    multipleWordsMatcher({ words: 3, type: TOKEN_UNIT_NAME, dictionary: threeWordUnits, penalty: -600 }),
+    multipleWordsMatcher({ words: 2, type: TOKEN_UNIT_NAME, dictionary: twoWordUnits, penalty: -500 }),
+    multipleWordsMatcher({ words: 1, type: TOKEN_UNIT_NAME, dictionary: oneWordUnits, penalty: -400 }),
+    multipleWordsMatcher({ words: 1, type: TOKEN_UNIT_PREFIX, dictionary: unitPrefixes, penalty: -300 }),
+    multipleWordsMatcher({ words: 1, type: TOKEN_UNIT_SUFFIX, dictionary: unitSuffixes, penalty: -300 }),
+    wordRegexpMatcher({
       type: TOKEN_UNIT_NAME,
       dictionary: abbreviations,
-      matchIndex: 1,
       match: /([a-z]+|[£$€]|)/i,
+      matchIndex: 1,
       penalty: -200,
     }),
-    wordMatcher({
-      type: TOKEN_UNIT_NAME,
+    customWordMatcher({
+      ...wordWithPowerMatcherBase,
       dictionary: oneWordUnits,
-      matchIndex: 1,
-      match: /([a-z]+)\^(-?\d+(?:\.\d+)?)/i,
-      transform: (value, token, tokens) => ([
-        { type: TOKEN_UNIT_NAME, value },
-        { type: TOKEN_UNIT_SUFFIX, value: Number(tokens[2]) },
-      ]),
       penalty: -5000,
     }),
-    wordMatcher({
-      type: TOKEN_UNIT_NAME,
+    customWordMatcher({
+      ...wordWithPowerMatcherBase,
       dictionary: abbreviations,
-      matchIndex: 1,
-      match: /([a-z]+)\^(-?\d+(?:\.\d+)?)/i,
-      transform: (value, token, tokens) => ([
-        { type: TOKEN_UNIT_NAME, value },
-        { type: TOKEN_UNIT_SUFFIX, value: Number(tokens[2]) },
-      ]),
       penalty: -3000,
     }),
   ],
@@ -177,7 +175,7 @@ const enLocale: TokenizerSpec = {
     createDateMatcher([time, monthName, date, year], -70000),
     createDateMatcher([time, date, monthName], -50000),
     createDateMatcher([time, monthName, date], -50000),
-    // TODO: Allow stuff like 6
+    createDateMatcher([time], -20000),
   ],
 };
 /* eslint-enable */
