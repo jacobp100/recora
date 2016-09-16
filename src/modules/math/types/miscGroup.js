@@ -30,7 +30,7 @@ const combineEntities = (
   } else if (isEqual(leftFundamentalUnits, rightFundamentalUnits)) {
     return entityOps.add(context, left, right);
   } else if (shouldDivide(leftFundamentalUnits, rightFundamentalUnits)) {
-    return size(leftFundamentalUnits.length) > size(rightFundamentalUnits.length)
+    return size(leftFundamentalUnits) <= size(rightFundamentalUnits)
       ? entityOps.divide(context, left, right)
       : entityOps.divide(context, right, left);
   }
