@@ -18,6 +18,7 @@ type FunctionSignature = [string, string[], Function];
 
 const resolver = {
   functionTrie: {},
+  variadicFunctions: {},
   context: {},
   setContext(context: ResolverContext) {
     return set('context', context, this);
@@ -28,7 +29,11 @@ const resolver = {
   // private: extend function with mutations
   extendFunctionsMut(functions: FunctionSignature[]) {
     forEach(([functionName, types, fn]) => {
-      setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
+      if (types) {
+        setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
+      } else {
+        setMut(this, ['variadicFunctions', functionName], fn);
+      }
     }, functions);
     return this;
   },
@@ -74,7 +79,8 @@ const resolver = {
     if (!args) return null;
 
     const triePath = map('type', args);
-    const func = get(['functionTrie', name, ...triePath, '_fn'], this);
+    let func = get(['functionTrie', name, ...triePath, '_fn'], this);
+    if (!func) func = get(['variadicFunctions', name], this);
     if (!func) return null;
 
     return func(this.context, ...args);

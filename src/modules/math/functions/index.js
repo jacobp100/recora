@@ -1,10 +1,13 @@
 // @flow
+
+// Bilinear operators
 export const FUNCTION_ADD = 'add';
 export const FUNCTION_SUBTRACT = 'subtract';
 export const FUNCTION_MULTIPLY = 'multiply';
 export const FUNCTION_DIVIDE = 'divide';
 export const FUNCTION_EXPONENT = 'exponent';
 
+// Entity functions
 export const FUNCTION_SQRT = 'sqrt';
 export const FUNCTION_CBRT = 'cbrt';
 export const FUNCTION_NEGATE = 'negate';
@@ -46,6 +49,7 @@ export const FUNCTION_ACOTH = 'acoth';
 export const FUNCTION_COSC = 'cosc';
 export const FUNCTION_TANC = 'tanc';
 
+// Colour functions
 export const FUNCTION_LIGHTEN = 'lighten';
 export const FUNCTION_DARKEN = 'darken';
 export const FUNCTION_MIX = 'mix';
@@ -53,3 +57,11 @@ export const FUNCTION_SCREEN = 'screen';
 export const FUNCTION_OVERLAY = 'overlay';
 export const FUNCTION_DODGE = 'dodge';
 export const FUNCTION_BURN = 'burn';
+
+// Constructors
+export const FUNCTION_RGB = 'rgb';
+export const FUNCTION_RGBA = 'rgba';
+export const FUNCTION_HSL = 'hsl';
+export const FUNCTION_HSLA = 'hsla';
+export const FUNCTION_HSV = 'hsv';
+export const FUNCTION_HSVA = 'hsva';
