@@ -14,6 +14,7 @@ import commaTransform from './transformers/commaTransform';
 import {
   createForwardOperatorTransform, createBackwardOperatorTransform,
 } from './transformers/createOperatorTransform';
+import functionShorthandTransform from './transformers/functionShorthandTransform';
 import conversionTransform from './transformers/conversionTransform';
 import percentTransform from './transformers/percentTransform';
 import entityTransform from './transformers/entityTransform';
@@ -26,6 +27,7 @@ export default createTransformer([
   commaTransform,
   createForwardOperatorTransform([TOKEN_OPERATOR_ADD, TOKEN_OPERATOR_SUBTRACT]),
   createForwardOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
+  functionShorthandTransform,
   createBackwardOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE]),
   createForwardOperatorTransform([TOKEN_OPERATOR_FACTORIAL]),
   remainingTokensTransform,
