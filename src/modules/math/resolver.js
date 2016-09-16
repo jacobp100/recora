@@ -15,14 +15,14 @@ import { resolveDefaults as dateTimeResolveDefaults } from './types/dateTime';
 import { mapUnlessNull } from '../../util';
 
 const resolver = {
-  functionTrie: {},
+  typedFunctionTrie: {},
   variadicFunctions: {},
   context: {},
   setContext(context: ResolverContext) {
     return set('context', context, this);
   },
   extendFunction(functionName: string, types: string[], fn: Function) {
-    return set(['functionTrie', functionName, ...types, '_fn'], fn, this);
+    return set(['typedFunctionTrie', functionName, ...types, '_fn'], fn, this);
   },
   resolve(value: Node): ?Node {
     switch (value.type) {
@@ -66,7 +66,7 @@ const resolver = {
     if (!args) return null;
 
     const triePath = map('type', args);
-    let func = get(['functionTrie', name, ...triePath, '_fn'], this);
+    let func = get(['typedFunctionTrie', name, ...triePath, '_fn'], this);
     if (!func) func = get(['variadicFunctions', name], this);
     if (!func) return null;
 
@@ -76,9 +76,9 @@ const resolver = {
 
 forEach(([functionName, types, fn]) => {
   if (types) {
-    setMut(resolver, ['functionTrie', functionName, ...types, '_fn'], fn);
+    setMut(resolver, ['typedFunctionTrie', functionName, ...types, '_fn'], fn);
   } else {
-    setMut(resolver, ['variadicFunctions', functionName], fn);
+    resolver.variadicFunctions[functionName] = fn;
   }
 }, functions);
 
