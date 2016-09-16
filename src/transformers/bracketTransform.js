@@ -18,6 +18,8 @@ const bracketTransform: Transformer = {
     new CaptureWildcard().any().lazy(),
   ]),
   transform: (captureGroups, transform) => transform([captureGroups[3]], ([bracketGroup]) => {
+    if (Array.isArray(bracketGroup)) return null;
+
     const fn = first(captureGroups[1]);
 
     let value;

@@ -45,3 +45,11 @@ export const FUNCTION_ACSCH = 'acsch';
 export const FUNCTION_ACOTH = 'acoth';
 export const FUNCTION_COSC = 'cosc';
 export const FUNCTION_TANC = 'tanc';
+
+export const FUNCTION_LIGHTEN = 'lighten';
+export const FUNCTION_DARKEN = 'darken';
+export const FUNCTION_MIX = 'mix';
+export const FUNCTION_SCREEN = 'screen';
+export const FUNCTION_OVERLAY = 'overlay';
+export const FUNCTION_DODGE = 'dodge';
+export const FUNCTION_BURN = 'burn';
