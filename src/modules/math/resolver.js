@@ -1,15 +1,7 @@
 // @flow
-import { set, get, map } from 'lodash/fp';
+import { set, get, map, forEach } from 'lodash/fp';
 import { set as setMut } from 'lodash';
-import {
-  FUNCTION_ADD,
-  FUNCTION_SUBTRACT,
-  FUNCTION_MULTIPLY,
-  FUNCTION_DIVIDE,
-  FUNCTION_EXPONENT,
-  FUNCTION_NEGATE,
-  FUNCTION_FACTORIAL,
-} from './functions';
+import functions from './functions/definitions';
 import {
   NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
   NODE_DATE_TIME, NODE_PERCENTAGE,
@@ -17,19 +9,12 @@ import {
 import type { // eslint-disable-line
   ResolverContext, Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
 } from './types';
-import * as entityOps from './operations/entity';
-import * as colorOps from './operations/color';
-import * as dateTimeOps from './operations/dateTime';
-import * as dateTimeEntityOps from './operations/dateTimeEntity';
-import * as colorEntityOps from './operations/colorEntity';
-import * as entityPercentageOps from './operations/entityPercentage';
-import * as entityFns from './functions/entity';
 import { resolve as miscGroupResolve } from './types/miscGroup';
 import { convert as conversionConvert } from './types/conversion';
 import { resolveDefaults as dateTimeResolveDefaults } from './types/dateTime';
 import { mapUnlessNull } from '../../util';
 
-const flip2 = fn => (context, left, right) => fn(context, right, left);
+type FunctionSignature = [string, string[], Function];
 
 const resolver = {
   functionTrie: {},
@@ -41,8 +26,10 @@ const resolver = {
     return set(['functionTrie', functionName, ...types, '_fn'], fn, this);
   },
   // private: extend function with mutations
-  extMut(functionName: string, types: string[], fn: Function) {
-    setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
+  extendFunctionsMut(functions: FunctionSignature[]) {
+    forEach(([functionName, types, fn]) => {
+      setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
+    }, functions);
     return this;
   },
   resolve(value: Node): ?Node {
@@ -94,32 +81,4 @@ const resolver = {
   },
 };
 
-/* eslint-disable max-len */
-export default resolver
-  .extMut(FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], entityOps.add)
-  .extMut(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], entityOps.subtract)
-  .extMut(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], entityOps.multiply)
-  .extMut(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], entityOps.divide)
-  .extMut(FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], entityOps.exponent)
-  .extMut(FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], colorOps.add)
-  .extMut(FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], colorOps.subtract)
-  .extMut(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], colorOps.multiply)
-  .extMut(FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], colorOps.divide)
-  .extMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_DATE_TIME], dateTimeOps.add)
-  .extMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_DATE_TIME], dateTimeOps.subtract)
-  .extMut(FUNCTION_ADD, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.add)
-  .extMut(FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_ENTITY], dateTimeEntityOps.subtract)
-  .extMut(FUNCTION_ADD, [NODE_ENTITY, NODE_DATE_TIME], flip2(dateTimeEntityOps.add))
-  .extMut(FUNCTION_MULTIPLY, [NODE_COLOR, NODE_ENTITY], colorEntityOps.multiply)
-  .extMut(FUNCTION_DIVIDE, [NODE_COLOR, NODE_ENTITY], colorEntityOps.divide)
-  .extMut(FUNCTION_EXPONENT, [NODE_COLOR, NODE_ENTITY], colorEntityOps.exponent)
-  .extMut(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_COLOR], flip2(colorEntityOps.multiply))
-  .extMut(FUNCTION_ADD, [NODE_ENTITY, NODE_PERCENTAGE], entityPercentageOps.add)
-  .extMut(FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_PERCENTAGE], entityPercentageOps.subtract)
-  .extMut(FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_PERCENTAGE], entityPercentageOps.multiply)
-  .extMut(FUNCTION_DIVIDE, [NODE_ENTITY, NODE_PERCENTAGE], entityPercentageOps.divide)
-  .extMut(FUNCTION_MULTIPLY, [NODE_PERCENTAGE, NODE_ENTITY], flip2(entityPercentageOps.multiply))
-  .extMut(FUNCTION_NEGATE, [NODE_ENTITY], entityFns.negate)
-  .extMut(FUNCTION_FACTORIAL, [NODE_ENTITY], entityFns.factorial)
-  ;
-/* eslint-enable */
+export default resolver.extendFunctionsMut(functions);

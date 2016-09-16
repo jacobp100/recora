@@ -3,10 +3,10 @@ import { first, drop, reduce, isEmpty, isEqual, intersection, keys, pick, size }
 import { NODE_ENTITY, NODE_DATE_TIME, NODE_PERCENTAGE } from '.';
 import type { ResolverContext, Node, EntityNode, DateTimeNode } from '.'; // eslint-disable-line
 import { getFundamentalUnits } from './entity';
-import * as entityOps from '../operations/entity';
-import * as dateTimeOps from '../operations/dateTime';
-import * as dateTimeEntityOps from '../operations/dateTimeEntity';
-import * as entityPercentageOps from '../operations/entityPercentage';
+import * as entityOps from '../functions/entity';
+import * as dateTimeOps from '../functions/dateTime';
+import * as dateTimeEntityOps from '../functions/dateTimeEntity';
+import * as entityPercentageOps from '../functions/entityPercentage';
 import { propagateNull } from '../../../util';
 
 const shouldDivide = (leftFundamentalUnits, rightFundamentalUnits) => {

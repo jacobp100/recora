@@ -2,6 +2,7 @@
 import Color from 'color-forge';
 import { NODE_COLOR } from '../types';
 import type { ResolverContext, ColorNode } from '../types'; // eslint-disable-line
+import { FUNCTION_ADD, FUNCTION_SUBTRACT, FUNCTION_MULTIPLY, FUNCTION_DIVIDE } from '.';
 
 const operationFactory = operation => (
   context: ResolverContext,
@@ -22,3 +23,10 @@ export const screen = operationFactory('screen');
 export const overlay = operationFactory('overlay');
 export const dodge = operationFactory('dodge');
 export const burn = operationFactory('burn');
+
+export default [
+  [FUNCTION_ADD, [NODE_COLOR, NODE_COLOR], add],
+  [FUNCTION_SUBTRACT, [NODE_COLOR, NODE_COLOR], subtract],
+  [FUNCTION_MULTIPLY, [NODE_COLOR, NODE_COLOR], multiply],
+  [FUNCTION_DIVIDE, [NODE_COLOR, NODE_COLOR], divide],
+];

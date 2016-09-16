@@ -37,6 +37,7 @@
     "color-forge": "^1.0.18",
     "gamma": "^1.0.0",
     "lodash": "^4.15.0",
+    "mathp": "^1.5.0",
     "timezone": "^1.0.6"
   },
   "ava": {

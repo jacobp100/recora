@@ -2,9 +2,12 @@
 import { matchesProperty, mapValues, update, multiply } from 'lodash/fp';
 import {
   convertTo, combineUnits, convertToFundamentalUnits, unitsAreLinear, isUnitless,
-} from '../types/entity';
-import { NODE_ENTITY } from '../types';
-import type { ResolverContext, EntityNode } from '../types'; // eslint-disable-line
+} from '../../types/entity';
+import { NODE_ENTITY } from '../../types';
+import type { ResolverContext, EntityNode } from '../../types'; // eslint-disable-line
+import {
+  FUNCTION_ADD, FUNCTION_SUBTRACT, FUNCTION_MULTIPLY, FUNCTION_DIVIDE, FUNCTION_EXPONENT,
+} from '..';
 
 const isZero = matchesProperty('quantity', 0);
 const zeroEntity = { type: NODE_ENTITY, quantity: 0, units: {} };
@@ -78,3 +81,11 @@ export {
   divideMath as divide,
   exponentMath as exponent,
 };
+
+export default [
+  [FUNCTION_ADD, [NODE_ENTITY, NODE_ENTITY], addMath],
+  [FUNCTION_SUBTRACT, [NODE_ENTITY, NODE_ENTITY], subtractMath],
+  [FUNCTION_MULTIPLY, [NODE_ENTITY, NODE_ENTITY], multiplyMath],
+  [FUNCTION_DIVIDE, [NODE_ENTITY, NODE_ENTITY], divideMath],
+  [FUNCTION_EXPONENT, [NODE_ENTITY, NODE_ENTITY], exponentMath],
+];

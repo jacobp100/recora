@@ -1,8 +1,9 @@
 // @flow
-import { NODE_ENTITY } from '../types';
+import { NODE_DATE_TIME, NODE_ENTITY } from '../types';
 import type { ResolverContext, EntityNode, DateTimeNode } from '../types'; // eslint-disable-line
 import { convertTo } from '../types/entity';
 import { dateTimeToUTCUnix } from '../util';
+import { FUNCTION_ADD, FUNCTION_SUBTRACT } from '.';
 
 const addSubtract = (
   context: ResolverContext,
@@ -35,3 +36,8 @@ export {
   addSubtract as add,
   addSubtract as subtract,
 };
+
+export default [
+  [FUNCTION_ADD, [NODE_DATE_TIME, NODE_DATE_TIME], addSubtract],
+  [FUNCTION_SUBTRACT, [NODE_DATE_TIME, NODE_DATE_TIME], addSubtract],
+];
