@@ -152,7 +152,7 @@
     "format": ["€", "prefix"]
   },
   "GBP": {
-    "alternates": ["quid", "sterling", "british pound", "pound sterling"],
+    "alternates": ["quid", "sterling", "british pound", "pound sterling", "pounds sterling"],
     "abbreviations": ["£"],
     "format": ["£", "prefix"]
   },
