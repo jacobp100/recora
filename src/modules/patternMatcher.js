@@ -24,7 +24,7 @@ class BaseMatcher {
     return set('end', end, this);
   }
 
-  optional() {
+  zeroOrOne() {
     return this.from(0).to(1);
   }
 
@@ -99,20 +99,19 @@ class BaseCaptureMatcher extends BaseMatcher {
   ) {
     const { pattern, isNegative } = this;
 
-    // It might be good do this in reverse, since it could mean less matches,
-    // But we have to run through the whole thing before returning the list in reverse
     for (let i = startI; i <= end; i += 1) {
-      if (i !== lastElementIndex && (this.conforms(array[i], pattern) === isNegative)) return;
       yield {
         index: index + i,
         captureRanges: captureRanges.concat([[index, index + i]]),
         array: array.slice(i),
       };
+      if (i !== lastElementIndex && (this.conforms(array[i], pattern) === isNegative)) return;
     }
   }
 
   * getMatches(matchStack: MatchStack) {
-    const { index, captureRanges, array } = matchStack;
+    // const { index, captureRanges, array } = matchStack;
+    const { array } = matchStack;
     const { pattern, isNegative, isLazy, start } = this;
 
     if (start > array.length) return;
@@ -123,14 +122,14 @@ class BaseCaptureMatcher extends BaseMatcher {
       if (this.conforms(array[i], pattern) === isNegative) return;
     }
 
-    if (i === this.end) {
-      yield {
-        index: index + i,
-        captureRanges: captureRanges.concat([[index, index + i]]),
-        array: array.slice(i),
-      };
-      return;
-    }
+    // if (i === this.end) {
+    //   yield {
+    //     index: index + i,
+    //     captureRanges: captureRanges.concat([[index, index + i]]),
+    //     array: array.slice(i),
+    //   };
+    //   return;
+    // }
 
     const lastElementIndex = array.length;
     const end = Math.min(this.end, lastElementIndex);

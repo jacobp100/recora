@@ -1,10 +1,12 @@
 // @flow
-import { assignWith, flow, concat, compact } from 'lodash/fp';
+import { assignWith, flow, concat, compact, values } from 'lodash/fp';
 import {
   TOKEN_BRACKET_CLOSE,
   TOKEN_BRACKET_OPEN,
   TOKEN_COLOR,
+  TOKEN_COMMA,
   TOKEN_DATE_TIME,
+  TOKEN_FUNCTION,
   TOKEN_NOOP,
   TOKEN_OPERATOR_ADD,
   TOKEN_OPERATOR_DIVIDE,
@@ -16,8 +18,11 @@ import {
   TOKEN_PERCENTAGE,
   TOKEN_UNIT_PREFIX,
 } from './tokenTypes';
+import * as functions from './modules/math/functions';
 import createTokenizer from './modules/tokenizer';
 import type { TokenizerSpec } from './modules/tokenizer/types';
+
+const functionNames = values(functions);
 
 const concatCompact = flow(concat, compact);
 
@@ -78,6 +83,18 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
       penalty: -1000,
       updateState: state => ({ bracketLevel: state.bracketLevel - 1 }),
     },
+    {
+      match: ',',
+      token: { type: TOKEN_COMMA },
+      penalty: -1000,
+    },
+  ],
+  function: [
+    {
+      match: new RegExp(`(${functionNames.join('|')})\\b`, 'i'),
+      token: token => ({ type: TOKEN_FUNCTION, value: token }),
+      penalty: -1000,
+    },
   ],
   noop: [
     { match: /[a-z]+/i, token: { type: TOKEN_NOOP }, penalty: 10 },
@@ -88,7 +105,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
   otherCharacter: [
     // No numbers, letters, whitespace, operators (except - and !), or brackets
     // the less this catches, the better the perf
-    { match: /[^\w\s*^/+%()\[\]]/, penalty: 1000 },
+    { match: /[^\w\s*^/+%()]/, penalty: 1000 },
   ],
   default: [
     { ref: 'operator' },
@@ -98,7 +115,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { ref: 'color' },
     { ref: 'date' },
     { ref: 'brackets' },
-    { ref: 'vector' },
+    { ref: 'function' },
     { ref: 'noop' },
     { ref: 'whitespace' },
     { ref: 'otherCharacter' },

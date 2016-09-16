@@ -9,7 +9,8 @@ import date from './date';
 const enLocale: TokenizerSpec = {
   number: [
     {
-      match: /\d[\d,]*(?:\.\d+)?/,
+      // Don't match commas when you write `add(1, 1)`
+      match: /\d(?:,\d|\d)*(?:\.\d+)?/,
       token: token => ({ type: TOKEN_NUMBER, value: Number(token.replace(/,/g, '')) }),
       penalty: -1000,
     },

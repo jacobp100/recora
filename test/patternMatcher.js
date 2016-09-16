@@ -555,3 +555,41 @@ test(
     ],
   },
 );
+
+test(
+  'Patterns should work with zeroOrOne',
+  shouldMatch,
+  new Pattern([
+    new CaptureElement(TOKEN_COLOR).zeroOrOne(),
+    new CaptureElement(TOKEN_BRACKET_OPEN),
+    new CaptureElement(TOKEN_NUMBER).any(),
+    new CaptureElement(TOKEN_BRACKET_CLOSE),
+  ]),
+  {
+    input: [
+      { type: TOKEN_COLOR },
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [{ type: TOKEN_COLOR }],
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+  {
+    input: [
+      { type: TOKEN_BRACKET_OPEN },
+      { type: TOKEN_NUMBER },
+      { type: TOKEN_BRACKET_CLOSE },
+    ],
+    expected: [
+      [],
+      [{ type: TOKEN_BRACKET_OPEN }],
+      [{ type: TOKEN_NUMBER }],
+      [{ type: TOKEN_BRACKET_CLOSE }],
+    ],
+  },
+);

@@ -128,6 +128,8 @@ test('brackets', entityResult, '1 + (2 * 2)', 5);
 test('brackets', entityResult, '(1 + 1)', 2);
 test('brackets', entityResult, '(6 - (2 + 2)) * 2', 4);
 test('brackets', entityResult, '(6 - (2 + 2)) * (6 - (2 + 2))', 4);
+test('functions', entityResult, 'negate(1)', -1);
+test('functions', entityResult, 'add(1, 1)', 2);
 test('units', entityResult, '1 meter', 1, { meter: 1 });
 test('units', entityResult, '1 METER', 1, { meter: 1 });
 test('units', entityResult, '2 meters', 2, { meter: 1 });

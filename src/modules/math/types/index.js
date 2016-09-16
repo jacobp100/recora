@@ -33,6 +33,10 @@ export const NODE_BRACKETS = 'NODE_BRACKETS';
 export type BracketsNode = Node &
   { type: 'NODE_BRACKETS', value: Node };
 
+export const NODE_ARRAY_GROUP = 'NODE_ARRAY_GROUP';
+export type ArrayGroupNode = Node &
+  { type: 'NODE_ARRAY_GROUP', value: Node[] };
+
 export const NODE_FUNCTION = 'NODE_FUNCTION';
 export type FunctionNode = Node &
   { type: 'NODE_FUNCTION', name: string, args: Node[] };

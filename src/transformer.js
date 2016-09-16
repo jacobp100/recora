@@ -10,6 +10,7 @@ import {
 } from './tokenTypes';
 import createTransformer from './modules/transformer';
 import bracketTransform from './transformers/bracketTransform';
+import commaTransform from './transformers/commaTransform';
 import {
   createForwardOperatorTransform, createBackwardOperatorTransform,
 } from './transformers/createOperatorTransform';
@@ -22,6 +23,7 @@ import miscGroupTransform from './transformers/miscGroupTransform';
 export default createTransformer([
   conversionTransform,
   bracketTransform,
+  commaTransform,
   createForwardOperatorTransform([TOKEN_OPERATOR_ADD, TOKEN_OPERATOR_SUBTRACT]),
   createForwardOperatorTransform([TOKEN_OPERATOR_MULTIPLY, TOKEN_OPERATOR_DIVIDE]),
   createBackwardOperatorTransform([TOKEN_OPERATOR_EXPONENT, TOKEN_OPERATOR_NEGATE]),
