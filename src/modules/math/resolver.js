@@ -14,8 +14,6 @@ import { convert as conversionConvert } from './types/conversion';
 import { resolveDefaults as dateTimeResolveDefaults } from './types/dateTime';
 import { mapUnlessNull } from '../../util';
 
-type FunctionSignature = [string, string[], Function];
-
 const resolver = {
   functionTrie: {},
   variadicFunctions: {},
@@ -25,17 +23,6 @@ const resolver = {
   },
   extendFunction(functionName: string, types: string[], fn: Function) {
     return set(['functionTrie', functionName, ...types, '_fn'], fn, this);
-  },
-  // private: extend function with mutations
-  extendFunctionsMut(functions: FunctionSignature[]) {
-    forEach(([functionName, types, fn]) => {
-      if (types) {
-        setMut(this, ['functionTrie', functionName, ...types, '_fn'], fn);
-      } else {
-        setMut(this, ['variadicFunctions', functionName], fn);
-      }
-    }, functions);
-    return this;
   },
   resolve(value: Node): ?Node {
     switch (value.type) {
@@ -87,4 +74,13 @@ const resolver = {
   },
 };
 
-export default resolver.extendFunctionsMut(functions);
+forEach(([functionName, types, fn]) => {
+  if (types) {
+    setMut(resolver, ['functionTrie', functionName, ...types, '_fn'], fn);
+  } else {
+    setMut(resolver, ['variadicFunctions', functionName], fn);
+  }
+}, functions);
+
+
+export default resolver;

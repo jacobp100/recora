@@ -46,6 +46,7 @@ const converter = (space, transformers) => (
   const values = mapUnlessNull(([transformer, value]) => (
     transformer(context, value)
   ), zip(transformers, [arg1, arg2, arg3]));
+  if (!values) return null;
 
   const alpha = a ? to1(context, a) : 1;
   if (typeof alpha !== 'number') return null;
