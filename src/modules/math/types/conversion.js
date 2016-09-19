@@ -2,7 +2,7 @@
 import { every, reduce, isEmpty } from 'lodash/fp';
 import { NODE_ENTITY } from '.';
 import type { ResolverContext, Units, Node } from '.'; // eslint-disable-line
-import { combineUnits, unitsAreCompatable, convertTo } from '../types/entity';
+import { combineUnits, unitsAreCompatable, convertTo, convertComposite } from '../types/entity';
 
 export const convert = ( // eslint-disable-line
   context: ResolverContext,
@@ -15,7 +15,7 @@ export const convert = ( // eslint-disable-line
   const allUnitsCompatable =
     !isEmpty(remainingUnits) && every(unitsAreCompatable(context, firstUnit), remainingUnits);
 
-  if (allUnitsCompatable) return null; // SPLIT UNITS
+  if (allUnitsCompatable) return convertComposite(context, units, value);
 
   const combinedUnits = reduce(combineUnits, firstUnit, remainingUnits);
   return convertTo(context, combinedUnits, value);

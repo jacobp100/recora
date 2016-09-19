@@ -1,11 +1,15 @@
 // @flow
 import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, every, curry,
-  isEmpty,
+  isEmpty, sortBy, set, size, map, filter, groupBy, values, flatMap, fromPairs, some, overEvery,
+  reject, flatten,
 } from 'lodash/fp';
-import { NODE_ENTITY } from '.';
-import type { ResolverContext, ConversionDescriptor, UnitName, Units, EntityNode } from '.'; // eslint-disable-line
+import { NODE_ENTITY, NODE_COMPOSITE_ENTITY } from '.';
+import type { // eslint-disable-line
+  ResolverContext, ConversionDescriptor, UnitName, Units, EntityNode, CompositeEntityNode,
+} from '.';
 import type { Curry2, Curry3 } from '../../../utilTypes';
+import { propagateNull, mapUnlessNull } from '../../../util';
 
 const getConversionDescriptor = (
   context: ResolverContext,
@@ -84,3 +88,84 @@ export const convertToFundamentalUnits = (
 ): ?EntityNode => (
   convertTo(context, getFundamentalUnits(context, entity.units), entity)
 );
+
+export const convertComposite = (
+  context: ResolverContext,
+  units: Units[],
+  entity: EntityNode
+): ?CompositeEntityNode => {
+  const unitNames = mapUnlessNull(unit => (
+    size(unit) === 1 ? keys(unit)[0] : null
+  ), units);
+
+  if (!unitNames) return null;
+
+  const sortedUnitNames = sortBy(unit => (
+    -Number(getConversionDescriptor(context, unit)[0])
+  ), unitNames);
+  const sortedUnits = map(unit => ({ [unit]: 1 }), sortedUnitNames);
+
+  const result = reduce(propagateNull((accum, unit) => {
+    const convertedEntity = convertTo(context, unit, accum.remainder);
+    if (!convertedEntity) return null;
+
+    const { quantity } = convertedEntity;
+
+    // Add small amount to account for rounding errors
+    const compositeQuantity = Math.floor(quantity + 1E-6);
+    const remainderQuantity = quantity - compositeQuantity;
+
+    return {
+      composite: accum.composite.concat(set('quantity', compositeQuantity, convertedEntity)),
+      remainder: set('quantity', remainderQuantity, convertedEntity),
+    };
+  }), {
+    remainder: entity,
+    composite: [],
+  }, sortedUnits);
+
+  if (!result) return null;
+
+  return { type: NODE_COMPOSITE_ENTITY, value: result.composite };
+};
+
+// If you have lhs = x meter^-1 yard, convert to unitless
+export const simplifyUnits = (
+  context: ResolverContext,
+  entity: EntityNode
+): ?EntityNode => {
+  const unitNames = keys(entity.units);
+  const unitsWithOneFundamentalQuantity = filter(unitName => (
+    size(getConversionDescriptor(context, unitName)[1]) === 1
+  ), unitNames);
+
+  const unitsGroupedByFundamentalType = groupBy(unitName => (
+    keys(getConversionDescriptor(context, unitName)[1])[0]
+  ), unitsWithOneFundamentalQuantity);
+
+  const unitsGroupedByFundamentalTypeThenFundamentalPower = mapValues(groupBy(unitName => (
+    values(getConversionDescriptor(context, unitName)[1])[0]
+  )), unitsGroupedByFundamentalType);
+
+  const allUnitGroups: (UnitName[])[] = flow(
+    values,
+    flatMap(values)
+  )(unitsGroupedByFundamentalTypeThenFundamentalPower);
+
+  // If a unit group has both positive and negative powers
+  // { yard: -1 meter: 1 } is rejected, but { yard: 1, meter: 1 } is not
+  const unitsToConvertTo = reject(overEvery([
+    some(unit => entity.units[unit] > 0),
+    some(unit => entity.units[unit] < 0),
+  ]), allUnitGroups);
+
+  if (unitNames.length === unitsToConvertTo.length) return entity;
+
+  const conversionUnits = flow(
+    flatten,
+    map(unit => [unit, entity.units[unit]]),
+    fromPairs
+  )(unitsToConvertTo);
+
+  return convertTo(context, conversionUnits, entity);
+};

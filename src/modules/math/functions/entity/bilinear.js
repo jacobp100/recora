@@ -1,7 +1,7 @@
 // @flow
 import { matchesProperty, mapValues, update, multiply } from 'lodash/fp';
 import {
-  convertTo, combineUnits, convertToFundamentalUnits, unitsAreLinear, isUnitless,
+  convertTo, combineUnits, convertToFundamentalUnits, unitsAreLinear, isUnitless, simplifyUnits,
 } from '../../types/entity';
 import { NODE_ENTITY } from '../../types';
 import type { ResolverContext, EntityNode } from '../../types'; // eslint-disable-line
@@ -42,12 +42,13 @@ const multiplyDivideFactory = direction => (
     ? right.units
     : mapValues(multiply(-1), right.units);
 
-  // FIXME: reduce units:
-  // if you have lhs = x meter^-1 and rhs = y yard, don't give xy meter^1 yard
-
   const quantity = left.quantity * Math.pow(right.quantity, direction);
   const units = combineUnits(left.units, rightEffectiveUnits);
-  return { type: NODE_ENTITY, quantity, units };
+
+  let entity = { type: NODE_ENTITY, quantity, units };
+  entity = simplifyUnits(context, entity);
+
+  return entity;
 };
 
 const exponentMath = (

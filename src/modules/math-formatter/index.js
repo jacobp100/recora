@@ -19,7 +19,8 @@ const formatter: Formatter = {
     if (!node) return '';
     const formatter = this.nodeFormatters[node.type];
     if (!formatter) return '';
-    return formatter(context, formattingHints, node);
+    const contextWithFormat = set('formatter', this, context);
+    return formatter(contextWithFormat, formattingHints, node);
   },
 };
 export default formatter;

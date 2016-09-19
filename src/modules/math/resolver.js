@@ -4,7 +4,7 @@ import { set as setMut } from 'lodash';
 import functions from './functions/definitions';
 import {
   NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
-  NODE_DATE_TIME, NODE_PERCENTAGE,
+  NODE_DATE_TIME, NODE_PERCENTAGE, NODE_COMPOSITE_ENTITY,
 } from './types';
 import type { // eslint-disable-line
   ResolverContext, Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
@@ -52,6 +52,7 @@ const resolver = {
       case NODE_DATE_TIME:
         return dateTimeResolveDefaults(this.context, value);
       case NODE_ENTITY:
+      case NODE_COMPOSITE_ENTITY:
       case NODE_PERCENTAGE:
       case NODE_COLOR:
         return value;

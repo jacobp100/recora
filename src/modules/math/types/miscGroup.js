@@ -11,10 +11,9 @@ import { propagateNull } from '../../../util';
 
 const shouldDivide = (leftFundamentalUnits, rightFundamentalUnits) => {
   const overlap = intersection(keys(leftFundamentalUnits), keys(rightFundamentalUnits));
-  const overlappingKeys = pick(overlap);
 
   return (overlap.length > 0) &&
-    isEqual(overlappingKeys(leftFundamentalUnits), overlappingKeys(rightFundamentalUnits));
+    isEqual(pick(leftFundamentalUnits, overlap), pick(rightFundamentalUnits, overlap));
 };
 
 const combineEntities = (
@@ -30,7 +29,7 @@ const combineEntities = (
   } else if (isEqual(leftFundamentalUnits, rightFundamentalUnits)) {
     return entityOps.add(context, left, right);
   } else if (shouldDivide(leftFundamentalUnits, rightFundamentalUnits)) {
-    return size(leftFundamentalUnits) <= size(rightFundamentalUnits)
+    return size(left.units) < size(right.units)
       ? entityOps.divide(context, left, right)
       : entityOps.divide(context, right, left);
   }

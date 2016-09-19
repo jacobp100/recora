@@ -24,10 +24,11 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
 
   t.truthy(actual, `Expected to get a result for "${input}"`);
 
-  const quantity = get(['result', 'quantity'], actual);
-  t.true(
-    quantity.toFixed(2) === expectedQuantity.toFixed(2),
-    `Expected ${quantity} to equal ${expectedQuantity} for "${input}"`
+  const actualQuantity = get(['result', 'quantity'], actual);
+  t.is(
+    actualQuantity.toFixed(2),
+    expectedQuantity.toFixed(2),
+    `Expected ${actualQuantity} to equal ${expectedQuantity} for "${input}"`
   );
 
   const actualUnits = get(['result', 'units'], actual);
@@ -40,6 +41,37 @@ const entityResult = (t, input, expectedQuantity, expectedUnits = {}) => {
       JSON.stringify(expectedUnits)
     } for "${input}"`
   );
+};
+
+const compositeEntityResult = (t, input, expectedResults) => {
+  t.plan(2 + (expectedResults.length * 2));
+
+  const actual = parse(input);
+
+  t.truthy(actual, `Expected to get a result for "${input}"`);
+  const entities = get(['result', 'value'], actual);
+
+  t.is(entities.length, expectedResults.length);
+
+  expectedResults.forEach(([expectedQuantity, expectedUnits], index) => {
+    const { quantity: actualQuantity, units: actualUnits } = entities[index];
+
+    t.is(
+      actualQuantity.toFixed(2),
+      expectedQuantity.toFixed(2),
+      `Expected ${actualQuantity} to equal ${expectedQuantity} for "${input}"`
+    );
+
+    t.deepEqual(
+      actualUnits,
+      expectedUnits,
+      `Expected ${
+        JSON.stringify(actualUnits)
+      } to equal ${
+        JSON.stringify(expectedUnits)
+      } for "${input}"`
+    );
+  }, expectedResults);
 };
 
 const colorResult = (t, input, expectedHex) => {
@@ -200,18 +232,18 @@ test('natural language', entityResult, 'mortgage is -£10 per month', -10, { GBP
 test('natural language', entityResult, 'Convert 1 meter to yards please', 1.09, { yard: 1 });
 test('natural language', entityResult, 'How many yards are there in 100 meters?', 109.36, { yard: 1 });
 test('natural language', entityResult, 'How many ounces can I buy with £5 at $1/kg', 176.37, { ounce: 1 });
+test('natural language', entityResult, '70km using 35 miles per gallon', 1.24, { gallon: 1 });
+test('natural language', entityResult, '70km using 35 miles per gallon at £1.20 per liter', 6.78, { GBP: 1 });
 // test('temperature conversions', entityResult, '100 celsius to kelvin', 373, { Kelvin: 1 });
 // test('temperature conversions', entityResult, '180 celsius to fahrenheit', 356, { Fahrenheit: 1 });
 // test('temperature conversions', entityResult, '180 centigrade to celsius', 180, { Celsius: 1 });
 // test('temperature conversions', entityResult, 'gas mark 4 to celsius', 180, { Celsius: 1 });
 // test('temperature conversions', entityResult, '4 gas mark to celsius', 180, { Celsius: 1 });
 // test('temperature conversions', entityResult, '180 degrees centigrade to gas mark', 4, { 'gas mark': 1 });
-// test('composite conversions', entityResult, '1 meter to feet and inches', 3 feet 3 inches);
-// test('composite conversions', entityResult, '500m to yards, feet and inches', 546 yards 2 feet 5 inches);
-// test('natural language', entityResult, '70km using 35 miles per gallon', 5.65, { liter: 1 });
-// test('natural language', entityResult, '70km using 35 miles per gallon at £1.20 per liter', 6.78, { GBP: 1 });
-// test('test', entityResult, '2gb at 50kb/s to hours, minutes and seconds', 11 hours 6 minutes 40 seconds);
-// test('test', entityResult, '1 yard to feet and inches', 3 feet 0 inches);
+test('composite conversions', compositeEntityResult, '1 meter to feet and inches', [[3, { foot: 1 }], [3, { inch: 1 }]]);
+test('composite conversions', compositeEntityResult, '500m to yards, feet and inches', [[546, { yard: 1 }], [2, { foot: 1 }], [5, { inch: 1 }]]);
+test('composite conversions', compositeEntityResult, '2gb at 50kb/s to hours, minutes and seconds', [[11, { hour: 1 }], [6, { minute: 1 }], [40, { second: 1 }]]);
+test('composite conversions', compositeEntityResult, '1 yard to feet and inches', [[3, { foot: 1 }], [0, { inch: 1 }]]);
 // test('test', entityResult, '500 to base 7', (base 7) 1313);
 // test('test', entityResult, '500 to base 10', 500);
 // test('test', entityResult, '500 to binary', 0b111110100);

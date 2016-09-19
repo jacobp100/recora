@@ -53,6 +53,10 @@ export const NODE_ENTITY = 'NODE_ENTITY';
 export type EntityNode = Node &
   { type: 'NODE_ENTITY', quantity: number, units: Units };
 
+export const NODE_COMPOSITE_ENTITY = 'NODE_COMPOSITE_ENTITY';
+export type CompositeEntityNode = Node &
+  { type: 'NODE_COMPOSITE_ENTITY', value: EntityNode[] };
+
 export const NODE_PERCENTAGE = 'NODE_PERCENTAGE';
 export type PercentageNode = Node &
   { type: 'NODE_PERCENTAGE', value: number };
