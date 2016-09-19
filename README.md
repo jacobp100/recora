@@ -52,7 +52,6 @@ In this example, we’ll be adding emoticons. To get emoticons to show up as tok
 
 ```js
 // tokenTypes.js
-
 export type TOKEN_EMOTICON = 'TOKEN_EMOTICON';
 ```
 
@@ -113,7 +112,7 @@ export type EmotionNode = Node &
 And then define some operations around it. We can define any functions, including add, subtract etc. in the functions folder. We’ll also need to expose them in the function definitions.
 
 ```js
-// modules/math/functions/emotion
+// modules/math/functions/emotion.js
 import { NODE_EMOTION } from '../types';
 import { FUNCTION_ADD } from '.';
 
@@ -132,7 +131,7 @@ export default [
 ```
 
 ```js
-// modules/math/functions/definitions
+// modules/math/functions/definitions.js
 import emotion from './emotion';
 
 export default [
@@ -144,6 +143,7 @@ export default [
 And lastly, we need to implement the type in the resolver. If your type has special logic, like functions, you can do that here. For this one, we don’t need to do anything other than return the value.
 
 ```js
+// modules/math/resolve.js
 import { NODE_EMOTION } from './types';
 
 const resolver = {
