@@ -42,4 +42,121 @@ We use multiple transformers to create operator precedence: for example, you wou
 
 ## Resolving
 
-The AST represents the exact operations that must be performed, so this step is really nothing more than performing the operations.
+The AST represents the exact operations that must be performed, so this step is mostly nothing more than performing the operations. However, for expressions with no clear AST representation, such as `1 foot 3 inches`, this gets put in a miscellaneous group: in this case, `1 meter` and `3 inches`. When resolving these groups, heuristics are used to determine the best thing to do. In this case, because they are both lengths, they are added. However, they can also be multiplied or divided.
+
+# Adding New Types
+
+For this example, we’ll be adding an emotion type. The first thing we’ll need to do is extend the tokeniser to recognise some new tokens. The tokeniser is currently split into two parts: purely generic tokens, such as operators like + and -, and english tokens, which can handle units. It’s not too important at the moment, as only English is supported, but in either one, we can add our own types.
+
+In this example, we’ll be adding emoticons. To get emoticons to show up as tokens, we’ll need to make the following edits to `tokenTypes.js` and `tokenizer.js`.
+
+```js
+// tokenTypes.js
+
+export type TOKEN_EMOTICON = 'TOKEN_EMOTICON';
+```
+
+```js
+// tokenizer.js
+import { TOKEN_HAPPY, TOKEN_SAD } from './tokenTypes';
+
+export default {
+  emoticons: [
+    { match: ':)', token: { type: TOKEN_EMOTICON, value: 1 }, penalty: -10000 },
+    { match: ':(', token: { type: TOKEN_EMOTICON, value: -1 }, penalty: -10000 },
+  ],
+  default: [
+    'emoticons',
+    ...
+  ],
+}
+```
+
+The penalty is somewhat arbitrary; however, it must be less than the sum of the penalties for both brackets and colons in this case.
+
+Now we’ll need to transform the tokens into nodes. We’ll need to define the node type, but we’ll do that in the next step. For now, we’ll use the PatternMatcher module to find the emoticon tokens, and transform it.
+
+```js
+// transformers/emoticon.js
+import { Pattern, CaptureOptions, CaptureWildcard } from '../modules/patternMatcher';
+import { NODE_EMOTION } from '../modules/math/types';
+import { TOKEN_HAPPY, TOKEN_SAD } from '../tokenTypes';
+
+export default {
+  pattern: new Pattern([
+    new CaptureOptions([TOKEN_HAPPY, TOKEN_SAD]).negate().lazy().any(),
+    new CaptureOptions([TOKEN_HAPPY, TOKEN_SAD]),
+    new CaptureWildcard().lazy().any(),
+  ]),
+  transform: (captureGroups, transform) => transform([
+    captureGroups[0],
+    captureGroups[2],
+  ], segments => (
+    [].concat(
+      segments[0],
+      { type: NODE_EMOTION, happiness: captureGroups[1].value, },
+      segments[1]
+    );
+  )),
+};
+```
+
+Lastly, we’ll need to implement this in the math module. Firstly, we’ll need to define the node type,
+
+```js
+// modules/math/types/index.js
+export const NODE_EMOTION = 'NODE_EMOTION';
+export type EmotionNode = Node &
+  { type: 'NODE_EMOTION', happiness: number };
+```
+
+And then define some operations around it. We can define any functions, including add, subtract etc. in the functions folder. We’ll also need to expose them in the function definitions.
+
+```js
+// modules/math/functions/emotion
+import { NODE_EMOTION } from '../types';
+import { FUNCTION_ADD } from '.';
+
+export const add = (
+  context: ResolverContext,
+  left: EmotionNode,
+  right: EmotionNode
+): EmotionNode => {
+  return { type: NODE_EMOTION, happiness: left.happiness + right.happiness };
+};
+
+// Array of [functionName, [...functionSignature], function]
+export default [
+  [FUNCTION_ADD, [NODE_EMOTION, NODE_EMOTION], add],
+];
+```
+
+```js
+// modules/math/functions/definitions
+import emotion from './emotion';
+
+export default [
+  ...,
+  emotion,
+];
+```
+
+And lastly, we need to implement the type in the resolver. If your type has special logic, like functions, you can do that here. For this one, we don’t need to do anything other than return the value.
+
+```js
+import { NODE_EMOTION } from './types';
+
+const resolver = {
+  resolve(value: Node): ?Node {
+    switch (value.type) {
+      ...
+      case NODE_EMOTION:
+        return value;
+      default:
+        return null;
+    }
+  },
+}
+```
+
+And that should be all!
