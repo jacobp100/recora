@@ -13,7 +13,7 @@ const shouldDivide = (leftFundamentalUnits, rightFundamentalUnits) => {
   const overlap = intersection(keys(leftFundamentalUnits), keys(rightFundamentalUnits));
 
   return (overlap.length > 0) &&
-    isEqual(pick(leftFundamentalUnits, overlap), pick(rightFundamentalUnits, overlap));
+    isEqual(pick(overlap, leftFundamentalUnits), pick(overlap, rightFundamentalUnits));
 };
 
 const combineEntities = (
