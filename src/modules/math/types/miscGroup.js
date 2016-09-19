@@ -10,6 +10,14 @@ import * as entityPercentageOps from '../functions/entityPercentage';
 import { propagateNull } from '../../../util';
 
 const shouldDivide = (leftFundamentalUnits, rightFundamentalUnits) => {
+  // The idea was that if you had { meter: 1 } and { yard: 1 }, the fundamental units would be both
+  // be { length: 1 }, so you'd assume you want to divide. We would take the overlapping units, and
+  // if the powers of the overlapping units were the same, you'd divide. So you could equally do
+  // { meter: 1, GBP: -1 } and { yard: 1 } and would still divide.
+  //
+  // However, areas and volumes are converted to lengths, so if you did 70km using 35 miles per
+  // gallon, the overlapping should be km and miles. But instead, they come out as { meter: 1 }
+  // and { meter: -2 }.
   const overlap = intersection(keys(leftFundamentalUnits), keys(rightFundamentalUnits));
 
   return (overlap.length > 0) &&
