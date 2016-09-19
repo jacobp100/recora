@@ -1,4 +1,5 @@
 // @flow
+import { findIndex, last } from 'lodash/fp';
 import type { ConversionDescriptors } from '../modules/math/types';
 
 const BASE_TIME = 'second';
@@ -19,6 +20,11 @@ const memoryDimensions = { [BASE_MEMORY]: 1 };
 const currencyDimensions = { [BASE_CURRENCY]: 1 };
 const absoluteTemperatureDimensions = { [BASE_ABSOLUTE_TEMPERATURE]: 1 };
 const noDimensions = {};
+
+const gasMarkToK =
+  [380.35, 394.25, 408.15, 421.95, 435.85, 453.15, 463.65, 477.55, 491.45, 505.35, 519.25];
+const kToGasMark =
+  [0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 // TODO: Copy from https://github.com/gentooboontoo/js-quantities/blob/master/src/quantities.js
 
@@ -203,10 +209,14 @@ const conversionDescriptors: ConversionDescriptors = {
             'arcsecond': [4.848136811095359935899141e-6, noDimensions],
 
                          // TODO: Rankine
-               'Kelvin': [1.4e-23,                       absoluteTemperatureDimensions],
+               'Kelvin': [1,                             absoluteTemperatureDimensions],
               'Celsius': [{
                            convertToBase: value => value - 273.15,
                            convertFromBase: value => value + 273.15,
+                         }, absoluteTemperatureDimensions],
+             'gas mark': [{
+                           convertToBase: value => kToGasMark[findIndex(k => k >= value, gasMarkToK)] || last(kToGasMark),
+                           convertFromBase: value => gasMarkToK[findIndex(gasMark => gasMark >= value, kToGasMark)] || last(gasMarkToK),
                          }, absoluteTemperatureDimensions],
            'Fahrenheit': [{
                            convertToBase: value => ((value - 273.15) * 1.8) + 32,

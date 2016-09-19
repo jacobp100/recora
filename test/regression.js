@@ -234,11 +234,11 @@ test('natural language', entityResult, 'How many yards are there in 100 meters?'
 test('natural language', entityResult, 'How many ounces can I buy with £5 at $1/kg', 176.37, { ounce: 1 });
 test('natural language', entityResult, '70km using 35 miles per gallon', 1.24, { gallon: 1 });
 test('natural language', entityResult, '70km using 35 miles per gallon at £1.20 per liter', 6.78, { GBP: 1 });
-// test('temperature conversions', entityResult, '100 celsius to kelvin', 373, { Kelvin: 1 });
-// test('temperature conversions', entityResult, '180 celsius to fahrenheit', 356, { Fahrenheit: 1 });
-// test('temperature conversions', entityResult, '180 centigrade to celsius', 180, { Celsius: 1 });
-// test('temperature conversions', entityResult, 'gas mark 4 to celsius', 180, { Celsius: 1 });
-// test('temperature conversions', entityResult, '4 gas mark to celsius', 180, { Celsius: 1 });
+test('temperature conversions', entityResult, '100 celsius to kelvin', 373.15, { Kelvin: 1 });
+test('temperature conversions', entityResult, '180 celsius to fahrenheit', 356, { Fahrenheit: 1 });
+test('temperature conversions', entityResult, '180 centigrade to celsius', 180, { Celsius: 1 });
+test('temperature conversions', entityResult, 'gas mark 4 to celsius', 180, { Celsius: 1 });
+test('temperature conversions', entityResult, '4 gas mark to celsius', 180, { Celsius: 1 });
 // test('temperature conversions', entityResult, '180 degrees centigrade to gas mark', 4, { 'gas mark': 1 });
 test('composite conversions', compositeEntityResult, '1 meter to feet and inches', [[3, { foot: 1 }], [3, { inch: 1 }]]);
 test('composite conversions', compositeEntityResult, '500m to yards, feet and inches', [[546, { yard: 1 }], [2, { foot: 1 }], [5, { inch: 1 }]]);
