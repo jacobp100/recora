@@ -45,6 +45,26 @@ export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> 
     isEqual(getFundamentalUnits(context, units1), getFundamentalUnits(context, units2))
   ));
 
+export const groupUnitsByFundamentalDimensions = curry((
+  context: ResolverContext,
+  units: Units
+): { [key: UnitName]: { [key: number]: UnitName[] } } => {
+  const unitNames = keys(units);
+  const unitsWithOneFundamentalQuantity = filter(unitName => (
+    size(getConversionDescriptor(context, unitName)[1]) === 1
+  ), unitNames);
+
+  const unitsGroupedByFundamentalType = groupBy(unitName => (
+    keys(getConversionDescriptor(context, unitName)[1])[0]
+  ), unitsWithOneFundamentalQuantity);
+
+  const unitsGroupedByFundamentalTypeThenFundamentalPower = mapValues(groupBy(unitName => (
+    values(getConversionDescriptor(context, unitName)[1])[0]
+  )), unitsGroupedByFundamentalType);
+
+  return unitsGroupedByFundamentalTypeThenFundamentalPower;
+});
+
 
 // Entity utils
 export const isUnitless = (entity: EntityNode): bool => isEmpty(entity.units);
@@ -134,23 +154,11 @@ export const simplifyUnits = (
   context: ResolverContext,
   entity: EntityNode
 ): ?EntityNode => {
-  const unitNames = keys(entity.units);
-  const unitsWithOneFundamentalQuantity = filter(unitName => (
-    size(getConversionDescriptor(context, unitName)[1]) === 1
-  ), unitNames);
-
-  const unitsGroupedByFundamentalType = groupBy(unitName => (
-    keys(getConversionDescriptor(context, unitName)[1])[0]
-  ), unitsWithOneFundamentalQuantity);
-
-  const unitsGroupedByFundamentalTypeThenFundamentalPower = mapValues(groupBy(unitName => (
-    values(getConversionDescriptor(context, unitName)[1])[0]
-  )), unitsGroupedByFundamentalType);
-
   const allUnitGroups: (UnitName[])[] = flow(
+    groupUnitsByFundamentalDimensions(context),
     values,
     flatMap(values)
-  )(unitsGroupedByFundamentalTypeThenFundamentalPower);
+  )(entity.units);
 
   // If a unit group has both positive and negative powers
   // { yard: -1 meter: 1 } is rejected, but { yard: 1, meter: 1 } is not
@@ -159,7 +167,7 @@ export const simplifyUnits = (
     some(unit => entity.units[unit] < 0),
   ]), allUnitGroups);
 
-  if (unitNames.length === unitsToConvertTo.length) return entity;
+  if (size(entity.units) === unitsToConvertTo.length) return entity;
 
   const conversionUnits = flow(
     flatten,

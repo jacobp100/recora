@@ -1,27 +1,60 @@
 // @flow
-import { first, drop, reduce, isEmpty, isEqual, intersection, keys, pick, size } from 'lodash/fp';
+import {
+  first, drop, reduce, isEmpty, isEqual, intersectionWith, keys, size, mapValues, curry, map,
+  flatMap, get, every, flow,
+} from 'lodash/fp';
 import { NODE_ENTITY, NODE_DATE_TIME, NODE_PERCENTAGE } from '.';
 import type { ResolverContext, Node, EntityNode, DateTimeNode } from '.'; // eslint-disable-line
-import { getFundamentalUnits } from './entity';
+import { getFundamentalUnits, groupUnitsByFundamentalDimensions } from './entity';
 import * as entityOps from '../functions/entity';
 import * as dateTimeOps from '../functions/dateTime';
 import * as dateTimeEntityOps from '../functions/dateTimeEntity';
 import * as entityPercentageOps from '../functions/entityPercentage';
 import { propagateNull } from '../../../util';
 
-const shouldDivide = (leftFundamentalUnits, rightFundamentalUnits) => {
-  // The idea was that if you had { meter: 1 } and { yard: 1 }, the fundamental units would be both
-  // be { length: 1 }, so you'd assume you want to divide. We would take the overlapping units, and
-  // if the powers of the overlapping units were the same, you'd divide. So you could equally do
-  // { meter: 1, GBP: -1 } and { yard: 1 } and would still divide.
-  //
-  // However, areas and volumes are converted to lengths, so if you did 70km using 35 miles per
-  // gallon, the overlapping should be km and miles. But instead, they come out as { meter: 1 }
-  // and { meter: -2 }.
-  const overlap = intersection(keys(leftFundamentalUnits), keys(rightFundamentalUnits));
+const getUnitPowerForGroupedUnits = curry((units, unitGroup) => reduce((power, unitName) => (
+  power + units[unitName]
+), 0, unitGroup));
 
-  return (overlap.length > 0) &&
-    isEqual(pick(overlap, leftFundamentalUnits), pick(overlap, rightFundamentalUnits));
+const pathsForGroupedUnits = unitGroup => flow(
+  keys,
+  flatMap(unitName => map(unitPower => [unitName, unitPower], keys(unitGroup[unitName])))
+)(unitGroup);
+
+const shouldDivide = (context, leftUnits, rightUnits) => {
+  /*
+  The logic for this is that you look for units that have the same dimensions on both the left and
+  right, and assume they want to divide. If they had { meter: 1 } and { yard: 1 }, they likely want
+  to divide. We only look for units that overlap, so { meter: 1 } and { yard: 1, GBP: -1 } will
+  still be a division.
+
+  If they have { liter: 1 } and { gallon: 1 }, they would want to divide. However, if they had
+  { liter: 1 } and { gallon: 1, mile: -1 }, they still want to divide, but if we did this based on
+  fundamental units only, they would not overlap.
+
+  To fix this, we get the fundamental unit powers for each unit. We map this to an object, so the
+  above would look like { meter: { 3: ['liter'] } } and { meter: { 3: ['gallon'] } }. We then look
+  at the powers for 'liter' and 'gallon' on each side, and if they are equal, we assume a division.
+
+  This is not perfect, because you'd want to divide { meter: 3 } and { gallon: 1 }. This should
+  probably be fixed at some point.
+  */
+  const resolveFundamentalPowers = units => flow(
+    groupUnitsByFundamentalDimensions(context),
+    mapValues(mapValues(getUnitPowerForGroupedUnits(units))),
+  )(units);
+
+  const leftGroupedUnits = resolveFundamentalPowers(leftUnits);
+  const rightGroupedUnits = resolveFundamentalPowers(rightUnits);
+
+  const leftPaths = pathsForGroupedUnits(leftGroupedUnits);
+  const rightPaths = pathsForGroupedUnits(rightGroupedUnits);
+
+  const overlappingPaths = intersectionWith(isEqual, leftPaths, rightPaths);
+
+  return (overlappingPaths.length > 0) && every(path => (
+    get(path, leftGroupedUnits) === get(path, rightGroupedUnits)
+  ), overlappingPaths);
 };
 
 const combineEntities = (
@@ -36,7 +69,7 @@ const combineEntities = (
     return entityOps.multiply(context, left, right);
   } else if (isEqual(leftFundamentalUnits, rightFundamentalUnits)) {
     return entityOps.add(context, left, right);
-  } else if (shouldDivide(leftFundamentalUnits, rightFundamentalUnits)) {
+  } else if (shouldDivide(context, left.units, right.units)) {
     return size(left.units) < size(right.units)
       ? entityOps.divide(context, left, right)
       : entityOps.divide(context, right, left);
