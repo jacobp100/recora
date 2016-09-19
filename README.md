@@ -79,7 +79,7 @@ dodge(#400, #800) | #b90000
 
 The process is simple: we take input, put it through a tokeniser, generate an abstract syntax tree, and process the result.
 
-The tokeniser is somewhat unconventional, as it generates multiple interpretations of tokens. For example, *1/12/2000* could be interpreted as a date, or as 1 divided by 12 divided by 2000. The tokeniser will prioritise the different interpretations of tokens: in the previous example, the date would be prioritised.
+The tokeniser is somewhat unconventional, as it generates multiple interpretations of tokens. For example, `1/12/2000` could be interpreted as a date, or as 1 divided by 12 divided by 2000. The tokeniser will prioritise the different interpretations of tokens: in the previous example, the date would be prioritised.
 
 For every interpretation, we generate an abstract syntax tree (AST), which represents the operations that must be performed. Generating an AST can also fail: for example, if you only had two tokens, a number, and a addition operator (+), there isn’t a suitable AST.
 
