@@ -244,5 +244,20 @@ export default [].concat(
 
 Now that we’ve implemented the type, we need to make a stringifier for the type should it be the outcome of resolving. In this case, we can assume this does not change for locales. We’ll need to make edits in the math-formatter module.
 
+```js
+// modules/math-formatter/defaultFormatter.js
+import { NODE_EMOTION } from '../math/types';
 
-And that should be all!
+const defaultFormatter: NodeFormatter = {
+  [NODE_EMOTION]: (context, formattingHints, emotion) => {
+    if (emotion.happiness >= 2) return ':D';
+    if (emotion.happiness === 1) return ':)';
+    if (emotion.happiness === 0) return ':|';
+    if (emotion.happiness === -1) return ':(';
+    if (emotion.happiness <= -2) return ":'(";
+  },
+};
+export default defaultFormatter;
+```
+
+And that should be all! Depending on what you’re doing, you can do as few or as many of the steps as needed: if you’re just adding new date formats, you’ll only need to extend the tokeniser.
