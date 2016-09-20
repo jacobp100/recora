@@ -12,7 +12,7 @@ A rewrite of the previous version. Not quite production ready, there will be rou
 * Formatting: at least dates need formatting
 * Tests: we only have an end-to-end test, which does test a lot of things, but individual components should be tested in isolation
 * Locales: allow comma decimal points, UK/US date formats
-* Data: there's a lot of units not accounted for
+* Data: there’s a lot of units not accounted for
 * Abstract units: get `#fff to hsl` working
 * Formatting hints: get `800 to base 7` working
 * Benchmarking: zero attempt has been made for performance so far
@@ -119,6 +119,8 @@ The AST represents the exact operations that must be performed, so this step is 
 
 # Adding New Types
 
+## Tokenizer
+
 For this example, we’ll be adding an emotion type. The first thing we’ll need to do is extend the tokeniser to recognise some new tokens. The tokeniser is currently split into two parts: purely generic tokens, such as operators like + and -, and english tokens, which can handle units. It’s not too important at the moment, as only English is supported, but in either one, we can add our own types.
 
 To get emoticons to show up as tokens, we’ll need to make the following edits to `tokenTypes.js` and `tokenizer.js`.
@@ -145,6 +147,8 @@ export default {
 ```
 
 The penalty is somewhat arbitrary; however, it must be less than the sum of the penalties for both brackets and colons in this case.
+
+## AST Transformation
 
 Now we’ll need to transform the tokens into nodes. We’ll need to define the node type, but we’ll do that in the next step. For now, we’ll use the PatternMatcher module to find the emoticon tokens, and transform it.
 
@@ -173,7 +177,9 @@ export default {
 };
 ```
 
-Lastly, we’ll need to implement this in the math module. Firstly, we’ll need to define the node type,
+## Resolving
+
+We’ll now need to implement this in the math module. Firstly, we’ll need to define the node type,
 
 ```js
 // modules/math/types/index.js
@@ -201,7 +207,7 @@ const resolver = {
 }
 ```
 
-If your type has functions relating to it, we can define any functions in the functions folder. Operators (+, - etc.) are defined in terms of functions, so to get `:) + :(` to work, we'll need to add an `add` function.
+If your type has functions relating to it, we can define any functions in the functions folder. Operators (+, - etc.) are defined in terms of functions, so to get `:) + :(` to work, we’ll need to add an `add` function.
 
 We’ll also need to expose them in the function definitions: this is just an array of tuples, where each tuple contains the function name, the argument types, and a reference to the actual function. Strictly speaking, the function definitions are all we need to export, but it is useful to export all functions as stand-alone functions, as other nodes may need to use the functions.
 
@@ -233,5 +239,10 @@ export default [].concat(
   emotion
 );
 ```
+
+## Formatting
+
+Now that we’ve implemented the type, we need to make a stringifier for the type should it be the outcome of resolving. In this case, we can assume this does not change for locales. We’ll need to make edits in the math-formatter module.
+
 
 And that should be all!
