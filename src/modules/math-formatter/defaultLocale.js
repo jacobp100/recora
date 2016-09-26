@@ -5,7 +5,7 @@ import { NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME } from '../math/type
 import type { Locale } from './types';
 
 const defaultFormatter: Locale = {
-  [NODE_ENTITY]: (context, formattingHints, entity) => {
+  [NODE_ENTITY]: (context, entity) => {
     const unitsString = flow(
       toPairs,
       map(([unit, power]) => (power === 1 ? unit : `${unit}^${power}`)),
@@ -13,13 +13,13 @@ const defaultFormatter: Locale = {
     )(entity.units);
     return `${entity.quantity} ${unitsString}`;
   },
-  [NODE_COMPOSITE_ENTITY]: (context, formattingHints, compositeEntity) => {
+  [NODE_COMPOSITE_ENTITY]: (context, compositeEntity) => {
     const formattedEntities = map(entity => (
       context.formatter.format(entity)
     ), compositeEntity.value);
     return formattedEntities.join(' ');
   },
-  [NODE_DATE_TIME]: (context, formattingHints, dateTime) => (
+  [NODE_DATE_TIME]: (context, dateTime) => (
     new Date(dateTimeToUTCUnix(dateTime)).toISOString()
   ),
 };

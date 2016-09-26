@@ -16,7 +16,7 @@ const formatter: Formatter = {
       ? set('locales', [localeFormatters[locale], defaultLocale], this)
       : set('locales', [defaultLocale], this);
   },
-  format(context, formattingHints, node) {
+  format(context, node) {
     if (!node) return '';
     const { type } = node;
     const contextWithFormat = set('formatter', this, context);
@@ -25,7 +25,7 @@ const formatter: Formatter = {
       if (output) {
         return output;
       } else if (type in localeFormatter) {
-        return localeFormatter[type](contextWithFormat, formattingHints, node);
+        return localeFormatter[type](contextWithFormat, node);
       }
       return '';
     }, '', this.locales);

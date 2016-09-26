@@ -6,7 +6,7 @@ import type { Transformer, TokenNode } from '../modules/transformer/types';
 import {
   TOKEN_NUMBER, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX,
 } from '../tokenTypes';
-import { NODE_ENTITY } from '../modules/math/types';
+import { baseEntity } from '../modules/math/types';
 import type { Units, EntityNode } from '../modules/math/types'; // eslint-disable-line
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
 import { evenIndexElements, oddIndexElements, mapUnlessNull, flatZip, uncastArray } from '../util';
@@ -29,7 +29,7 @@ const getEntities = (segment: TokenNode[]): ?(EntityNode[]) => {
   unit1 number1 unit2 number2 unit3
     => [Entity(number1 unit1 unit2), Entity(number2 unit3)]
   */
-  const baseEntityValue = { type: NODE_ENTITY, quantity: undefined, units: {} };
+  const baseEntityValue = { ...baseEntity, quantity: undefined };
   const maybeEntities = reduce((accum, tag) => {
     if (tag.type === INTERMEDIATE_UNIT) {
       const unit: Units = { [tag.name]: tag.power };

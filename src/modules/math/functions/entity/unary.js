@@ -3,7 +3,7 @@ import { multiply, mapValues } from 'lodash/fp';
 import gamma from 'gamma';
 import mathp from 'mathp';
 import { convertToFundamentalUnits, isUnitless } from '../../types/entity';
-import { NODE_ENTITY } from '../../types';
+import { NODE_ENTITY, baseEntity } from '../../types';
 import type { ResolverContext, EntityNode } from '../../types'; // eslint-disable-line
 import {
   FUNCTION_SQRT, FUNCTION_CBRT, FUNCTION_NEGATE, FUNCTION_ROUND, FUNCTION_FLOOR, FUNCTION_CEIL,
@@ -21,7 +21,7 @@ const unitlessFunction = (fn: (value: number) => number) => (
 ): ?EntityNode => {
   const fundamental = convertToFundamentalUnits(context, entity);
   return fundamental && isUnitless(fundamental)
-    ? { type: NODE_ENTITY, quantity: fn(fundamental.quantity), units: {} }
+    ? { ...baseEntity, quantity: fn(fundamental.quantity) }
     : null;
 };
 
@@ -29,7 +29,7 @@ const quantityFn = (fn: (value: number) => number) => (
   context: ResolverContext,
   entity: EntityNode
 ): ?EntityNode => ({
-  type: NODE_ENTITY,
+  ...baseEntity,
   quantity: fn(entity.quantity),
   units: entity.units,
 });
@@ -40,7 +40,7 @@ const powerFn = (power: number) => (
 ): ?EntityNode => (
   entity.quantity >= 0
     ? {
-      type: NODE_ENTITY,
+      ...baseEntity,
       quantity: Math.pow(entity.quantity, 1 / power),
       units: mapValues(multiply(1 / power), entity.units),
     }

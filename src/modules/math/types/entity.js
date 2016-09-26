@@ -4,7 +4,7 @@ import {
   isEmpty, sortBy, set, size, map, filter, groupBy, values, flatMap, fromPairs, some, overEvery,
   reject, flatten,
 } from 'lodash/fp';
-import { NODE_ENTITY, NODE_COMPOSITE_ENTITY } from '.';
+import { NODE_COMPOSITE_ENTITY, baseEntity } from '.';
 import type { // eslint-disable-line
   ResolverContext, ConversionDescriptor, UnitName, Units, EntityNode, CompositeEntityNode,
 } from '.';
@@ -99,7 +99,7 @@ export const convertTo = (
     calculateConversionValue(context, conversionValueNumerator, entity.units),
     calculateConversionValue(context, conversionValueDenominator, units)
   )(entity.quantity);
-  return { type: NODE_ENTITY, quantity, units };
+  return { ...baseEntity, quantity, units };
 };
 
 export const convertToFundamentalUnits = (

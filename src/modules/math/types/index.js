@@ -51,7 +51,9 @@ export type ConversionNode = Node &
 
 export const NODE_ENTITY = 'NODE_ENTITY';
 export type EntityNode = Node &
-  { type: 'NODE_ENTITY', quantity: number, units: Units };
+  { type: 'NODE_ENTITY', quantity: number, units: Units, formatting: {} };
+export const baseEntity: EntityNode =
+  { type: NODE_ENTITY, quantity: NaN, units: {}, formatting: {} };
 
 export const NODE_COMPOSITE_ENTITY = 'NODE_COMPOSITE_ENTITY';
 export type CompositeEntityNode = Node &

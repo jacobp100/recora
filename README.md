@@ -16,6 +16,8 @@ A rewrite of the previous version. Not quite production ready, there will be rou
 * Abstract units: get `#fff to hsl` working
 * Formatting hints: get `800 to base 7` working
 * Benchmarking: zero attempt has been made for performance so far
+* Create base node objects that you can extend rather than doing { type: ... } every time
+  * Allows easier extending
 
 # Examples
 

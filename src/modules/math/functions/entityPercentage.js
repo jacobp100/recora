@@ -1,5 +1,5 @@
 // @flow
-import { NODE_ENTITY, NODE_PERCENTAGE } from '../types';
+import { NODE_ENTITY, NODE_PERCENTAGE, baseEntity } from '../types';
 import type { ResolverContext, EntityNode, PercentageNode } from '../types'; // eslint-disable-line
 import { FUNCTION_ADD, FUNCTION_SUBTRACT, FUNCTION_MULTIPLY, FUNCTION_DIVIDE } from '.';
 import { flip2 } from './util';
@@ -10,7 +10,7 @@ const transform = (transform: (entityValue: number, percentageValue: number) => 
   entity: EntityNode,
   percentage: PercentageNode
 ): EntityNode => ({
-  type: NODE_ENTITY,
+  ...baseEntity,
   quantity: transform(entity.quantity, percentage.value),
   units: entity.units,
 });

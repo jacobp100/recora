@@ -2,7 +2,6 @@
 import { isEqual, toPairs, reduce, stubTrue, cond, getOr } from 'lodash/fp';
 import type { EntityNode, ResolverContext } from '../../math/types';
 import { convertToFundamentalUnits } from '../../math/types/entity';
-import type { FormattingHints } from '../types';
 import unitFormatting from '../data/en-unit-formatting.json';
 import unitPlurals from '../data/en-unit-plurals.json';
 import { formatPower, orderOfMagnitude } from '../util';
@@ -42,17 +41,17 @@ const formatUnits = (value, entity) => {
   }, value, toPairs(entity.units));
 };
 
-const isCurrency = (context, formattingHints, entity) =>
-  !formattingHints.base &&
-  !formattingHints.decimalPlaces &&
-  !formattingHints.significantFigures &&
+const isCurrency = (context, entity) =>
+  !entity.formatting.base &&
+  !entity.formatting.decimalPlaces &&
+  !entity.formatting.significantFigures &&
   isEqual(convertToFundamentalUnits(context, entity), { EUR: 1 });
 
-const formatCurrency = (context, formattingHints, entity) =>
+const formatCurrency = (context, entity) =>
   formatUnits(entity.quantity.toFixed(2), entity);
 
-const baseNumberFormatter = (formattingHints, entity) => {
-  const { base, decimalPlaces, significantFigures } = formattingHints;
+const baseNumberFormatter = (entity) => {
+  const { base, decimalPlaces, significantFigures } = entity.formatting;
 
   // if (entity.quantity === 1 && !noSymbols(entity)) {
   //   return '';
@@ -87,12 +86,11 @@ const baseNumberFormatter = (formattingHints, entity) => {
   return entity.quantity.toExponential(3);
 };
 
-const baseFormatter = (context, formattingHints, entity) =>
-  formatUnits(baseNumberFormatter(formattingHints, entity), entity);
+const baseFormatter = (context, entity) =>
+  formatUnits(baseNumberFormatter(entity), entity);
 
 const entityFormatter: (
   context: ResolverContext,
-  formattingHints: FormattingHints,
   entity: EntityNode,
 ) => string = cond([
   [isCurrency, formatCurrency],

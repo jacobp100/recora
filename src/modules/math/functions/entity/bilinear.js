@@ -3,14 +3,14 @@ import { matchesProperty, mapValues, update, multiply } from 'lodash/fp';
 import {
   convertTo, combineUnits, convertToFundamentalUnits, unitsAreLinear, isUnitless, simplifyUnits,
 } from '../../types/entity';
-import { NODE_ENTITY } from '../../types';
+import { NODE_ENTITY, baseEntity } from '../../types';
 import type { ResolverContext, EntityNode } from '../../types'; // eslint-disable-line
 import {
   FUNCTION_ADD, FUNCTION_SUBTRACT, FUNCTION_MULTIPLY, FUNCTION_DIVIDE, FUNCTION_EXPONENT,
 } from '..';
 
 const isZero = matchesProperty('quantity', 0);
-const zeroEntity = { type: NODE_ENTITY, quantity: 0, units: {} };
+const zeroEntity = { ...baseEntity, quantity: 0 };
 
 
 const addSubtractFactory = direction => (
@@ -27,7 +27,7 @@ const addSubtractFactory = direction => (
 
   const quantity = left.quantity + (rightWithLhsUnits.quantity * direction);
   const units = left.units;
-  return { type: NODE_ENTITY, quantity, units };
+  return { ...baseEntity, quantity, units };
 };
 
 const multiplyDivideFactory = direction => (
@@ -45,7 +45,7 @@ const multiplyDivideFactory = direction => (
   const quantity = left.quantity * Math.pow(right.quantity, direction);
   const units = combineUnits(left.units, rightEffectiveUnits);
 
-  let entity = { type: NODE_ENTITY, quantity, units };
+  let entity = { ...baseEntity, quantity, units };
   entity = simplifyUnits(context, entity);
 
   return entity;
@@ -67,7 +67,7 @@ const exponentMath = (
 
   const quantity = Math.pow(left.quantity, rightFundamentalUnits.quantity);
   const units = mapValues(multiply(right.quantity), left.units);
-  return { type: NODE_ENTITY, quantity, units };
+  return { ...baseEntity, quantity, units };
 };
 
 const addMath = addSubtractFactory(1);

@@ -1,5 +1,5 @@
 // @flow
-import { first } from 'lodash/fp';
+import { first, isEmpty } from 'lodash/fp';
 import {
   Pattern, CaptureWildcard, CaptureElement,
 } from '../modules/patternMatcher';
@@ -15,6 +15,8 @@ const bracketTransform: Transformer = {
     new CaptureWildcard().any().lazy(),
   ]),
   transform: (captureGroups, transform) => transform([captureGroups[2]], ([arg]) => {
+    if (isEmpty(arg)) return null;
+
     const fn = first(captureGroups[1]);
 
     const concatSegments = [].concat(

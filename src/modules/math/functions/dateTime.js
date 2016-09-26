@@ -1,5 +1,5 @@
 // @flow
-import { NODE_DATE_TIME, NODE_ENTITY } from '../types';
+import { NODE_DATE_TIME, baseEntity } from '../types';
 import type { ResolverContext, EntityNode, DateTimeNode } from '../types'; // eslint-disable-line
 import { convertTo } from '../types/entity';
 import { dateTimeToUTCUnix } from '../util';
@@ -15,7 +15,7 @@ const addSubtract = (
   const milliseconds = Math.abs(leftUtcUnix - rightUtcUnix);
 
   const dateEntity: EntityNode = {
-    type: NODE_ENTITY,
+    ...baseEntity,
     quantity: milliseconds,
     units: { millisecond: 1 },
   };

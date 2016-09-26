@@ -7,7 +7,7 @@ import formatEntity from './entity';
 
 const enFormatter: Locale = {
   [NODE_ENTITY]: formatEntity,
-  [NODE_DATE_TIME]: (context, formattingHints, dateTime) => {
+  [NODE_DATE_TIME]: (context, dateTime) => {
     const { year, month, date, hour, minute, second, timezone } = dateTime.value;
     return tz([year, month, date, hour, minute, second], 'en_GB', '%c', timezone);
   },
