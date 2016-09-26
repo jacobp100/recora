@@ -1,7 +1,7 @@
 // @flow
 import { Pattern, CaptureElement } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/transformer/types';
-import { NODE_ARRAY_GROUP } from '../modules/math/types';
+import { baseArrayGroup } from '../modules/math/types';
 import type { PercentageNode } from '../modules/math/types'; // eslint-disable-line
 import { TOKEN_COMMA } from '../tokenTypes';
 import { evenIndexElements } from '../util';
@@ -17,7 +17,7 @@ const entityTransform: Transformer = {
     ]).oneOrMore(),
   ]),
   transform: (captureGroups, transform) => transform(evenIndexElements(captureGroups), segments => (
-    { type: NODE_ARRAY_GROUP, value: segments }
+    { ...baseArrayGroup, value: segments }
   )),
 };
 export default entityTransform;

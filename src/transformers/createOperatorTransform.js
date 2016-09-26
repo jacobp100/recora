@@ -13,7 +13,7 @@ import {
   TOKEN_OPERATOR_NEGATE,
   TOKEN_OPERATOR_FACTORIAL,
 } from '../tokenTypes';
-import { NODE_FUNCTION, NODE_MISC_GROUP } from '../modules/math/types';
+import { NODE_MISC_GROUP, baseMiscGroup, baseFunction } from '../modules/math/types';
 import type { Node, FunctionNode } from '../modules/math/types'; // eslint-disable-line
 import {
   FUNCTION_ADD,
@@ -68,7 +68,7 @@ const createBilinearNode = (name, leftSegment, rightSegment): ?FunctionNode => {
   const rhs = singleArrayValue(rightSegment);
 
   return (lhs && rhs)
-    ? { type: NODE_FUNCTION, name, args: [lhs, rhs] }
+    ? { ...baseFunction, name, args: [lhs, rhs] }
     : null;
 };
 
@@ -79,14 +79,14 @@ const createUnaryNode = (bindingDirection, name, leftSegment, rightSegment): ?Fu
 
   if (bindingDirection === FORWARD && rightSide && rightSide.type === NODE_MISC_GROUP) {
     argument = first(rightSide.value);
-    const miscGroup: Node = { type: NODE_MISC_GROUP, value: rightSide.value.slice(1) };
+    const miscGroup: Node = { ...baseMiscGroup, value: rightSide.value.slice(1) };
     rightSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === FORWARD) {
     argument = rightSide;
     rightSide = null;
   } else if (bindingDirection === BACKWARD && leftSide && leftSide.type === NODE_MISC_GROUP) {
     argument = last(leftSide.value);
-    const miscGroup: Node = { type: NODE_MISC_GROUP, value: leftSide.value.slice(1) };
+    const miscGroup: Node = { ...baseMiscGroup, value: leftSide.value.slice(1) };
     leftSide = compactMiscGroup(miscGroup);
   } else if (bindingDirection === BACKWARD) {
     argument = leftSide;
@@ -95,13 +95,9 @@ const createUnaryNode = (bindingDirection, name, leftSegment, rightSegment): ?Fu
 
   if (!argument) return null;
 
-  const node = {
-    type: NODE_FUNCTION,
-    name,
-    args: [argument],
-  };
+  const node = { ...baseFunction, name, args: [argument] };
   const group = compact([leftSide, node, rightSide]);
-  const miscGroup: Node = { type: NODE_MISC_GROUP, value: group };
+  const miscGroup: Node = { ...baseMiscGroup, value: group };
   const value = compactMiscGroup(miscGroup);
 
   return value;

@@ -2,7 +2,7 @@
 import { first, last } from 'lodash/fp';
 import { Pattern, CaptureElement, CaptureWildcard } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/transformer/types';
-import { NODE_PERCENTAGE } from '../modules/math/types';
+import { basePercentage } from '../modules/math/types';
 import type { PercentageNode } from '../modules/math/types'; // eslint-disable-line
 import { TOKEN_NUMBER, TOKEN_PERCENTAGE } from '../tokenTypes';
 import { uncastArray } from '../util';
@@ -23,7 +23,7 @@ const entityTransform: Transformer = {
     captureGroups[3],
   ], segments => {
     const value: number = captureGroups[1][0].value;
-    const percentage: PercentageNode = { type: NODE_PERCENTAGE, value };
+    const percentage: PercentageNode = { ...basePercentage, value };
 
     const concatSegments = [].concat(
       first(segments),

@@ -5,7 +5,7 @@ import {
 } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/transformer/types';
 import { TOKEN_FUNCTION, TOKEN_BRACKET_OPEN, TOKEN_BRACKET_CLOSE } from '../tokenTypes';
-import { NODE_BRACKETS, NODE_ARRAY_GROUP, NODE_FUNCTION } from '../modules/math/types';
+import { NODE_ARRAY_GROUP, baseBrackets, baseFunction } from '../modules/math/types';
 import { uncastArray } from '../util';
 
 const bracketTransform: Transformer = {
@@ -24,11 +24,11 @@ const bracketTransform: Transformer = {
 
     let value;
     if (!fn) {
-      value = { type: NODE_BRACKETS, value: bracketGroup };
+      value = { ...baseBrackets, value: bracketGroup };
     } else if (bracketGroup.type === NODE_ARRAY_GROUP) {
-      value = { type: NODE_FUNCTION, name: fn.value, args: bracketGroup.value };
+      value = { ...baseFunction, name: fn.value, args: bracketGroup.value };
     } else {
-      value = { type: NODE_FUNCTION, name: fn.value, args: [bracketGroup] };
+      value = { ...baseFunction, name: fn.value, args: [bracketGroup] };
     }
 
     const concatSegments = [].concat(

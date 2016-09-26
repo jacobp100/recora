@@ -4,7 +4,7 @@ import {
   isEmpty, sortBy, set, size, map, filter, groupBy, values, flatMap, fromPairs, some, overEvery,
   reject, flatten,
 } from 'lodash/fp';
-import { NODE_COMPOSITE_ENTITY, baseEntity } from '.';
+import { baseCompositeEntity, baseEntity } from '.';
 import type { // eslint-disable-line
   ResolverContext, ConversionDescriptor, UnitName, Units, EntityNode, CompositeEntityNode,
 } from '.';
@@ -146,7 +146,7 @@ export const convertComposite = (
 
   if (!result) return null;
 
-  return { type: NODE_COMPOSITE_ENTITY, value: result.composite };
+  return { ...baseCompositeEntity, value: result.composite };
 };
 
 // If you have lhs = x meter^-1 yard, convert to unitless

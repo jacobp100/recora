@@ -5,7 +5,7 @@ import {
 } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/transformer/types';
 import { TOKEN_FUNCTION } from '../tokenTypes';
-import { NODE_FUNCTION } from '../modules/math/types';
+import { baseFunction } from '../modules/math/types';
 import { uncastArray } from '../util';
 
 const bracketTransform: Transformer = {
@@ -21,7 +21,7 @@ const bracketTransform: Transformer = {
 
     const concatSegments = [].concat(
       first(captureGroups),
-      { type: NODE_FUNCTION, name: fn.value, args: [arg] }
+      { ...baseFunction, name: fn.value, args: [arg] }
     );
     return uncastArray(concatSegments);
   }),

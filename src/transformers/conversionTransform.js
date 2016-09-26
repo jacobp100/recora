@@ -7,7 +7,7 @@ import type { Transformer } from '../modules/transformer/types';
 import {
   TOKEN_NOOP, TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX, TOKEN_NUMBER,
 } from '../tokenTypes';
-import { NODE_CONVERSION } from '../modules/math/types';
+import { baseConversion } from '../modules/math/types';
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
 
 const conversionTokens = [
@@ -72,7 +72,7 @@ const conversionsTransform: Transformer = {
       map(unit => ({ [unit.name]: unit.power }))
     )(segmentWithIntermediateUnits);
 
-    return { type: NODE_CONVERSION, value, units };
+    return { ...baseConversion, value, units };
   }),
 };
 export default conversionsTransform;

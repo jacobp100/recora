@@ -39,49 +39,63 @@ export type ResolverContext = {
 };
 
 
-export const NODE_BRACKETS = 'NODE_BRACKETS';
 export type BracketsNode = Node &
-  { type: 'NODE_BRACKETS', value: Node };
+  { type: 'NODE_BRACKETS', value: ?Node };
+export const NODE_BRACKETS = 'NODE_BRACKETS';
+export const baseBrackets: BracketsNode =
+  { type: NODE_BRACKETS, value: null };
 
-export const NODE_ARRAY_GROUP = 'NODE_ARRAY_GROUP';
 export type ArrayGroupNode = Node &
   { type: 'NODE_ARRAY_GROUP', value: Node[] };
+export const NODE_ARRAY_GROUP = 'NODE_ARRAY_GROUP';
+export const baseArrayGroup: ArrayGroupNode =
+  { type: NODE_ARRAY_GROUP, value: [] };
 
-export const NODE_FUNCTION = 'NODE_FUNCTION';
 export type FunctionNode = Node &
   { type: 'NODE_FUNCTION', name: string, args: Node[] };
+export const NODE_FUNCTION = 'NODE_FUNCTION';
+export const baseFunction: FunctionNode =
+  { type: NODE_FUNCTION, name: '', args: [] };
 
-export const NODE_MISC_GROUP = 'NODE_MISC_GROUP';
 export type MiscGroupNode = Node &
   { type: 'NODE_MISC_GROUP', value: Node[] };
+export const NODE_MISC_GROUP = 'NODE_MISC_GROUP';
+export const baseMiscGroup: MiscGroupNode =
+  { type: NODE_MISC_GROUP, value: [] };
 
-export const NODE_CONVERSION = 'NODE_CONVERSION';
 export type ConversionNode = Node &
-  { type: 'NODE_CONVERSION', value: Node, units: Units[] };
+  { type: 'NODE_CONVERSION', value: ?Node, units: Units[] };
+export const NODE_CONVERSION = 'NODE_CONVERSION';
+export const baseConversion: ConversionNode =
+  { type: NODE_CONVERSION, value: null, units: [] };
 
-export const NODE_ENTITY = 'NODE_ENTITY';
 export type EntityNode = Node &
   { type: 'NODE_ENTITY', quantity: number, units: Units, formatting: {} };
+export const NODE_ENTITY = 'NODE_ENTITY';
 export const baseEntity: EntityNode =
   { type: NODE_ENTITY, quantity: NaN, units: {}, formatting: {} };
 
-export const NODE_COMPOSITE_ENTITY = 'NODE_COMPOSITE_ENTITY';
 export type CompositeEntityNode = Node &
   { type: 'NODE_COMPOSITE_ENTITY', value: EntityNode[] };
+export const NODE_COMPOSITE_ENTITY = 'NODE_COMPOSITE_ENTITY';
+export const baseCompositeEntity: CompositeEntityNode =
+  { type: 'NODE_COMPOSITE_ENTITY', value: [] };
 
-export const NODE_PERCENTAGE = 'NODE_PERCENTAGE';
 export type PercentageNode = Node &
   { type: 'NODE_PERCENTAGE', value: number };
+export const NODE_PERCENTAGE = 'NODE_PERCENTAGE';
+export const basePercentage: PercentageNode =
+  { type: 'NODE_PERCENTAGE', value: NaN };
 
-export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = Node &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };
+export const NODE_COLOR = 'NODE_COLOR';
 export const baseColor: ColorNode =
   { type: NODE_COLOR, space: 'rgb', values: [0, 0, 0], alpha: 1 };
 
 // directionHint is used for miscGroup to work out whether to add or subtract an entity
-export const NODE_DATE_TIME = 'NODE_DATE_TIME';
 export type DateTimeNode = Node &
   { type: 'NODE_DATE_TIME', value: DateTime, directionHint: number };
+export const NODE_DATE_TIME = 'NODE_DATE_TIME';
 export const baseDateTime: DateTimeNode =
   { type: NODE_DATE_TIME, value: zeroTime, directionHint: 1 };
