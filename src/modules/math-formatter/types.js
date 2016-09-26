@@ -7,9 +7,9 @@ export type NodeFormattingFunction = (
   FormattingHints: FormattingHints,
   value: Node
 ) => string;
-export type NodeFormatter = { [key: string]: NodeFormattingFunction };
+export type Locale = { [key: string]: NodeFormattingFunction };
 export type Formatter = {
-  nodeFormatters: NodeFormatter,
+  locales: Locale[],
   setLocale: (locale: string) => Formatter,
   format: NodeFormattingFunction,
 };

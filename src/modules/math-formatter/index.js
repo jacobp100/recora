@@ -1,26 +1,34 @@
 // @flow
-import { set, assign } from 'lodash/fp';
+import { set, reduce } from 'lodash/fp';
 import en from './en';
-import defaultFormatter from './defaultFormatter';
+import defaultLocale from './defaultLocale';
 import type { Formatter } from './types';
 
-const formatters = {
+const localeFormatters = {
   en,
 };
 
+// Technically allows for composition of locales, so you could do en_GB, base_en, defaultLocale
 const formatter: Formatter = {
-  nodeFormatters: defaultFormatter,
+  locales: [defaultLocale],
   setLocale(locale) {
-    return locale in formatters
-      ? set('nodeFormatters', assign(defaultFormatter, formatters[locale]), this)
-      : this;
+    return locale in localeFormatters
+      ? set('locales', [localeFormatters[locale], defaultLocale], this)
+      : set('locales', [defaultLocale], this);
   },
   format(context, formattingHints, node) {
     if (!node) return '';
-    const formatter = this.nodeFormatters[node.type];
-    if (!formatter) return '';
+    const { type } = node;
     const contextWithFormat = set('formatter', this, context);
-    return formatter(contextWithFormat, formattingHints, node);
+
+    return reduce((output, localeFormatter) => {
+      if (output) {
+        return output;
+      } else if (type in localeFormatter) {
+        return localeFormatter[type](contextWithFormat, formattingHints, node);
+      }
+      return '';
+    }, '', this.locales);
   },
 };
 export default formatter;

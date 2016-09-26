@@ -1,9 +1,10 @@
 // @flow
 import { flow, toPairs, map, join } from 'lodash/fp';
-import { NODE_ENTITY, NODE_COMPOSITE_ENTITY } from '../math/types';
-import type { NodeFormatter } from './types';
+import { dateTimeToUTCUnix } from '../math/util';
+import { NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME } from '../math/types';
+import type { Locale } from './types';
 
-const defaultFormatter: NodeFormatter = {
+const defaultFormatter: Locale = {
   [NODE_ENTITY]: (context, formattingHints, entity) => {
     const unitsString = flow(
       toPairs,
@@ -18,5 +19,8 @@ const defaultFormatter: NodeFormatter = {
     ), compositeEntity.value);
     return formattedEntities.join(' ');
   },
+  [NODE_DATE_TIME]: (context, formattingHints, dateTime) => (
+    new Date(dateTimeToUTCUnix(dateTime)).toISOString()
+  ),
 };
 export default defaultFormatter;

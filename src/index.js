@@ -1,16 +1,15 @@
 // @flow
 import { flow, reject, map, pick } from 'lodash/fp';
-import type { Tokenizer } from './modules/tokenizer/types';
 import { TOKEN_NOOP } from './tokenTypes';
 import createTokenizerWithLocale from './tokenizer';
 import enTokenizerLocale from './tokenizerLocales/en';
 import transformer from './transformer';
-import resolver from './modules/math/resolver';
-import defaultContext from './modules/math/resolverContext';
+import { resolver, defaultContext } from './modules/math';
 import defaultFormatter from './modules/math-formatter';
+import units from './data/units';
+import type { Tokenizer } from './modules/tokenizer/types';
 import type { ResolverContext } from './modules/math/types';
 import type { Formatter } from './modules/math-formatter/types';
-import units from './data/units';
 
 const cleanTokens = flow(
   reject({ type: TOKEN_NOOP }),
