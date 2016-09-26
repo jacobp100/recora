@@ -1,6 +1,7 @@
 // @flow
 import { first, last, reduce, map, reduceRight, update, multiply, get } from 'lodash/fp';
-import type { EntityNode } from '../modules/math/types';
+import { NODE_MISC_GROUP } from '../modules/math/types';
+import type { EntityNode, Node, MiscGroupNode } from '../modules/math/types'; // eslint-disable-line
 import type { TokenNode } from '../modules/transformer/types';
 import { TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX } from '../tokenTypes';
 import { propagateNull } from '../util';
@@ -35,4 +36,16 @@ export const combineUnitNamesPrefixesSuffixes = (segment: TokenNode[]): ?(Entity
   }), [], segmentWithIntermediateUnits);
 
   return segmentWithIntermediateUnits;
+};
+
+export const compactMiscGroup = (node: TokenNode): ?Node => {
+  if (node.type !== NODE_MISC_GROUP || !node.value) return node;
+
+  const value: MiscGroupNode[] = node.value;
+  if (value.length > 1) {
+    return node;
+  } else if (value.length === 1) {
+    return value[0];
+  }
+  return null;
 };

@@ -3,8 +3,8 @@ import { isEqual, toPairs, reduce, stubTrue, cond, getOr } from 'lodash/fp';
 import type { EntityNode, ResolverContext } from '../../math/types';
 import { convertToFundamentalUnits } from '../../math/types/entity';
 import type { FormattingHints } from '../types';
-import unitFormatting from '../data/en-unit-formatting';
-import unitPlurals from '../data/en-unit-plurals';
+import unitFormatting from '../data/en-unit-formatting.json';
+import unitPlurals from '../data/en-unit-plurals.json';
 import { formatPower, orderOfMagnitude } from '../util';
 
 

@@ -4,7 +4,7 @@ import { CaptureWildcard } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/transformer/types';
 import * as nodes from '../modules/math/types';
 import { TOKEN_NOOP } from '../tokenTypes';
-import { compactMiscGroup } from '../nodeUtil';
+import { compactMiscGroup } from './util';
 
 const nodeTypes = values(nodes);
 

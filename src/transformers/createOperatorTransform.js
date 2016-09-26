@@ -25,7 +25,7 @@ import {
   FUNCTION_FACTORIAL,
 } from '../modules/math/functions';
 import { propagateNull, evenIndexElements, oddIndexElements, singleArrayValue } from '../util';
-import { compactMiscGroup } from '../nodeUtil';
+import { compactMiscGroup } from './util';
 
 type Direction = number;
 const FORWARD: Direction = 0;
