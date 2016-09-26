@@ -1,6 +1,6 @@
 // @flow
 import Color from 'color-forge';
-import { NODE_COLOR, NODE_ENTITY, NODE_PERCENTAGE } from '../types';
+import { NODE_COLOR, NODE_ENTITY, NODE_PERCENTAGE, baseColor } from '../types';
 import type { ResolverContext, ColorNode, Node } from '../types'; // eslint-disable-line
 import {
   FUNCTION_ADD, FUNCTION_SUBTRACT, FUNCTION_MULTIPLY, FUNCTION_DIVIDE, FUNCTION_MIX,
@@ -15,7 +15,7 @@ const operationFactory = operation => (
   const leftColor = new Color(left.values, left.alpha, left.space);
   const rightColor = new Color(right.values, right.alpha, right.space);
   const { values, alpha, space } = leftColor[operation](rightColor);
-  return { type: NODE_COLOR, values, alpha, space };
+  return { ...baseColor, values, alpha, space };
 };
 
 const createMixer = fn => (
@@ -27,7 +27,7 @@ const createMixer = fn => (
   const leftColor = new Color(left.values, left.alpha, left.space);
   const rightColor = new Color(right.values, right.alpha, right.space);
   const { values, alpha, space } = leftColor.mix(rightColor, fn(valueNode));
-  return { type: NODE_COLOR, values, alpha, space };
+  return { ...baseColor, values, alpha, space };
 };
 
 export const add = operationFactory('add');

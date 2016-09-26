@@ -1,6 +1,6 @@
 // @flow
 import { curry, clamp, isEqual, zip } from 'lodash/fp';
-import { NODE_COLOR, NODE_ENTITY, NODE_PERCENTAGE } from '../types';
+import { NODE_ENTITY, NODE_PERCENTAGE, baseColor } from '../types';
 import type { ResolverContext, Node, EntityNode, PercentageNode, ColorNode } from '../types'; // eslint-disable-line
 import { convertToFundamentalUnits } from '../types/entity';
 import {
@@ -51,7 +51,7 @@ const converter = (space, transformers) => (
   const alpha = a ? to1(context, a) : 1;
   if (typeof alpha !== 'number') return null;
 
-  return { type: NODE_COLOR, space, values, alpha };
+  return { ...baseColor, space, values, alpha };
 };
 
 const rgb = converter('rgb', [to255, to255, to255]);

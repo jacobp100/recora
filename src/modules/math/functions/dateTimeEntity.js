@@ -1,5 +1,5 @@
 // @flow
-import { NODE_DATE_TIME, NODE_ENTITY } from '../types';
+import { NODE_DATE_TIME, NODE_ENTITY, baseDateTime } from '../types';
 import type { ResolverContext, EntityNode, DateTimeNode } from '../types'; // eslint-disable-line
 import { convertTo } from '../types/entity';
 import { dateTimeToUTCUnix, utcUnixToTz, unixTzToDateTime } from '../util';
@@ -21,7 +21,7 @@ const addSubtractFactory = direction => (
 
   const value = unixTzToDateTime(newUnix, left.value.timezone);
 
-  return { type: NODE_DATE_TIME, value, directionHint: 1 };
+  return { ...baseDateTime, value, directionHint: 1 };
 };
 
 const addMath = addSubtractFactory(1);

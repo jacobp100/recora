@@ -1,6 +1,16 @@
 // @flow
 export type Node = Object;
 
+export const zeroTime = {
+  year: null,
+  month: null,
+  date: null,
+  hour: null,
+  minute: null,
+  second: null,
+  timezone: 'UTC',
+};
+
 // NOTE: We're using the timezone library, so months are 1-based (sane)
 export type DateTime = {
   year: ?number,
@@ -66,8 +76,12 @@ export type PercentageNode = Node &
 export const NODE_COLOR = 'NODE_COLOR';
 export type ColorNode = Node &
   { type: 'NODE_COLOR', space: string, values: [number, number, number], alpha: number };
+export const baseColor: ColorNode =
+  { type: NODE_COLOR, space: 'rgb', values: [0, 0, 0], alpha: 1 };
 
 // directionHint is used for miscGroup to work out whether to add or subtract an entity
 export const NODE_DATE_TIME = 'NODE_DATE_TIME';
 export type DateTimeNode = Node &
   { type: 'NODE_DATE_TIME', value: DateTime, directionHint: number };
+export const baseDateTime: DateTimeNode =
+  { type: NODE_DATE_TIME, value: zeroTime, directionHint: 1 };
