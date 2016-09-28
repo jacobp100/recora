@@ -1,22 +1,30 @@
 // @flow
-import { every, reduce, isEmpty } from 'lodash/fp';
+import { every, reduce, isEmpty, set } from 'lodash/fp';
 import { NODE_ENTITY } from '.';
-import type { ResolverContext, Units, Node } from '.'; // eslint-disable-line
+import type { ResolverContext, Units, Node, ConversionNode } from '.'; // eslint-disable-line
 import { combineUnits, unitsAreCompatable, convertTo, convertComposite } from '../types/entity';
 
 export const convert = ( // eslint-disable-line
   context: ResolverContext,
-  units: Units[],
+  conversion: ConversionNode,
   value: Node
 ): ?Node => {
-  if (value.type !== NODE_ENTITY) return null;
+  if (value.type === NODE_ENTITY) {
+    if (value.virtualConversion) return null;
 
-  const [firstUnit, ...remainingUnits] = units;
-  const allUnitsCompatable =
-    !isEmpty(remainingUnits) && every(unitsAreCompatable(context, firstUnit), remainingUnits);
+    const { entityConversion: units, formatting } = conversion;
+    const [firstUnit, ...remainingUnits] = units;
+    const allUnitsCompatable =
+      !isEmpty(remainingUnits) && every(unitsAreCompatable(context, firstUnit), remainingUnits);
 
-  if (allUnitsCompatable) return convertComposite(context, units, value);
+    let entity = allUnitsCompatable
+      ? convertComposite(context, units, value)
+      : convertTo(context, reduce(combineUnits, firstUnit, remainingUnits), value);
+    if (!entity) return null;
 
-  const combinedUnits = reduce(combineUnits, firstUnit, remainingUnits);
-  return convertTo(context, combinedUnits, value);
+    entity = set('formatting', formatting, entity);
+
+    return entity;
+  }
+  return null;
 };

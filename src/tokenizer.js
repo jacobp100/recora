@@ -17,6 +17,7 @@ import {
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_PERCENTAGE,
   TOKEN_UNIT_PREFIX,
+  TOKEN_VIRTUAL_UNIT,
 } from './tokenTypes';
 import * as functions from './modules/math/functions';
 import createTokenizer from './modules/tokenizer';
@@ -44,6 +45,10 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
   unit: [
     { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },
   ],
+  virtualUnit: [
+    { match: /(rgb|hs[lv])a?/i, token: token => ({ type: TOKEN_VIRTUAL_UNIT, value: token }), penalty: -1500 },
+  ],
+  formattingHint: [],
   color: [
     { match: /#[0-9a-f]{3,8}/i, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -1000 },
   ],
@@ -70,7 +75,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
       penalty: -50000, // Has to beat multiple numbers
     },
   ],
-  brackets: [
+  bracket: [
     {
       match: '(',
       token: (token, matches, state) => ({ type: TOKEN_BRACKET_OPEN, value: state.bracketLevel }),
@@ -112,9 +117,11 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { ref: 'percent' },
     { ref: 'number' },
     { ref: 'unit' },
+    { ref: 'virtualUnit' },
+    { ref: 'formattingHint' },
     { ref: 'color' },
     { ref: 'date' },
-    { ref: 'brackets' },
+    { ref: 'bracket' },
     { ref: 'function' },
     { ref: 'noop' },
     { ref: 'whitespace' },

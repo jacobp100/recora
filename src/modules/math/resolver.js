@@ -25,6 +25,7 @@ const resolver = {
     return set(['typedFunctionTrie', functionName, ...types, '_fn'], fn, this);
   },
   resolve(value: Node): ?Node {
+    if (!value) return null;
     switch (value.type) {
       case NODE_BRACKETS: {
         const bracketsNode: BracketsNode = value;
@@ -47,7 +48,7 @@ const resolver = {
         const resolvedValue = this.resolve(conversionNode.value);
         if (!resolvedValue) return null;
 
-        return conversionConvert(context, value.units, resolvedValue);
+        return conversionConvert(context, value, resolvedValue);
       }
       case NODE_DATE_TIME:
         return dateTimeResolveDefaults(this.context, value);

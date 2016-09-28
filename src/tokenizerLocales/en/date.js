@@ -137,29 +137,29 @@ const dateSpec: TokenizerSpecEntries = [
   createDateMatcher([date, time], -30000),
   createDateMatcher([time], -20000),
   {
-    match: /now|today/,
+    match: /\bnow|today\b/i,
     token: { type: TOKEN_DATE_TIME, value: defaultValue },
     penalty: -500,
   },
   {
-    match: 'yesterday',
+    match: /\byesterday\b/i,
     token: () => createRelativeDate(-1, 'day'),
     tokenIndices: [2],
     penalty: -500,
   },
   {
-    match: 'tomorrow',
+    match: /\btomorrow\b/i,
     token: () => createRelativeDate(1, 'day'),
     tokenIndices: [2],
     penalty: -500,
   },
   {
-    match: /ago/,
+    match: /\bago\b/i,
     token: { type: TOKEN_DATE_TIME_BACKWARDS, value: defaultValue },
     penalty: -500,
   },
   {
-    match: /(next|last)\s+(week|month|year|century|millenium)/i,
+    match: /\b(next|last)\s+(week|month|year|century|millenium)\b/i,
     token: (match, matches) => createRelativeDate(
       matches[1].toLowerCase() === 'next' ? 1 : -1,
       matches[2].toLowerCase()
