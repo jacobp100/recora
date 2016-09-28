@@ -1,7 +1,7 @@
 // @flow
 import {
   __, flow, take, takeRight, takeWhile, takeRightWhile, drop, dropRight, dropWhile, dropRightWhile,
-  isEmpty, map, includes, last, filter, reduce, set, first,
+  isEmpty, map, includes, last, filter, reduce, set, getOr,
 } from 'lodash/fp';
 import type { Transformer } from '../modules/transformer/types';
 import {
@@ -92,7 +92,7 @@ const conversionsTransform: Transformer = {
       map(unit => ({ [unit.name]: unit.power }))
     )(unitSegmentWithIntermediateUnits);
 
-    const virtualConversion = first(virtualConversions.value) || null;
+    const virtualConversion = getOr(null, [0, 'value'], virtualConversions);
 
     const formatting = flow(
       filter({ type: TOKEN_FORMATTING_HINT }),
