@@ -5,6 +5,12 @@ import { dateTimeToUTCUnix } from '../math/util';
 import { NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME, NODE_COLOR } from '../math/types';
 import type { Locale } from './types';
 
+const hsxFormatter = ([hue, a, b]) => [hue, `${a}%`, `${b}%`];
+const colorFormatters = {
+  hsl: hsxFormatter,
+  hsv: hsxFormatter,
+};
+
 const defaultFormatter: Locale = {
   [NODE_ENTITY]: (context, entity) => {
     const unitsString = flow(
@@ -24,12 +30,22 @@ const defaultFormatter: Locale = {
     const spaceFormatting = color.formatting.space;
     if (!spaceFormatting) return new Color(color.values, color.alpha, color.space).toHex();
 
-    const args = map(Math.round, color.values);
-    if (endsWith('a', spaceFormatting)) {
+    const [baseSpace, hasAlpha] = endsWith('a', spaceFormatting)
+      ? [spaceFormatting.slice(0, -1), true]
+      : [spaceFormatting, false];
+
+    let args = map(Math.round, color.values);
+
+    if (baseSpace in colorFormatters) {
+      args = colorFormatters[baseSpace](args);
+    }
+
+    if (hasAlpha) {
       const { alpha } = color;
       const alphaString = Math.round(alpha) === alpha ? alpha : alpha.toFixed(2);
-      args.push(alphaString);
+      args = args.concat(alphaString);
     }
+
     return `${spaceFormatting}(${args.join(', ')})`;
   },
   [NODE_DATE_TIME]: (context, dateTime) => (

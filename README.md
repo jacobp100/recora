@@ -9,11 +9,9 @@ A rewrite of the previous version. Not quite production ready, there will be rou
 # Todo
 
 * Temperatures: they work for absolute temperatures, but temerature differences need to be tested
-* Formatting: at least dates need formatting
 * Tests: we only have an end-to-end test, which does test a lot of things, but individual components should be tested in isolation
 * Locales: allow comma decimal points, UK/US date formats
 * Data: there’s a lot of units not accounted for
-* Abstract units: get `#fff to hsl` working
 * Benchmarking: zero attempt has been made for performance so far
 
 # Examples
