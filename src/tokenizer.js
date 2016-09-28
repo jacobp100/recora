@@ -17,7 +17,7 @@ import {
   TOKEN_OPERATOR_SUBTRACT,
   TOKEN_PERCENTAGE,
   TOKEN_UNIT_PREFIX,
-  TOKEN_VIRTUAL_UNIT,
+  TOKEN_PSEUDO_UNIT,
 } from './tokenTypes';
 import * as functions from './modules/math/functions';
 import createTokenizer from './modules/tokenizer';
@@ -46,7 +46,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { match: '/', token: { type: TOKEN_UNIT_PREFIX, value: -1 }, penalty: -1500 },
   ],
   virtualUnit: [
-    { match: /(rgb|hs[lv])a?/i, token: token => ({ type: TOKEN_VIRTUAL_UNIT, value: token }), penalty: -1500 },
+    { match: /(rgb|hs[lv])a?/i, token: token => ({ type: TOKEN_PSEUDO_UNIT, value: token }), penalty: -1500 },
   ],
   formattingHint: [],
   color: [

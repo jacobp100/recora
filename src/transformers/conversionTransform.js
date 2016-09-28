@@ -5,24 +5,19 @@ import {
 } from 'lodash/fp';
 import type { Transformer } from '../modules/transformer/types';
 import {
-  TOKEN_NOOP,
-  TOKEN_UNIT_NAME,
-  TOKEN_UNIT_PREFIX,
-  TOKEN_UNIT_SUFFIX,
-  TOKEN_NUMBER,
-  TOKEN_FORMATTING_HINT,
-  TOKEN_VIRTUAL_UNIT,
+  TOKEN_FORMATTING_HINT, TOKEN_NOOP, TOKEN_NUMBER, TOKEN_PSEUDO_UNIT, TOKEN_UNIT_NAME,
+  TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX,
 } from '../tokenTypes';
 import { baseConversion } from '../modules/math/types';
 import { INTERMEDIATE_UNIT, combineUnitNamesPrefixesSuffixes } from './util';
 
 const conversionTokens = [
+  TOKEN_FORMATTING_HINT,
   TOKEN_NOOP,
+  TOKEN_PSEUDO_UNIT,
   TOKEN_UNIT_NAME,
   TOKEN_UNIT_PREFIX,
   TOKEN_UNIT_SUFFIX,
-  TOKEN_FORMATTING_HINT,
-  TOKEN_VIRTUAL_UNIT,
 ];
 const unitTokens = [
   TOKEN_UNIT_NAME,
@@ -78,7 +73,7 @@ const conversionsTransform: Transformer = {
   transform: (captureGroups, transform) => transform([captureGroups[0]], ([value]) => {
     const conversionSegment = captureGroups[1];
 
-    const pseudoConversions = filter({ type: TOKEN_VIRTUAL_UNIT }, conversionSegment);
+    const pseudoConversions = filter({ type: TOKEN_PSEUDO_UNIT }, conversionSegment);
     if (pseudoConversions.length > 1) return null;
 
     const unitSegmentWithIntermediateUnits = flow(
