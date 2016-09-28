@@ -5,10 +5,10 @@ import {
   TOKEN_UNIT_PREFIX,
   TOKEN_UNIT_SUFFIX,
 } from '../../tokenTypes';
-import oneWordUnits from '../../data/en/1-word-units.json';
-import twoWordUnits from '../../data/en/2-word-units.json';
-import threeWordUnits from '../../data/en/3-word-units.json';
-import abbreviations from '../../data/en/abbreviations.json';
+import oneWordUnits from '../../../data/en/1-word-units.json';
+import twoWordUnits from '../../../data/en/2-word-units.json';
+import threeWordUnits from '../../../data/en/3-word-units.json';
+import abbreviations from '../../../data/en/abbreviations.json';
 import { multipleWordsMatcher, wordRegexpMatcher, customWordMatcher } from '../../tokenizerUtil';
 
 const unitPrefixes = {

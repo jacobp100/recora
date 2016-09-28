@@ -1,6 +1,6 @@
 // @flow
 import { findIndex, last } from 'lodash/fp';
-import type { ConversionDescriptors } from '../modules/math/types';
+import type { ConversionDescriptors } from '../src/modules/math/types';
 
 const BASE_TIME = 'second';
 const BASE_LENGTH = 'meter';
