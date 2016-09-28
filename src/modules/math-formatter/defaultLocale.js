@@ -1,5 +1,5 @@
 // @flow
-import { flow, toPairs, map, join, endsWith } from 'lodash/fp';
+import { flow, toPairs, map, join } from 'lodash/fp';
 import Color from 'color-forge';
 import { dateTimeToUTCUnix } from '../math/util';
 import { NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME, NODE_COLOR } from '../math/types';
@@ -27,26 +27,18 @@ const defaultFormatter: Locale = {
     return formattedEntities.join(' ');
   },
   [NODE_COLOR]: (context, color) => {
-    const spaceFormatting = color.formatting.space;
-    if (!spaceFormatting) return new Color(color.values, color.alpha, color.space).toHex();
+    const { asFunction, withAlpha } = color.formatting;
+    if (!asFunction) return new Color(color.values, color.alpha, color.space).toHex();
 
-    const [baseSpace, hasAlpha] = endsWith('a', spaceFormatting)
-      ? [spaceFormatting.slice(0, -1), true]
-      : [spaceFormatting, false];
+    const { space, values, alpha } = color;
 
-    let args = map(Math.round, color.values);
+    const functionName = `${space}${withAlpha ? 'a' : ''}`;
+    let args = map(Math.round, values);
 
-    if (baseSpace in colorFormatters) {
-      args = colorFormatters[baseSpace](args);
-    }
+    if (space in colorFormatters) args = colorFormatters[space](args);
+    if (withAlpha) args = args.concat(Math.round(alpha) === alpha ? alpha : alpha.toFixed(2));
 
-    if (hasAlpha) {
-      const { alpha } = color;
-      const alphaString = Math.round(alpha) === alpha ? alpha : alpha.toFixed(2);
-      args = args.concat(alphaString);
-    }
-
-    return `${spaceFormatting}(${args.join(', ')})`;
+    return `${functionName}(${args.join(', ')})`;
   },
   [NODE_DATE_TIME]: (context, dateTime) => (
     new Date(dateTimeToUTCUnix(dateTime)).toISOString()

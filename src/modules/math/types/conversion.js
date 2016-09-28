@@ -40,7 +40,8 @@ export const convert = ( // eslint-disable-line
       let { formatting } = conversion;
 
       if (conversionSpace) {
-        const targetColorSpace = endsWith('a', conversionSpace)
+        const hasAlphaComponent = endsWith('a', conversionSpace);
+        const targetColorSpace = hasAlphaComponent
           ? conversionSpace.slice(0, -1)
           : conversionSpace;
 
@@ -48,7 +49,7 @@ export const convert = ( // eslint-disable-line
           .convert(targetColorSpace);
         color = { ...baseColor, values, alpha, space };
 
-        formatting = set('space', conversionSpace, formatting);
+        formatting = { ...formatting, asFunction: true, withAlpha: hasAlphaComponent };
       }
 
       color = set('formatting', formatting, color);
