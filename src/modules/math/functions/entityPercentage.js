@@ -2,7 +2,7 @@
 import { NODE_ENTITY, NODE_PERCENTAGE, baseEntity } from '../types';
 import type { ResolverContext, EntityNode, PercentageNode } from '../types'; // eslint-disable-line
 import { FUNCTION_ADD, FUNCTION_SUBTRACT, FUNCTION_MULTIPLY, FUNCTION_DIVIDE } from '.';
-import { flip2 } from './util';
+import { flip2 } from '../util/functions';
 
 
 const transform = (transform: (entityValue: number, percentageValue: number) => number) => (

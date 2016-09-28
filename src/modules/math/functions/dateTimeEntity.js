@@ -2,9 +2,9 @@
 import { NODE_DATE_TIME, NODE_ENTITY, baseDateTime } from '../types';
 import type { ResolverContext, EntityNode, DateTimeNode } from '../types'; // eslint-disable-line
 import { convertTo } from '../types/entity';
-import { dateTimeToUTCUnix, utcUnixToTz, unixTzToDateTime } from '../util';
+import { dateTimeToUTCUnix, utcUnixToTz, unixTzToDateTime } from '../util/date';
 import { FUNCTION_ADD, FUNCTION_SUBTRACT } from '.';
-import { flip2 } from './util';
+import { flip2 } from '../util/functions';
 
 const addSubtractFactory = direction => (
   context: ResolverContext,

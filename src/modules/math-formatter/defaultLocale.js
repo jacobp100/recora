@@ -1,7 +1,7 @@
 // @flow
 import { flow, toPairs, map, join } from 'lodash/fp';
 import Color from 'color-forge';
-import { dateTimeToUTCUnix } from '../math/util';
+import { dateTimeToUTCUnix } from '../math/util/date';
 import { NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME, NODE_COLOR } from '../math/types';
 import type { Locale } from './types';
 

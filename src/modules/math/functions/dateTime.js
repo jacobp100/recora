@@ -2,7 +2,7 @@
 import { NODE_DATE_TIME, baseEntity } from '../types';
 import type { ResolverContext, EntityNode, DateTimeNode } from '../types'; // eslint-disable-line
 import { convertTo } from '../types/entity';
-import { dateTimeToUTCUnix } from '../util';
+import { dateTimeToUTCUnix } from '../util/date';
 import { FUNCTION_ADD, FUNCTION_SUBTRACT } from '.';
 
 const addSubtract = (

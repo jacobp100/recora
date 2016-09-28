@@ -2,7 +2,7 @@
 import { NODE_COLOR, NODE_PERCENTAGE } from '../types';
 import type { ResolverContext, PercentageNode, ColorNode } from '../types'; // eslint-disable-line
 import { FUNCTION_LIGHTEN, FUNCTION_DARKEN, FUNCTION_ADD, FUNCTION_SUBTRACT } from '.';
-import { lighten, darken, evolveColor } from './colorUtil';
+import { lighten, darken, evolveColor } from '../util/color';
 
 
 const lightenDarkenFactory = fn => (

@@ -4,8 +4,8 @@ import type { ResolverContext, EntityNode, ColorNode } from '../types'; // eslin
 import {
   FUNCTION_LIGHTEN, FUNCTION_DARKEN, FUNCTION_MULTIPLY, FUNCTION_DIVIDE, FUNCTION_EXPONENT,
 } from '.';
-import { flip2 } from './util';
-import { lighten, darken, evolveWhenUnitless } from './colorUtil';
+import { flip2 } from '../util/functions';
+import { lighten, darken, evolveWhenUnitless } from '../util/color';
 
 
 const lightenDarkenFactory = fn => evolveWhenUnitless((color, entity) => (

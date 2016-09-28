@@ -1,7 +1,7 @@
 // @flow
 import { map } from 'lodash/fp';
 import tz from 'timezone/loaded';
-import type { DateTime } from './types';
+import type { DateTime } from '../types';
 
 export const dateTimeToUTCUnix = (dateTime: DateTime): number => {
   const { year, month, date, hour, minute, second, timezone } = dateTime;
