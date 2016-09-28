@@ -1,9 +1,9 @@
 // @flow
 import { every, reduce, isEmpty, set, endsWith } from 'lodash/fp';
-import Color from 'color-forge';
-import { NODE_ENTITY, NODE_COLOR, baseColor } from '.';
+import { NODE_ENTITY, NODE_COLOR } from '.';
 import type { ResolverContext, Units, Node, ConversionNode } from '.'; // eslint-disable-line
 import { combineUnits, unitsAreCompatable, convertTo, convertComposite } from '../types/entity';
+import { convertSpace } from '../types/color';
 
 export const convert = ( // eslint-disable-line
   context: ResolverContext,
@@ -44,10 +44,7 @@ export const convert = ( // eslint-disable-line
           ? conversionSpace.slice(0, -1)
           : conversionSpace;
 
-        const { values, alpha, space } = new Color(value.values, value.alpha, value.space)
-          .convert(targetColorSpace);
-        color = { ...baseColor, values, alpha, space };
-
+        color = convertSpace(context, targetColorSpace, color);
         formatting = { ...formatting, asFunction: true, withAlpha: hasAlphaComponent };
       }
 
