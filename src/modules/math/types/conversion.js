@@ -10,8 +10,8 @@ export const convert = ( // eslint-disable-line
   conversion: ConversionNode,
   value: Node
 ): ?Node => {
-  if (value.type === NODE_ENTITY && value.pseudoConversion) return null;
-  if (value.type !== NODE_ENTITY && value.entityConversion) return null;
+  if (value.type === NODE_ENTITY && !isEmpty(value.pseudoConversion)) return null;
+  if (value.type !== NODE_ENTITY && !isEmpty(value.entityConversion)) return null;
 
   switch (value.type) {
     case NODE_ENTITY: {
