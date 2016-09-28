@@ -16,7 +16,7 @@ export const convert = ( // eslint-disable-line
   switch (value.type) {
     case NODE_ENTITY: {
       const units = conversion.entityConversion;
-      let entity;
+      let entity = value;
 
       if (!isEmpty(units)) {
         const [firstUnit, ...remainingUnits] = units;
@@ -24,18 +24,17 @@ export const convert = ( // eslint-disable-line
           !isEmpty(remainingUnits) && every(unitsAreCompatable(context, firstUnit), remainingUnits);
 
         entity = allUnitsCompatable
-          ? convertComposite(context, units, value)
-          : convertTo(context, reduce(combineUnits, firstUnit, remainingUnits), value);
-        if (!entity) return null;
+          ? convertComposite(context, units, entity)
+          : convertTo(context, reduce(combineUnits, firstUnit, remainingUnits), entity);
       }
 
+      if (!entity) return null;
       entity = set('formatting', conversion.formatting, entity);
 
       return entity;
     }
     case NODE_COLOR: {
       const conversionSpace = conversion.pseudoConversion;
-
       let color = value;
       let { formatting } = conversion;
 
