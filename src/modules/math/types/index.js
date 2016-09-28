@@ -65,10 +65,10 @@ export const baseMiscGroup: MiscGroupNode =
   { type: NODE_MISC_GROUP, value: [] };
 
 export type ConversionNode = Node &
-  { type: 'NODE_CONVERSION', value: ?Node, entityConversion: Units[], virtualConversion: ?string, formatting: Object };
+  { type: 'NODE_CONVERSION', value: ?Node, entityConversion: Units[], pseudoConversion: ?string, formatting: Object };
 export const NODE_CONVERSION = 'NODE_CONVERSION';
 export const baseConversion: ConversionNode =
-  { type: NODE_CONVERSION, value: null, entityConversion: [], virtualConversion: null, formatting: {} };
+  { type: NODE_CONVERSION, value: null, entityConversion: [], pseudoConversion: null, formatting: {} };
 
 export type EntityNode = Node &
   { type: 'NODE_ENTITY', quantity: number, units: Units, formatting: {} };

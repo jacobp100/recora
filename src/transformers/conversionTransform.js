@@ -78,8 +78,8 @@ const conversionsTransform: Transformer = {
   transform: (captureGroups, transform) => transform([captureGroups[0]], ([value]) => {
     const conversionSegment = captureGroups[1];
 
-    const virtualConversions = filter({ type: TOKEN_VIRTUAL_UNIT }, conversionSegment);
-    if (virtualConversions.length > 1) return null;
+    const pseudoConversions = filter({ type: TOKEN_VIRTUAL_UNIT }, conversionSegment);
+    if (pseudoConversions.length > 1) return null;
 
     const unitSegmentWithIntermediateUnits = flow(
       filter(token => includes(token.type, unitTokens)),
@@ -92,7 +92,7 @@ const conversionsTransform: Transformer = {
       map(unit => ({ [unit.name]: unit.power }))
     )(unitSegmentWithIntermediateUnits);
 
-    const virtualConversion = getOr(null, [0, 'value'], virtualConversions);
+    const pseudoConversion = getOr(null, [0, 'value'], pseudoConversions);
 
     const formatting = flow(
       filter({ type: TOKEN_FORMATTING_HINT }),
@@ -100,7 +100,7 @@ const conversionsTransform: Transformer = {
       reduce((accum, { key, value }) => set(key, value, accum), {})
     )(conversionSegment);
 
-    return { ...baseConversion, value, entityConversion, virtualConversion, formatting };
+    return { ...baseConversion, value, entityConversion, pseudoConversion, formatting };
   }),
 };
 export default conversionsTransform;

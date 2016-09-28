@@ -10,7 +10,7 @@ export const convert = ( // eslint-disable-line
   conversion: ConversionNode,
   value: Node
 ): ?Node => {
-  if (value.type === NODE_ENTITY && value.virtualConversion) return null;
+  if (value.type === NODE_ENTITY && value.pseudoConversion) return null;
   if (value.type !== NODE_ENTITY && value.entityConversion) return null;
 
   switch (value.type) {
@@ -34,7 +34,7 @@ export const convert = ( // eslint-disable-line
       return entity;
     }
     case NODE_COLOR: {
-      const conversionSpace = conversion.virtualConversion;
+      const conversionSpace = conversion.pseudoConversion;
 
       let color = value;
       let { formatting } = conversion;
