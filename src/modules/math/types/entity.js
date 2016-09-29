@@ -2,7 +2,7 @@
 import {
   keys, flow, mergeWith, omitBy, eq, reduce, toPairs, mapValues, multiply, isEqual, every, curry,
   isEmpty, sortBy, set, size, map, filter, groupBy, values, flatMap, fromPairs, some, overEvery,
-  reject, flatten,
+  reject, flatten, mapKeys, propertyOf,
 } from 'lodash/fp';
 import { baseCompositeEntity, baseEntity } from '.';
 import type { // eslint-disable-line
@@ -10,6 +10,7 @@ import type { // eslint-disable-line
 } from '.';
 import type { Curry2, Curry3 } from '../../../utilTypes';
 import { propagateNull, mapUnlessNull } from '../../../util';
+import baseDimensions from '../../../../data/baseDimensions';
 
 const getConversionDescriptor = (
   context: ResolverContext,
@@ -32,7 +33,10 @@ export const combineUnits: Curry2<Units, Units, Units> =
 
 export const getFundamentalUnits: Curry2<ResolverContext, Units, Units> =
   curry((context, units) => reduce((accum, [unitName, unitValue]) => {
-    const siUnitDimensions = getConversionDescriptor(context, unitName)[1];
+    const siUnitDimensions = mapKeys(
+      propertyOf(baseDimensions),
+      getConversionDescriptor(context, unitName)[1]
+    );
     const scaledSiUnitDimensions = mapValues(multiply(unitValue), siUnitDimensions);
     return combineUnits(scaledSiUnitDimensions, accum);
   }, {}, toPairs(units)));
@@ -45,13 +49,15 @@ export const unitsAreCompatable: Curry3<ResolverContext, Units, Units, boolean> 
     isEqual(getFundamentalUnits(context, units1), getFundamentalUnits(context, units2))
   ));
 
+const sizeWithoutLengthBug = flow(keys, size);
 export const groupUnitsByFundamentalDimensions = curry((
   context: ResolverContext,
   units: Units
 ): { [key: UnitName]: { [key: number]: UnitName[] } } => {
   const unitNames = keys(units);
+
   const unitsWithOneFundamentalQuantity = filter(unitName => (
-    size(getConversionDescriptor(context, unitName)[1]) === 1
+    sizeWithoutLengthBug(getConversionDescriptor(context, unitName)[1]) === 1
   ), unitNames);
 
   const unitsGroupedByFundamentalType = groupBy(unitName => (

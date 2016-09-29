@@ -2,23 +2,16 @@
 import { findIndex, last } from 'lodash/fp';
 import type { ConversionDescriptors } from '../src/modules/math/types';
 
-const BASE_TIME = 'second';
-const BASE_LENGTH = 'meter';
-const BASE_WEIGHT = 'kilogram';
-const BASE_CURRENCY = 'EUR';
-const BASE_MEMORY = 'bit';
-const BASE_ABSOLUTE_TEMPERATURE = 'Kelvin';
-
-const timeDimensions = { [BASE_TIME]: 1 };
-const lengthDimensions = { [BASE_LENGTH]: 1 };
-const weightDimensions = { [BASE_WEIGHT]: 1 };
-const areaDimensions = { [BASE_LENGTH]: 2 };
-const volumeDimensions = { [BASE_LENGTH]: 3 };
-const energyDimensions = { [BASE_WEIGHT]: 1, [BASE_LENGTH]: 2, [BASE_TIME]: -2 };
-const powerDimensions = { [BASE_WEIGHT]: 1, [BASE_LENGTH]: 2, [BASE_TIME]: -3 };
-const memoryDimensions = { [BASE_MEMORY]: 1 };
-const currencyDimensions = { [BASE_CURRENCY]: 1 };
-const absoluteTemperatureDimensions = { [BASE_ABSOLUTE_TEMPERATURE]: 1 };
+const timeDimensions = { time: 1 };
+const lengthDimensions = { length: 1 };
+const weightDimensions = { weight: 1 };
+const areaDimensions = { length: 2 };
+const volumeDimensions = { length: 3 };
+const energyDimensions = { weight: 1, length: 2, time: -2 };
+const powerDimensions = { weight: 1, length: 2, time: -3 };
+const memoryDimensions = { memory: 1 };
+const currencyDimensions = { currency: 1 };
+const absoluteTemperatureDimensions = { absoluteTemperature: 1 };
 const noDimensions = {};
 
 const gasMarkToK =

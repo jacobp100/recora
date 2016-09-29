@@ -23,7 +23,7 @@ export default class Recora {
   resolver: typeof resolver
   formatter: Formatter
 
-  constructor() {
+  constructor({ locale = 'en' }: { locale: string } = {}) {
     const tokenizer = createTokenizerWithLocale(enTokenizerLocale);
     this.tokenizer = tokenizer;
 
@@ -31,7 +31,7 @@ export default class Recora {
     this.resolverContext = resolverContext;
     this.resolver = resolver.setContext(resolverContext);
 
-    this.formatter = defaultFormatter.setLocale('en');
+    this.formatter = defaultFormatter.setLocale(locale);
   }
 
   getResult(text: string) {
