@@ -3,7 +3,7 @@
 export default {
   time: 'second',
   length: 'meter',
-  weight: 'kilogram',
+  mass: 'kilogram',
   currency: 'EUR',
   memory: 'bit',
   absoluteTemperature: 'Kelvin',

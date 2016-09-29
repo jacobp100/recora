@@ -31,7 +31,7 @@ const enLocale: TokenizerSpec = {
       penalty: -2000,
     },
     {
-      match: /\boct\b/i,
+      match: /\boct(?:al)?\b/i,
       token: { type: TOKEN_FORMATTING_HINT, value: { key: 'base', value: 8 } },
       penalty: -2000,
     },

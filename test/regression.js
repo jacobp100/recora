@@ -117,6 +117,12 @@ const dateResult = (t, input, expectedValuesWithoutDefaults) => {
   );
 };
 
+const stringResult = (t, input, expected) => {
+  t.plan(1);
+  const actual = parse(input).pretty;
+  t.is(actual, expected);
+};
+
 // const noResult = (t, input) => {
 //   t.plan(1);
 //   const actual = parse(input);
@@ -244,11 +250,16 @@ test('composite conversions', compositeEntityResult, '1 meter to feet and inches
 test('composite conversions', compositeEntityResult, '500m to yards, feet and inches', [[546, { yard: 1 }], [2, { foot: 1 }], [5, { inch: 1 }]]);
 test('composite conversions', compositeEntityResult, '2gb at 50kb/s to hours, minutes and seconds', [[11, { hour: 1 }], [6, { minute: 1 }], [40, { second: 1 }]]);
 test('composite conversions', compositeEntityResult, '1 yard to feet and inches', [[3, { foot: 1 }], [0, { inch: 1 }]]);
-// test('test', entityResult, '500 to base 7', (base 7) 1313);
-// test('test', entityResult, '500 to base 10', 500);
-// test('test', entityResult, '500 to binary', 0b111110100);
-// test('test', entityResult, '500 to octal', 0o764);
-// test('test', entityResult, '500 to hexadecimal', 0x1f4);
+test('formatting hints', stringResult, '500 to base 7', '(base 7) 1313');
+test('formatting hints', stringResult, '500 to base 10', '500');
+test('formatting hints', stringResult, '500 to binary', '0b111110100');
+test('formatting hints', stringResult, '500 to octal', '0o764');
+test('formatting hints', stringResult, '500 to hexadecimal', '0x1f4');
+test('formatting hints', stringResult, '#800000 to hsl', 'hsl(0, 100%, 25%)');
+test('formatting hints', stringResult, '#123456 to hsl', 'hsl(210, 65%, 20%)');
+test('formatting hints', stringResult, 'hsl(210 degrees, 65%, 20%) to rgb', 'rgb(18, 51, 84)');
+test('formatting hints', stringResult, 'rgb(18, 51, 84) to hsl', 'hsl(210, 65%, 20%)');
+test('formatting hints', stringResult, 'hsl(0, 100%, 50%) to hsl', 'hsl(0, 100%, 50%)');
 // test('fix sin pi', entityResult, 'sin(pi)', 0);
 // test('resolve constant', entityResult, 'pi', 3.14);
 // test('resolve constant', entityResult, 'e', 2.72);
@@ -346,11 +357,6 @@ test('colour functions', colorResult, 'mix(#800000, #ff0000, 0.3)', '#a60000');
 test('colour functions', colorResult, 'darken(rgb(255, 0, 0), 50%)', '#000000');
 test('colour functions', colorResult, 'darken(hsl(0, 100%, 100), 50%)', '#ff0000');
 test('colour functions', colorResult, 'darken(hsl(0, 100%, 50%), 25%)', '#800000');
-// test('colour conversions', colorResult, '#800000 to hsl', hsl(0°, 100%, 25%));
-// test('colour conversions', colorResult, '#123456 to hsl', hsl(210°, 65%, 20%));
-// test('colour conversions', colorResult, 'hsl(210 degrees, 65%, 20%) to rgb', rgb(18, 51, 84));
-// test('colour conversions', colorResult, 'rgb(18, 51, 84) to hsl', hsl(210°, 65%, 20%));
-// test('colour conversions', colorResult, 'hsl(0, 100%, 0.5) to hsl', hsl(0°, 100%, 50%));
 // test('test', colorResult, 'red', #ff0000);
 // test('test', colorResult, 'red + lime', #ffff0);
 /* eslint-enable */

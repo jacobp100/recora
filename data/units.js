@@ -4,11 +4,11 @@ import type { ConversionDescriptors } from '../src/modules/math/types';
 
 const timeDimensions = { time: 1 };
 const lengthDimensions = { length: 1 };
-const weightDimensions = { weight: 1 };
+const massDimensions = { mass: 1 };
 const areaDimensions = { length: 2 };
 const volumeDimensions = { length: 3 };
-const energyDimensions = { weight: 1, length: 2, time: -2 };
-const powerDimensions = { weight: 1, length: 2, time: -3 };
+const energyDimensions = { mass: 1, length: 2, time: -2 };
+const powerDimensions = { mass: 1, length: 2, time: -3 };
 const memoryDimensions = { memory: 1 };
 const currencyDimensions = { currency: 1 };
 const absoluteTemperatureDimensions = { absoluteTemperature: 1 };
@@ -48,11 +48,11 @@ const conversionDescriptors: ConversionDescriptors = {
              'angstrom': [1e-10,                         lengthDimensions],
         'nautical mile': [1852,                          lengthDimensions],
 
-                 'gram': [1e-3,                          weightDimensions],
-                'tonne': [1e3,                           weightDimensions],
-                'ounce': [0.0283495,                     weightDimensions],
-                'pound': [0.453592,                      weightDimensions],
-                'stone': [6.35029,                       weightDimensions],
+                 'gram': [1e-3,                          massDimensions],
+                'tonne': [1e3,                           massDimensions],
+                'ounce': [0.0283495,                     massDimensions],
+                'pound': [0.453592,                      massDimensions],
+                'stone': [6.35029,                       massDimensions],
 
                  'acre': [4047,                          areaDimensions],
               'hectare': [1e4,                           areaDimensions],
@@ -136,16 +136,16 @@ const conversionDescriptors: ConversionDescriptors = {
             'terameter': [1e12,                          lengthDimensions],
             'petameter': [1e15,                          lengthDimensions],
 
-            'femtogram': [1e-18,                         weightDimensions],
-             'picogram': [1e-15,                         weightDimensions],
-             'nanogram': [1e-12,                         weightDimensions],
-            'microgram': [1e-9,                          weightDimensions],
-            'milligram': [1e-6,                          weightDimensions],
-             'kilogram': [1,                             weightDimensions],
-             'megagram': [1e3,                           weightDimensions],
-             'gigagram': [1e6,                           weightDimensions],
-             'teragram': [1e9,                           weightDimensions],
-             'petagram': [1e12,                          weightDimensions],
+            'femtogram': [1e-18,                         massDimensions],
+             'picogram': [1e-15,                         massDimensions],
+             'nanogram': [1e-12,                         massDimensions],
+            'microgram': [1e-9,                          massDimensions],
+            'milligram': [1e-6,                          massDimensions],
+             'kilogram': [1,                             massDimensions],
+             'megagram': [1e3,                           massDimensions],
+             'gigagram': [1e6,                           massDimensions],
+             'teragram': [1e9,                           massDimensions],
+             'petagram': [1e12,                          massDimensions],
 
            'milliliter': [1e-6,                          volumeDimensions],
            'centiliter': [1e-5,                          volumeDimensions],
