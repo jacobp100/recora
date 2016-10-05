@@ -1,13 +1,14 @@
 {
   "name": "recora",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "ava",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "lint": "eslint --config .eslintrc.js src",
-    "cli": "babel-node src/cli"
+    "cli": "babel-node src/cli",
+    "build": "rm -rf lib; cp -R src lib; babel src --out-dir lib"
   },
   "keywords": [],
   "author": "",

@@ -6,7 +6,7 @@ import enTokenizerLocale from './tokenizerLocales/en';
 import transformer from './transformer';
 import { resolver, defaultContext } from './modules/math';
 import defaultFormatter from './modules/math-formatter';
-import units from '../data/units';
+import units from './units';
 import type { Tokenizer } from './modules/tokenizer/types';
 import type { ResolverContext } from './modules/math/types';
 import type { Formatter } from './modules/math-formatter/types';

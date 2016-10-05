@@ -1,6 +1,6 @@
 // @flow
 import { findIndex, last } from 'lodash/fp';
-import type { ConversionDescriptors } from '../src/modules/math/types';
+import type { ConversionDescriptors } from './modules/math/types';
 
 const timeDimensions = { time: 1 };
 const lengthDimensions = { length: 1 };
