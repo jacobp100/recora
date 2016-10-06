@@ -1,5 +1,5 @@
 // @flow
-import { assignWith, flow, concat, compact, values } from 'lodash/fp';
+import { values } from 'lodash/fp';
 import {
   TOKEN_BRACKET_CLOSE,
   TOKEN_BRACKET_OPEN,
@@ -22,13 +22,12 @@ import {
 import * as functions from './modules/math/functions';
 import createTokenizer from './modules/tokenizer';
 import type { TokenizerSpec } from './modules/tokenizer/types';
+import { mergeTokenizerSpecs } from './tokenizerUtil';
 
 const functionNames = values(functions);
 
-const concatCompact = flow(concat, compact);
-
 /* eslint-disable max-len */
-export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompact, locale, {
+export default (locale: TokenizerSpec) => createTokenizer(mergeTokenizerSpecs(locale, {
   operator: [
     { match: '**', token: { type: TOKEN_OPERATOR_EXPONENT }, penalty: -1000 },
     { match: '^', token: { type: TOKEN_OPERATOR_EXPONENT }, penalty: -1000 },

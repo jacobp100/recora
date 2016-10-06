@@ -1,5 +1,5 @@
 // @flow
-import { map, flow, has, join, range } from 'lodash/fp';
+import { map, flow, has, join, range, concat, compact, assignWith } from 'lodash/fp';
 import type { TokenizerSpecEntry, TokenResult } from './modules/tokenizer/types';
 
 const wordRegexpCreator: (words: number) => RegExp = flow(
@@ -31,6 +31,9 @@ type WordRegexpMatcher = {
   match: RegExp,
   matchIndex: number,
 };
+
+const concatCompact = flow(concat, compact);
+export const mergeTokenizerSpecs = assignWith(concatCompact);
 
 export const customWordMatcher = ({
   dictionary,

@@ -2,7 +2,7 @@
 import { flow, reject, map, pick } from 'lodash/fp';
 import { TOKEN_NOOP } from './tokenTypes';
 import createTokenizerWithLocale from './tokenizer';
-import enTokenizerLocale from './tokenizerLocales/en';
+import createEnTokenizerLocale from './tokenizerLocales/en';
 import transformer from './transformer';
 import { resolver, defaultContext } from './modules/math';
 import defaultFormatter from './modules/math-formatter';
@@ -22,9 +22,12 @@ export default class Recora {
   resolverContext: ResolverContext
   resolver: typeof resolver
   formatter: Formatter
+  userConstants: Object = {}
 
   constructor({ locale = 'en' }: { locale: string } = {}) {
-    const tokenizer = createTokenizerWithLocale(enTokenizerLocale);
+    const tokenizer = createTokenizerWithLocale(createEnTokenizerLocale({
+      userConstants: this.userConstants,
+    }));
     this.tokenizer = tokenizer;
 
     const resolverContext = defaultContext.setUnits(units);
@@ -32,6 +35,14 @@ export default class Recora {
     this.resolver = resolver.setContext(resolverContext);
 
     this.formatter = defaultFormatter.setLocale(locale);
+  }
+
+  setConstants(userConstants: Object) {
+    this.userConstants = userConstants;
+    const tokenizer = createTokenizerWithLocale(createEnTokenizerLocale({
+      userConstants: this.userConstants,
+    }));
+    this.tokenizer = tokenizer;
   }
 
   getResult(text: string) {

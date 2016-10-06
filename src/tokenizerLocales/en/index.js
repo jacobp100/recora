@@ -1,5 +1,5 @@
 // @flow
-import { keys } from 'lodash/fp';
+import { keys, concat } from 'lodash/fp';
 import constants from '../../modules/math/constants';
 import type { TokenizerSpec } from '../../modules/tokenizer/types';
 import {
@@ -7,32 +7,19 @@ import {
 } from '../../tokenTypes';
 import unit from './unit';
 import date from './date';
+import { mergeTokenizerSpecs } from '../../tokenizerUtil';
 
 
 const numberReString = '\\d(?:,\\d|\\d)*(?:\\.\\d+)?';
 const toNumber = value => Number(value.replace(/,/g, '') || 0);
 
-/* eslint-disable max-len */
-const enLocale: TokenizerSpec = {
+const baseEnLocale: TokenizerSpec = {
   number: [
     {
       // Don't match commas when you write `add(1, 1)`
       match: new RegExp(numberReString),
       token: token => ({ type: TOKEN_NUMBER, value: toNumber(token) }),
       penalty: -1000,
-    },
-  ],
-  constant: [
-    {
-      match: new RegExp(`(${keys(constants).join('|')})(\\^${numberReString}|)\\b`, 'i'),
-      token: (token, tokens) => ({
-        type: TOKEN_CONSTANT,
-        value: {
-          value: constants[tokens[1]],
-          power: tokens[2] ? toNumber(tokens[2].substring(1)) : 1,
-        },
-      }),
-      penalty: -5000,
     },
   ],
   percent: [
@@ -69,6 +56,30 @@ const enLocale: TokenizerSpec = {
   unit,
   date,
 };
+
+/* eslint-disable max-len */
+const createEnLocale = ({
+  userConstants,
+}: {
+  userConstants: Object
+}): TokenizerSpec => mergeTokenizerSpecs(baseEnLocale, {
+  constant: [
+    {
+      match: new RegExp(
+        `(${concat(keys(constants), keys(userConstants)).join('|')})(\\^${numberReString}|)\\b`,
+        'i'
+      ),
+      token: (token, [, name, power]) => ({
+        type: TOKEN_CONSTANT,
+        value: {
+          value: (name in userConstants ? userConstants[name] : constants[name]),
+          power: (power ? toNumber(power.substring(1)) : 1),
+        },
+      }),
+      penalty: -5000,
+    },
+  ],
+});
 /* eslint-enable */
 
-export default enLocale;
+export default createEnLocale;
