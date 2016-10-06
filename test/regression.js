@@ -123,6 +123,16 @@ const stringResult = (t, input, expected) => {
   t.is(actual, expected);
 };
 
+const doesNotCrash = (t, input) => {
+  t.plan(1);
+  try {
+    parse(input);
+    t.pass();
+  } catch (e) {
+    t.fail();
+  }
+};
+
 // const noResult = (t, input) => {
 //   t.plan(1);
 //   const actual = parse(input);
@@ -318,10 +328,6 @@ test('relative date math', dateResult, '2 weeks ago', { date: 18, month: 12, yea
 test('relative date math', dateResult, '13 hours from now', { hour: 13, date: 1, month: 1, year: 1970 });
 // test('relative date math', dateResult, '2 weeks ago until next week in days', 21 days);
 // test('relative dates', 'next week to days', 7 days);
-// test('should not crash with', entityResult, 'sin', );
-// test('should not crash with', entityResult, 'sin(', );
-// test('should not crash with', entityResult, 'sin(2 * )', );
-// test('should not crash with', entityResult, '1 *', );
 test('parse colours', colorResult, '#f00', '#ff0000');
 test('colour constructors', colorResult, 'rgb(128, 0, 0)', '#800000');
 test('colour constructors', colorResult, 'rgb(50%, 0%, 0%)', '#800000');
@@ -359,4 +365,8 @@ test('colour functions', colorResult, 'darken(hsl(0, 100%, 100), 50%)', '#ff0000
 test('colour functions', colorResult, 'darken(hsl(0, 100%, 50%), 25%)', '#800000');
 // test('test', colorResult, 'red', #ff0000);
 // test('test', colorResult, 'red + lime', #ffff0);
+test('should not crash with', doesNotCrash, 'sin');
+test('should not crash with', doesNotCrash, 'sin(');
+test('should not crash with', doesNotCrash, 'sin(2 * )');
+test('should not crash with', doesNotCrash, '1 *');
 /* eslint-enable */
