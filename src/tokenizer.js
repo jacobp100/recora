@@ -1,6 +1,7 @@
 // @flow
 import { values } from 'lodash/fp';
 import {
+  TOKEN_ASSIGNMENT,
   TOKEN_BRACKET_CLOSE,
   TOKEN_BRACKET_OPEN,
   TOKEN_COLOR,
@@ -37,6 +38,16 @@ export default (locale: TokenizerSpec) => createTokenizer(mergeTokenizerSpecs(lo
     { match: '-', token: { type: TOKEN_OPERATOR_SUBTRACT }, penalty: -1000 },
     { match: '-', token: { type: TOKEN_OPERATOR_NEGATE }, penalty: -500 },
     { match: '!', token: { type: TOKEN_OPERATOR_FACTORIAL }, penalty: -500 },
+  ],
+  assignment: [
+    // Must override reassignment,
+    // Say if you do test = 5 and then test = 6
+    // we need to override the possibility of (test: constant) (=: noop) (6: number)
+    {
+      match: /(\w+)\s*=/,
+      token: (token, [, identifier]) => ({ type: TOKEN_ASSIGNMENT, value: identifier }),
+      penalty: -10000,
+    },
   ],
   percent: [
     { match: '%', token: { type: TOKEN_PERCENTAGE }, penalty: -1000 },
@@ -114,6 +125,7 @@ export default (locale: TokenizerSpec) => createTokenizer(mergeTokenizerSpecs(lo
   ],
   default: [
     { ref: 'operator' },
+    { ref: 'assignment' },
     { ref: 'percent' },
     { ref: 'number' },
     { ref: 'unit' },

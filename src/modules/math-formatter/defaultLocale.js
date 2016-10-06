@@ -2,7 +2,9 @@
 import { flow, toPairs, map, join } from 'lodash/fp';
 import Color from 'color-forge';
 import { dateTimeToUTCUnix } from '../math/util/date';
-import { NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME, NODE_COLOR } from '../math/types';
+import {
+  NODE_ASSIGNMENT, NODE_ENTITY, NODE_COMPOSITE_ENTITY, NODE_DATE_TIME, NODE_COLOR,
+} from '../math/types';
 import type { Locale } from './types';
 
 const hsxFormatter = ([hue, a, b]) => [hue, `${a}%`, `${b}%`];
@@ -12,6 +14,9 @@ const colorFormatters = {
 };
 
 const defaultFormatter: Locale = {
+  [NODE_ASSIGNMENT]: (context, assignment) => (
+    `${assignment.identifier} = ${context.formatter.format(context, assignment.value)}`
+  ),
   [NODE_ENTITY]: (context, entity) => {
     const unitsString = flow(
       toPairs,

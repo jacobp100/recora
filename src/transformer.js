@@ -9,6 +9,7 @@ import {
   TOKEN_OPERATOR_FACTORIAL,
 } from './tokenTypes';
 import createTransformer from './modules/transformer';
+import assignmentTransform from './transformers/assignmentTransform';
 import bracketTransform from './transformers/bracketTransform';
 import commaTransform from './transformers/commaTransform';
 import {
@@ -22,6 +23,7 @@ import remainingTokensTransform from './transformers/remainingTokensTransform';
 import miscGroupTransform from './transformers/miscGroupTransform';
 
 export default createTransformer([
+  assignmentTransform,
   conversionTransform,
   bracketTransform,
   commaTransform,

@@ -3,11 +3,11 @@ import { set, get, map, forEach } from 'lodash/fp';
 import { set as setMut } from 'lodash';
 import functions from './functions/definitions';
 import {
-  NODE_BRACKETS, NODE_FUNCTION, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY, NODE_COLOR,
-  NODE_DATE_TIME, NODE_PERCENTAGE, NODE_COMPOSITE_ENTITY,
+  NODE_BRACKETS, NODE_FUNCTION, NODE_ASSIGNMENT, NODE_MISC_GROUP, NODE_CONVERSION, NODE_ENTITY,
+  NODE_COLOR, NODE_DATE_TIME, NODE_PERCENTAGE, NODE_COMPOSITE_ENTITY, baseAssignment,
 } from './types';
 import type { // eslint-disable-line
-  ResolverContext, Node, BracketsNode, FunctionNode, MiscGroupNode, ConversionNode,
+  ResolverContext, Node, BracketsNode, FunctionNode, AssignmentNode, MiscGroupNode, ConversionNode,
 } from './types';
 import { resolve as miscGroupResolve } from './types/miscGroup';
 import { convert as conversionConvert } from './types/conversion';
@@ -49,6 +49,14 @@ const resolver = {
         if (!resolvedValue) return null;
 
         return conversionConvert(context, value, resolvedValue);
+      }
+      case NODE_ASSIGNMENT: {
+        const assignmentNode: AssignmentNode = value;
+
+        const resolvedValue = this.resolve(assignmentNode.value);
+        if (!resolvedValue) return null;
+
+        return { ...baseAssignment, value: resolvedValue, identifier: assignmentNode.identifier };
       }
       case NODE_DATE_TIME:
         return dateTimeResolveDefaults(this.context, value);

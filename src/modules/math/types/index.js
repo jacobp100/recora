@@ -58,6 +58,12 @@ export const NODE_FUNCTION = 'NODE_FUNCTION';
 export const baseFunction: FunctionNode =
   { type: NODE_FUNCTION, name: '', args: [] };
 
+export type AssignmentNode = Node &
+  { type: 'NODE_ASSIGNMENT', identifier: string, value: ?Node };
+export const NODE_ASSIGNMENT = 'NODE_ASSIGNMENT';
+export const baseAssignment: AssignmentNode =
+  { type: NODE_ASSIGNMENT, identifier: '', value: null };
+
 export type MiscGroupNode = Node &
   { type: 'NODE_MISC_GROUP', value: Node[] };
 export const NODE_MISC_GROUP = 'NODE_MISC_GROUP';
