@@ -74,7 +74,7 @@ export default class Recora {
 
     return {
       text,
-      result,
+      value: result,
       pretty: formatter.format(resolverContext, result),
       tokens: cleanTokens(tokens),
     };

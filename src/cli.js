@@ -16,7 +16,7 @@ const processInput = input => {
 
   console.log(value ? value.pretty : '(no result)'); // eslint-disable-line
 
-  const result = value && value.result;
+  const result = value && value.value;
   if (result && result.type === NODE_ASSIGNMENT) {
     recora.setConstant(result.identifier, result.value);
   }
