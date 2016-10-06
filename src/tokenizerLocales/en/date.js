@@ -9,7 +9,6 @@ import {
   TOKEN_BRACKET_OPEN,
   TOKEN_BRACKET_CLOSE,
   TOKEN_DATE_TIME,
-  TOKEN_DATE_TIME_BACKWARDS,
 } from '../../tokenTypes';
 import { propagateNull } from '../../util';
 
@@ -104,7 +103,7 @@ const createTransformer = transformers => (match, matches): ?TokenBase => {
   if (!valueMatches) return null;
   const { value } = valueMatches;
 
-  return { type: TOKEN_DATE_TIME, value };
+  return { type: TOKEN_DATE_TIME, value: { value, directionHint: 1 } };
 };
 
 const createDateMatcher = (transformers, penalty) => ({
@@ -115,7 +114,7 @@ const createDateMatcher = (transformers, penalty) => ({
 
 const createRelativeDate = (count, unit) => [
   { type: TOKEN_BRACKET_OPEN },
-  { type: TOKEN_DATE_TIME, value: defaultValue },
+  { type: TOKEN_DATE_TIME, value: { value: defaultValue, directionHint: 1 } },
   { type: TOKEN_OPERATOR_ADD },
   { type: TOKEN_NUMBER, value: count },
   { type: TOKEN_UNIT_NAME, value: unit },
@@ -138,7 +137,7 @@ const dateSpec: TokenizerSpecEntries = [
   createDateMatcher([time], -20000),
   {
     match: /\bnow|today\b/i,
-    token: { type: TOKEN_DATE_TIME, value: defaultValue },
+    token: { type: TOKEN_DATE_TIME, value: { value: defaultValue, directionHint: 1 } },
     penalty: -500,
   },
   {
@@ -155,7 +154,7 @@ const dateSpec: TokenizerSpecEntries = [
   },
   {
     match: /\bago\b/i,
-    token: { type: TOKEN_DATE_TIME_BACKWARDS, value: defaultValue },
+    token: { type: TOKEN_DATE_TIME, value: { value: defaultValue, directionHint: -1 } },
     penalty: -500,
   },
   {

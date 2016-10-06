@@ -48,6 +48,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
   virtualUnit: [
     { match: /(rgb|hs[lv])a?/i, token: token => ({ type: TOKEN_PSEUDO_UNIT, value: token }), penalty: -1500 },
   ],
+  constant: [],
   formattingHint: [],
   color: [
     { match: /#[0-9a-f]{3,8}/i, token: token => ({ type: TOKEN_COLOR, value: token }), penalty: -1000 },
@@ -70,7 +71,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
           second: date.getSeconds(),
           timezone: 'UTC',
         };
-        return { type: TOKEN_DATE_TIME, value };
+        return { type: TOKEN_DATE_TIME, value: { value, directionHint: 1 } };
       },
       penalty: -50000, // Has to beat multiple numbers
     },
@@ -118,6 +119,7 @@ export default (locale: TokenizerSpec) => createTokenizer(assignWith(concatCompa
     { ref: 'number' },
     { ref: 'unit' },
     { ref: 'virtualUnit' },
+    { ref: 'constant' },
     { ref: 'formattingHint' },
     { ref: 'color' },
     { ref: 'date' },

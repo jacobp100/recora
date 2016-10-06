@@ -1,18 +1,38 @@
 // @flow
+import { keys } from 'lodash/fp';
+import constants from '../../modules/math/constants';
 import type { TokenizerSpec } from '../../modules/tokenizer/types';
-import { TOKEN_NUMBER, TOKEN_PERCENTAGE, TOKEN_FORMATTING_HINT } from '../../tokenTypes';
+import {
+  TOKEN_NUMBER, TOKEN_CONSTANT, TOKEN_PERCENTAGE, TOKEN_FORMATTING_HINT,
+} from '../../tokenTypes';
 import unit from './unit';
 import date from './date';
 
+
+const numberReString = '\\d(?:,\\d|\\d)*(?:\\.\\d+)?';
+const toNumber = value => Number(value.replace(/,/g, '') || 0);
 
 /* eslint-disable max-len */
 const enLocale: TokenizerSpec = {
   number: [
     {
       // Don't match commas when you write `add(1, 1)`
-      match: /\d(?:,\d|\d)*(?:\.\d+)?/i,
-      token: token => ({ type: TOKEN_NUMBER, value: Number(token.replace(/,/g, '')) }),
+      match: new RegExp(numberReString),
+      token: token => ({ type: TOKEN_NUMBER, value: toNumber(token) }),
       penalty: -1000,
+    },
+  ],
+  constant: [
+    {
+      match: new RegExp(`(${keys(constants).join('|')})(\\^${numberReString}|)\\b`, 'i'),
+      token: (token, tokens) => ({
+        type: TOKEN_CONSTANT,
+        value: {
+          value: constants[tokens[1]],
+          power: tokens[2] ? toNumber(tokens[2].substring(1)) : 1,
+        },
+      }),
+      penalty: -5000,
     },
   ],
   percent: [
