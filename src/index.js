@@ -1,5 +1,5 @@
 // @flow
-import { flow, reject, map, pick } from 'lodash/fp';
+import { flow, reject, map, pick, set } from 'lodash/fp';
 import { TOKEN_NOOP } from './tokenTypes';
 import createTokenizerWithLocale from './tokenizer';
 import createEnTokenizerLocale from './tokenizerLocales/en';
@@ -43,6 +43,11 @@ export default class Recora {
       userConstants: this.userConstants,
     }));
     this.tokenizer = tokenizer;
+    return this;
+  }
+
+  setConstant(identifier: string, value: any) {
+    return this.setConstants(set(identifier, value, this.userConstants));
   }
 
   getResult(text: string) {
