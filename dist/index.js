@@ -205,7 +205,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports) {
 
-	module.exports = lodash/fp;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ },
 /* 2 */
@@ -273,8 +273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var functionNames = (0, _fp.values)(functions);
 	
 	/* eslint-disable max-len */
-	
-	(function (locale) {
+	var createTokenizerWithLocale = function createTokenizerWithLocale(locale) {
 	  return (0, _tokenizer2.default)((0, _tokenizerUtil.mergeTokenizerSpecs)(locale, {
 	    operator: [{ match: '**', token: { type: _tokenTypes.TOKEN_OPERATOR_EXPONENT }, penalty: -1000 }, { match: '^', token: { type: _tokenTypes.TOKEN_OPERATOR_EXPONENT }, penalty: -1000 }, { match: /\*(?!\*)/, token: { type: _tokenTypes.TOKEN_OPERATOR_MULTIPLY }, penalty: -1000 }, { match: '/', token: { type: _tokenTypes.TOKEN_OPERATOR_DIVIDE }, penalty: -1000 }, { match: '+', token: { type: _tokenTypes.TOKEN_OPERATOR_ADD }, penalty: -1000 }, { match: '-', token: { type: _tokenTypes.TOKEN_OPERATOR_SUBTRACT }, penalty: -1000 }, { match: '-', token: { type: _tokenTypes.TOKEN_OPERATOR_NEGATE }, penalty: -500 }, { match: '!', token: { type: _tokenTypes.TOKEN_OPERATOR_FACTORIAL }, penalty: -500 }],
 	    assignment: [
@@ -361,8 +360,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }), {
 	    bracketLevel: 0
 	  });
-	});
+	};
 	/* eslint-enable */
+	
+	exports.default = createTokenizerWithLocale;
 
 /***/ },
 /* 4 */
@@ -3392,7 +3393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 32 */
 /***/ function(module, exports) {
 
-	module.exports = color-forge;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_32__;
 
 /***/ },
 /* 33 */
@@ -3617,7 +3618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 36 */
 /***/ function(module, exports) {
 
-	module.exports = lodash;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_36__;
 
 /***/ },
 /* 37 */
@@ -4073,7 +4074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 46 */
 /***/ function(module, exports) {
 
-	module.exports = timezone/loaded;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_46__;
 
 /***/ },
 /* 47 */
@@ -4286,13 +4287,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 50 */
 /***/ function(module, exports) {
 
-	module.exports = gamma;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_50__;
 
 /***/ },
 /* 51 */
 /***/ function(module, exports) {
 
-	module.exports = mathp;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_51__;
 
 /***/ },
 /* 52 */

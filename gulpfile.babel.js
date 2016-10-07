@@ -155,7 +155,7 @@ gulp.task('build', ['data'], (cb) => {
     },
     externals: (context, request, cb) => {
       if (!/^\./.test(request)) {
-        cb(null, `var ${request}`);
+        cb(null, request);
       } else {
         cb();
       }

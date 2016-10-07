@@ -2,7 +2,7 @@
   "name": "recora",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "ava",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",

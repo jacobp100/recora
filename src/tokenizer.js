@@ -28,7 +28,7 @@ import { mergeTokenizerSpecs } from './tokenizerUtil';
 const functionNames = values(functions);
 
 /* eslint-disable max-len */
-export default (locale: TokenizerSpec) => createTokenizer(mergeTokenizerSpecs(locale, {
+const createTokenizerWithLocale = (locale: TokenizerSpec) => createTokenizer(mergeTokenizerSpecs(locale, {
   operator: [
     { match: '**', token: { type: TOKEN_OPERATOR_EXPONENT }, penalty: -1000 },
     { match: '^', token: { type: TOKEN_OPERATOR_EXPONENT }, penalty: -1000 },
@@ -144,3 +144,5 @@ export default (locale: TokenizerSpec) => createTokenizer(mergeTokenizerSpecs(lo
   bracketLevel: 0,
 });
 /* eslint-enable */
+
+export default createTokenizerWithLocale;
