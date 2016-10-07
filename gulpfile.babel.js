@@ -1,5 +1,7 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 import gulp from 'gulp';
+import path from 'path';
+import webpack from 'webpack';
 import del from 'del';
 import pluralize from 'pluralize';
 import {
@@ -7,11 +9,11 @@ import {
   first, flatMap, groupBy, omitBy, isNil, flatten, without, values,
 } from 'lodash/fp';
 import file from 'gulp-file';
-import units from './src/data/units';
-import en from './gulp-data/en';
+import units from './src/units';
+import en from './gulp-data/en.json';
 
 
-const enDataDir = 'src/data/en';
+const enDataDir = 'data/en';
 const enMathFormattingDataDir = 'src/modules/math-formatter/data';
 
 
@@ -92,7 +94,7 @@ gulp.task('en-data', ['clean-en-data'], () => {
   return file([
     ...xWordUnitsFiles,
     abbreviationsFile,
-  ])
+  ], { src: true })
     .pipe(gulp.dest(enDataDir));
 });
 
@@ -114,10 +116,68 @@ gulp.task('en-math-formatting-data', ['clean-en-math-formatting-data'], () => {
   return file([
     { name: 'en-unit-formatting.json', source: JSON.stringify(formatting) },
     { name: 'en-unit-plurals.json', source: JSON.stringify(plurals) },
-  ])
+  ], { src: true })
     .pipe(gulp.dest(enMathFormattingDataDir));
 });
 
-gulp.task('data', ['en-data', 'en-math-formatting-data']);
+gulp.task('build', ['data'], (cb) => {
+  webpack({
+    context: __dirname,
+    entry: './src/index.js',
+    devtool: 'source-map',
+    output: {
+      path: path.join(__dirname, '/dist'),
+      filename: 'index.js',
+      library: 'recora',
+      libraryTarget: 'umd',
+    },
+    module: {
+      loaders: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel',
+          query: {
+            presets: ['latest'],
+            plugins: [
+              'transform-flow-strip-types',
+              'transform-object-rest-spread',
+              'transform-class-properties',
+              'transform-exponentiation-operator',
+            ],
+          },
+        },
+        {
+          test: /\.json$/,
+          loader: 'json',
+        },
+      ],
+    },
+    externals: (context, request, cb) => {
+      if (!/^\./.test(request)) {
+        cb(null, `var ${request}`);
+      } else {
+        cb();
+      }
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production'),
+        },
+      }),
+      new webpack.optimize.DedupePlugin(),
+    ],
+  }, (err, stats) => {
+    if (err) {
+      cb(err);
+    } else if (stats.hasErrors()) {
+      cb(new Error(stats.toJson('errors-only').errors[0]));
+    } else {
+      cb(null);
+    }
+  });
+});
 
-gulp.task('default', ['data']);
+gulp.task('data', ['en-data', 'en-math-formatting-data']);
+gulp.task('default', ['build']);
