@@ -4876,7 +4876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	var isCurrency = function isCurrency(context, entity) {
-	  return !entity.formatting.base && !entity.formatting.decimalPlaces && !entity.formatting.significantFigures && (0, _fp.isEqual)((0, _entity.convertToFundamentalUnits)(context, entity), { EUR: 1 });
+	  return !entity.formatting.base && !entity.formatting.decimalPlaces && !entity.formatting.significantFigures && (0, _fp.isEqual)((0, _entity.getFundamentalUnits)(context, entity.units), { EUR: 1 });
 	};
 	
 	var formatCurrency = function formatCurrency(context, entity) {
