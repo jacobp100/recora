@@ -122,6 +122,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  _createClass(Recora, [{
+	    key: 'setCustomUnits',
+	    value: function setCustomUnits(customUnits) {
+	      var newUnits = (0, _fp.assign)(_units2.default, customUnits);
+	      this.resolverContext = this.resolverContext.setUnits(newUnits);
+	      this.resolver = this.resolver.setContext(this.resolverContext);
+	    }
+	  }, {
 	    key: 'setConstants',
 	    value: function setConstants(userConstants) {
 	      this.userConstants = userConstants;

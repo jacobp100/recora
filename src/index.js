@@ -1,5 +1,5 @@
 // @flow
-import { flow, reject, map, pick, set } from 'lodash/fp';
+import { flow, reject, map, pick, set, assign } from 'lodash/fp';
 import { TOKEN_NOOP } from './tokenTypes';
 import createTokenizerWithLocale from './tokenizer';
 import createEnTokenizerLocale from './tokenizerLocales/en';
@@ -35,6 +35,12 @@ export default class Recora {
     this.resolver = resolver.setContext(resolverContext);
 
     this.formatter = defaultFormatter.setLocale(locale);
+  }
+
+  setCustomUnits(customUnits: Object) {
+    const newUnits = assign(units, customUnits);
+    this.resolverContext = this.resolverContext.setUnits(newUnits);
+    this.resolver = this.resolver.setContext(this.resolverContext);
   }
 
   setConstants(userConstants: Object) {
