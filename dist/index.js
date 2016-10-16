@@ -137,6 +137,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.setConstants((0, _fp.set)(identifier, value, this.userConstants));
 	    }
 	  }, {
+	    key: 'setDate',
+	    value: function setDate(dateObject) {
+	      this.resolverContext = this.resolverContext.setDate(dateObject);
+	      this.resolver = this.resolver.setContext(this.resolverContext);
+	    }
+	  }, {
 	    key: 'getResult',
 	    value: function getResult(text) {
 	      var tokenizer = this.tokenizer;
@@ -4776,9 +4782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _enFormatter;
 	
-	var _loaded = __webpack_require__(46);
-	
-	var _loaded2 = _interopRequireDefault(_loaded);
+	var _fp = __webpack_require__(1);
 	
 	var _types = __webpack_require__(9);
 	
@@ -4790,6 +4794,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
+	var formatZeros = (0, _fp.flow)(String, (0, _fp.padCharsStart)('0', 2));
+	var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'];
+	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	
 	var enFormatter = (_enFormatter = {}, _defineProperty(_enFormatter, _types.NODE_ENTITY, _entity2.default), _defineProperty(_enFormatter, _types.NODE_DATE_TIME, function (context, dateTime) {
 	  var _dateTime$value = dateTime.value;
 	  var year = _dateTime$value.year;
@@ -4797,10 +4805,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var date = _dateTime$value.date;
 	  var hour = _dateTime$value.hour;
 	  var minute = _dateTime$value.minute;
-	  var second = _dateTime$value.second;
 	  var timezone = _dateTime$value.timezone;
 	
-	  return (0, _loaded2.default)([year, month, date, hour, minute, second], 'en_GB', '%c', timezone);
+	  var day = days[new Date(year, month - 1, date).getDay()];
+	  var time = formatZeros(hour) + ':' + formatZeros(minute);
+	  var tz = timezone === 'UTC' ? '' : ' (' + timezone + ')';
+	  return time + ' ' + day + ' ' + date + ' ' + months[month - 1] + ' ' + year + tz;
 	}), _enFormatter);
 	exports.default = enFormatter;
 

@@ -50,6 +50,11 @@ export default class Recora {
     return this.setConstants(set(identifier, value, this.userConstants));
   }
 
+  setDate(dateObject: Date) {
+    this.resolverContext = this.resolverContext.setDate(dateObject);
+    this.resolver = this.resolver.setContext(this.resolverContext);
+  }
+
   getResult(text: string) {
     const { tokenizer, resolver } = this;
 
