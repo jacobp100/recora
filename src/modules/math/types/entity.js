@@ -10,7 +10,7 @@ import type { // eslint-disable-line
 } from '.';
 import type { Curry2, Curry3 } from '../../../utilTypes';
 import { propagateNull, mapUnlessNull } from '../../../util';
-import baseDimensions from '../../../../data/baseDimensions';
+import baseDimensions from '../../../../data/baseDimensions.json';
 
 const getConversionDescriptor = (
   context: ResolverContext,

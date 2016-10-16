@@ -1,7 +1,7 @@
 // @flow
 import { isEqual, toPairs, reduce, stubTrue, cond, getOr } from 'lodash/fp';
 import type { EntityNode, ResolverContext } from '../../math/types';
-import { convertToFundamentalUnits } from '../../math/types/entity';
+import { getFundamentalUnits } from '../../math/types/entity';
 import unitFormatting from '../data/en-unit-formatting.json';
 import unitPlurals from '../data/en-unit-plurals.json';
 import { formatPower, orderOfMagnitude } from '../util';
@@ -45,7 +45,7 @@ const isCurrency = (context, entity) =>
   !entity.formatting.base &&
   !entity.formatting.decimalPlaces &&
   !entity.formatting.significantFigures &&
-  isEqual(convertToFundamentalUnits(context, entity), { EUR: 1 });
+  isEqual(getFundamentalUnits(context, entity.units), { EUR: 1 });
 
 const formatCurrency = (context, entity) =>
   formatUnits(entity.quantity.toFixed(2), entity);
