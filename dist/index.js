@@ -5260,7 +5260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return entity.quantity + ' ' + unitsString;
 	}), _defineProperty(_defaultFormatter, _types.NODE_COMPOSITE_ENTITY, function (context, compositeEntity) {
 	  var formattedEntities = (0, _fp.map)(function (entity) {
-	    return context.formatter.format(entity);
+	    return context.formatter.format(context, entity);
 	  }, compositeEntity.value);
 	  return formattedEntities.join(' ');
 	}), _defineProperty(_defaultFormatter, _types.NODE_COLOR, function (context, color) {

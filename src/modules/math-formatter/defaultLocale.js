@@ -27,7 +27,7 @@ const defaultFormatter: Locale = {
   },
   [NODE_COMPOSITE_ENTITY]: (context, compositeEntity) => {
     const formattedEntities = map(entity => (
-      context.formatter.format(entity)
+      context.formatter.format(context, entity)
     ), compositeEntity.value);
     return formattedEntities.join(' ');
   },
