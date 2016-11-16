@@ -56,7 +56,7 @@ export default class Recora {
     return this.setConstants(set(identifier, value, this.userConstants));
   }
 
-  setDate(dateObject: Date) {
+  setDate(dateObject: Object) {
     this.resolverContext = this.resolverContext.setDate(dateObject);
     this.resolver = this.resolver.setContext(this.resolverContext);
   }

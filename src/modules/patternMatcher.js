@@ -1,6 +1,7 @@
 // @flow
 /* globals Generator */
 import { set, map, includes } from 'lodash/fp';
+import type { TokenNode, CaptureGroup } from './transformer/types';
 
 type CaptureRange = [number, number];
 type MatchStack = { index: number, captureRanges: CaptureRange[], array: string[] }
@@ -44,7 +45,7 @@ class BaseMatcher {
     return set('isLazy', true, this);
   }
 
-  match(tokens) {
+  match(tokens: TokenNode[]): ?(CaptureGroup[]) {
     const types = map('type', tokens);
 
     const matchStack = { index: 0, captureRanges: [], array: types };

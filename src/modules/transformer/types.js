@@ -11,6 +11,6 @@ export type TransformTokenFunction =
   (captureGroupsToTransform: CaptureGroup[], transform: TransformFunction) => ?TransformResult;
 export type CaptureGroupFunction = (tokens: TokenNode[]) => ?(CaptureGroup[]);
 export type Transformer = {
-  pattern: { match: CaptureGroupFunction },
+  pattern: { +match: CaptureGroupFunction },
   transform: (captureGroups: CaptureGroup[], transform: TransformTokenFunction) => ?TransformResult,
 };
