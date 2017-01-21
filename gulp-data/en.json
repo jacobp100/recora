@@ -83,6 +83,9 @@
   "angstrom": {
     "format": [" Å", "suffix"]
   },
+  "mile": {
+    "abbreviations": ["mi"]
+  },
 
   "liter": {
     "alternates": ["litre"],
@@ -94,6 +97,9 @@
   },
   "centiliter": {
     "alternates": ["centilitre"]
+  },
+  "gallon": {
+    "abbreviations": ["gal"]
   },
 
   "teaspoon": {
