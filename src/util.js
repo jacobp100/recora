@@ -1,5 +1,5 @@
 // @flow
-import { curry, flatten, isArray } from 'lodash/fp';
+import { curry, flatten, isArray, reduceRight as oddReduceRight, flip } from 'lodash/fp';
 import type { Curry2 } from './utilTypes';
 
 type EveryOtherForm<T> = (startIndex: number) => (array: T[]) => T[];
@@ -66,3 +66,5 @@ export const singleArrayValue: UncastArray<any> = value => {
   return null;
 };
 
+// Lodash flips the argument here
+export const reduceRight = (cb, a, b) => oddReduceRight(flip(cb), a, b);

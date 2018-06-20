@@ -1,10 +1,10 @@
 // @flow
-import { first, last, reduce, map, reduceRight, update, multiply, get } from 'lodash/fp';
+import { first, last, reduce, map, update, multiply, get } from 'lodash/fp';
 import { NODE_MISC_GROUP } from '../modules/math/types';
 import type { EntityNode, Node, MiscGroupNode } from '../modules/math/types'; // eslint-disable-line
 import type { TokenNode } from '../modules/transformer/types';
 import { TOKEN_UNIT_NAME, TOKEN_UNIT_PREFIX, TOKEN_UNIT_SUFFIX } from '../tokenTypes';
-import { propagateNull } from '../util';
+import { propagateNull, reduceRight } from '../util';
 
 export const INTERMEDIATE_UNIT = 'INTERMEDIATE_UNIT';
 

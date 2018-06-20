@@ -1,6 +1,6 @@
 // @flow
 import {
-  first, last, reduce, zip, flow, map, isEmpty, dropRight, reduceRight, compact,
+  first, last, reduce, zip, flow, map, isEmpty, dropRight, compact,
 } from 'lodash/fp';
 import { Pattern, CaptureOptions } from '../modules/patternMatcher';
 import type { Transformer } from '../modules/transformer/types';
@@ -24,7 +24,13 @@ import {
   FUNCTION_NEGATE,
   FUNCTION_FACTORIAL,
 } from '../modules/math/functions';
-import { propagateNull, evenIndexElements, oddIndexElements, singleArrayValue } from '../util';
+import {
+  propagateNull,
+  evenIndexElements,
+  oddIndexElements,
+  singleArrayValue,
+  reduceRight,
+} from '../util';
 import { compactMiscGroup } from './util';
 
 type Direction = number;
